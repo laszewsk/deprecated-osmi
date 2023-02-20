@@ -23,6 +23,7 @@ import glob
 import os
 import re
 import subprocess
+import time
 import yaml
 from cloudmesh.common.StopWatch import StopWatch
 from cloudmesh.common.Shell import Shell
@@ -50,7 +51,7 @@ args = parser.parse_args()
 
 with open (args.outfn, 'w') as csvfile:
     cw = csv.writer(csvfile, delimiter=',')
-    cw.writerow("prg:Timestamp:GPU:Server:Concurrency:Model:# of Requests:BatchSize:Throughput (inf/s):Latency (ms)".split(":"))
+    cw.writerow("Timestamp:GPU:Server:Concurrency:Model:# of Requests:BatchSize:Throughput (inf/s):Theta:Latency (ms)".split(":"))
 
 extract = lambda x: float(re.findall('\d+.\d+', x)[0])
 
@@ -78,6 +79,8 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
             for ngpus in args.ngpus: # e.g. [1, 2, 4, 8]
                 print(f"ngpus: {ngpus}")
                 for concurrency in args.concurrency: # e.g. [1, 2, 4, 8, 16]
+                    StopWatch.start(f"concurrency-{concurrency}")
+                    start = time.perf_counter()
                     print(f"concurrency: {concurrency}")
                     proc = []
                     # filenames = []
@@ -95,6 +98,9 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
 
                     # Barrier 
                     exit_codes = [p.wait() for p in proc]
+                    
+                    t_concurrency = time.perf_counter()-start
+                    StopWatch.stop(f"concurrency-{concurrency}")
 
                     filenames = glob.glob(os.path.join(out_path, "results/log*"))
                     print(filenames)
@@ -111,13 +117,16 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                         
                         # Delete log files after getting perf metrics.
                         os.unlink(fn)
-                    
+
+                    # total throughput in samples per second - see Brewer et. al (2021) equation 1
+                    theta = throughput*batchsize/t_concurrency
                     avg_latency = latency/num_files
-                    print(f"throughput: {throughput:.2f}") 
+                    print(f"\nthroughput: {throughput:.2f}")
+                    print(f"theta: {theta:.2f}") 
                     print(f"avg latency: {avg_latency:.2f}")
                     with open(args.outfn, 'a') as csvfile:
                         cw = csv.writer(csvfile, delimiter=',')
-                        cw.writerow([timestamp, args.gpu, server_id, concurrency, model, nrequests, batchsize, throughput, avg_latency])
+                        cw.writerow([timestamp, args.gpu, server_id, concurrency, model, nrequests, batchsize, throughput, theta, avg_latency])    
             StopWatch.stop(f"batchsize-{batchsize}")
 StopWatch.stop("loop")
 StopWatch.benchmark()
