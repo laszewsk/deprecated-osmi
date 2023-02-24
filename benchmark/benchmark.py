@@ -16,7 +16,9 @@ from smi import SMI
 
 
 # gRPC
+#Start
 inference = SMI(model=args.model, hostport='localhost:8500').grpc(args.batch)
+#Stop
 
 # HTTP
 #inference = SMI(model=args.model, hostport='localhost:8501').http()
@@ -24,6 +26,7 @@ inference = SMI(model=args.model, hostport='localhost:8500').grpc(args.batch)
 # Embedded
 #inference = SMI(model=args.model).embedded(model_base_path="/ccs/home/whbrewer/surbench/models")
 
+#Start
 meta = models(args.batch)[args.model]
 input_shape = meta['input_shape']
 output_name = meta['output_name']
@@ -31,12 +34,17 @@ output_shape = meta['output_shape']
 dtype_name = meta['dtype'].__name__
 dtype_map = {'float64': 'double_val', 'float32': 'float_val'}
 dtype_method = dtype_map[dtype_name]
+#Stop
 
 times = []
 for _ in tqdm(range(args.num_requests)):
+    #Start
     data = np.array(np.random.random(input_shape))
+    #Stop
     tik = time.perf_counter()
+    #Start
     result = inference(data)
+    #Stop
     tok = time.perf_counter()
     if args.verbose:
         # following is for gRPC output
@@ -46,3 +54,4 @@ for _ in tqdm(range(args.num_requests)):
 elapsed = sum(times)
 average = elapsed/args.num_requests
 print(f"elapsed: {elapsed:.4f}s, avg: {average:.4f}s")
+StopWatch.benchmark()

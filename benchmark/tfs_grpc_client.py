@@ -18,11 +18,21 @@ parser.add_argument('-o', '--outfile', default='results.csv', help='name of outp
 parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
 parser.add_argument('-vv', action='store_true', help='extra verbose output')
 parser.add_argument('--redux', action='store_true', help='divide args.n by args.batch')
+parser.add_argument('-t', '--tqdm', action='store_true')
+# store true or false?
 args = parser.parse_args()
 
 import tensorflow as tf
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
+from cloudmesh.common.StopWatch import StopWatch
+
+def start(msg):
+    StopWatch.start(f"tfs_grpc_client-py {msg} model={args.model}, batch={args.batch}, num_requests={args.n}, outfile={args.outfile}, redux={args.redux}")
+
+def stop(msg):
+    StopWatch.stop(f"tfs_grpc_client-py {msg} model={args.model}, batch={args.batch}, num_requests={args.n}, outfile={args.outfile}, redux={args.redux}")
+
 
 hostport = args.server
 print(hostport)
@@ -47,8 +57,10 @@ models = {
 times = list()
 results = list()
 
+start("create data")
 data = np.array(np.random.random(models[args.model]['shape']), dtype=models[args.model]['dtype'])
 payload_size = data.nbytes
+stop("create data")
 print("payload size in bytes:", payload_size)
 
 assert payload_size < MAX_MESSAGE_LENGTH, f"Exceeded gRPC payload limit of {MAX_MESSAGE_LENGTH}"
@@ -58,7 +70,10 @@ if args.redux:
 else:
     num_requests = args.n
 
-for _ in tqdm(range(num_requests)):
+# flag to switch on/off tqdmt
+start("loop total")
+for i in tqdm(range(num_requests)) if tqdm else range(num_requests):
+    start(f"loop {i}")
     data = np.array(np.random.random(models[args.model]['shape']), dtype=models[args.model]['dtype'])
     tik = time.perf_counter()
     request = predict_pb2.PredictRequest()
@@ -69,7 +84,8 @@ for _ in tqdm(range(num_requests)):
     if args.vv: print(results[0])
     tok = time.perf_counter()
     times.append(tok - tik)
-
+    stop(f"loop {i}")
+stop("loop total")
 
 elapsed = sum(times)
 avg_inference_latency = elapsed/num_requests
@@ -78,6 +94,9 @@ throughput = 1/avg_inference_latency
 print(f"elapsed time: {elapsed:.1f}s | average inference latency: {avg_inference_latency:.3f}s | 99th percentile latency: {np.percentile(times, 99):.3f}s | ips: {1/avg_inference_latency:.1f}")
 print(f"throughput: {throughput}")
 print(f"latency: {avg_inference_latency}")
+
+StopWatch.event("client result", {"latency": avg_inference_latency, "throughput": throughput})
+StopWatch.benchmark()
 
 # write_header = True if not os.path.exists(args.outfile) else False
 
