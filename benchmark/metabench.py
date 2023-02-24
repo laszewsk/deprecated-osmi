@@ -103,7 +103,7 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                     # Barrier 
                     exit_codes = [p.wait() for p in proc]
                     
-                    t_concurrency = time.perf_counter()-start
+                    t_concurrency = time.perf_counter() - start
                     StopWatch.stop(f"concurrency-{concurrency}")
 
                     filenames = glob.glob(os.path.join(out_path, "results/log*"))
@@ -123,7 +123,7 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                         os.unlink(fn)
 
                     # total throughput in samples per second - see Brewer et. al (2021) equation 1
-                    theta = throughput*batchsize/t_concurrency
+                    theta = nrequests*batchsize*concurrency/t_concurrency
                     avg_latency = latency/num_files
                     print(f"\nthroughput: {throughput:.2f}")
                     print(f"theta: {theta:.2f}") 
@@ -133,8 +133,11 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                                                          "ngpus": ngpus, "concurrency": concurrency, "config file": config_file})
                     with open(args.outfn, 'a') as csvfile:
                         cw = csv.writer(csvfile, delimiter=',')
-                        cw.writerow([timestamp, args.gpu, server_id, concurrency, model, nrequests, batchsize, throughput, theta, avg_latency])    
+                        cw.writerow([timestamp, args.gpu, server_id, concurrency, model, \
+                                     nrequests, batchsize, throughput, theta, avg_latency])    
+
             StopWatch.stop(f"batchsize-{batchsize}")
+
 StopWatch.stop("loop")
 StopWatch.benchmark()
 StopWatch.benchmark(filename="metabench-{args.config}.log")
