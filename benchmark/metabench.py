@@ -120,7 +120,7 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                         os.unlink(fn)
 
                     # total throughput in samples per second - see Brewer et. al (2021) equation 1
-                    theta = nrequests*batchsize/t_concurrency
+                    theta = nrequests*batchsize*concurrency/t_concurrency
                     avg_latency = latency/num_files
                     print(f"\nthroughput: {throughput:.2f}")
                     print(f"theta: {theta:.2f}") 
