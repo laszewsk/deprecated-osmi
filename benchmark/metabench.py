@@ -55,8 +55,10 @@ with open (args.outfn, 'w') as csvfile:
 
 extract = lambda x: float(re.findall('\d+.\d+', x)[0])
 
+config_file = args.config
 if ".yaml" in args.server:
     # read and parse YAML file
+    config_file = args.server
     with open(args.server,'r') as f:
         sections = yaml.load(f.read(), Loader=yaml.FullLoader)
 
@@ -93,7 +95,9 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                             timestamp = datetime.datetime.now().time()
                             print(timestamp, cmd)
                             f = open(log_file,"w")
-                            proc.append(subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT, shell=True))
+                            proc.append(subprocess.Popen(cmd, stdout=f,
+                                                         stderr=subprocess.STDOUT,
+                                                         shell=True))
                             # filenames.append(f"log{server_id}.{client_rank}.txt")
 
                     # Barrier 
@@ -124,9 +128,13 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                     print(f"\nthroughput: {throughput:.2f}")
                     print(f"theta: {theta:.2f}") 
                     print(f"avg latency: {avg_latency:.2f}")
+                    StopWatch.event("metabench result", {"throughput": throughput, "theta": theta, "avg latency": avg_latency,
+                                                         "model": model, "number of requests": nrequests, "batchsize": batchsize,
+                                                         "ngpus": ngpus, "concurrency": concurrency, "config file": config_file})
                     with open(args.outfn, 'a') as csvfile:
                         cw = csv.writer(csvfile, delimiter=',')
                         cw.writerow([timestamp, args.gpu, server_id, concurrency, model, nrequests, batchsize, throughput, theta, avg_latency])    
             StopWatch.stop(f"batchsize-{batchsize}")
 StopWatch.stop("loop")
 StopWatch.benchmark()
+StopWatch.benchmark(filename="metabench-{args.config}.log")
