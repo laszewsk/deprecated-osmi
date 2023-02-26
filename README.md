@@ -128,7 +128,7 @@ TODO: complete
 
 ## Running OSMI benchmark on rivanna
 
-To run the OSMI benchmark, you will first need to generate the project directory with the code. We assume you are in the group `bii_dsc_community`. THis allows you access to the directory 
+To run the OSMI benchmark, you will first need to generate the project directory with the code. We assume you are in the group `bii_dsc_community`. THis allows you access to the directory
 
 ```/project/bii_dsc_community```
 
@@ -136,37 +136,32 @@ As well as the slurm partitions `gpu` and `bii_gpu`
 
 ## Set up a project directory and get the code
 
-To get the code we clone a gitlab instance that is hosted at Oakridge National Laboratory (<https://code.ornl.gov/whb/osmi-bench>). Firts you need to create a directory under your username in the project directory. We recommend to use your username. Follow these setps: 
+<!-- To get the code we clone a gitlab instance that is hosted at Oakridge National Laboratory (<https://code.ornl.gov/whb/osmi-bench>). -->
+To get the code we clone this github repository (https://github.com/laszewsk/osmi.git)  First you need to create a directory under your username in the project directory. We recommend to use your username. Follow these steps: 
 
 ```
 mkdir -p /project/bii_dsc_community/$USER/osmi
 cd /project/bii_dsc_community/$USER/osmi
-git clone git@github.com:DSC-SPIDAL/mlcommons-osmi.git
-git clone https://code.ornl.gov/whb/osmi-bench.git
-cd osmi-bench
+git clone https://github.com/laszewsk/osmi.git
+cd osmi
 ```
 
-## Set up Python via Miniforge and Conda
+## Set up Python via Conda
 
 Next we recommend that you set up python. Although Conda is not our favorite development environment, we use conda here out of convenience. In future we will also document here how to set OSMI up with an environment from python.org useing vanillla python installs.
 
-```
+<!-- ```
 rivanna> wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
 rivanna> bash Miniforge3-Linux-x86_64.sh
 rivanna> source ~/.bashrc
 rivanna> conda create -n osmi python=3.8
 rivanna> conda activate osmi
-```
-
-gregors version of this
+``` -->
 
 ```
 rivanna> module load anaconda
 rivanna> conda -V    # 4.9.2
 rivanna> anaconda -V # 1.7.2
-```
-
-```
 rivanna> conda create -n OSMI python=3.8
 rivanna> conda activate OSMI
 ```
@@ -189,46 +184,50 @@ Rivanna has two brimary modes so users can interact with it.
 
 Once you know hwo to create jobs with a propper batch script you will likely no longer need to use interactive jobs. We keep this documentation for beginners that like to experiement in interactive mode to develop batch scripts.
 
-We noticed that when running interactive jobs on compute node it makes writing to the files system a lot faster.
-TODO: This is inprecise as its not discussed which file system ... Also you can just use git to sync
-
-First, obtain an interactive job with 
+First, obtain an interactive job with
 
 ```
-rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=1-00:00:00
+rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00
 ```
 
 *note: use --partition=bii-gpu --gres=gpu:v100:n to recieve n v100 GPUs
-
-Next
-
-```
-node> cd /project/bii_dsc_community/$USER/osmi/osmi-bench/
-```
-
-Now edit requirements.txt to remove the version number from grpcio
-
-```
-node> pip install –-user  -r requirements.txt 
-```
 
 ```
 node> cd models
 node> python train.py small_lstm
 node> python train.py medium_cnn
 node> python train.py large_tcnn
-cd .. 
-singularity pull docker://bitnami/tensorflow-serving [for cpu]
-singularity pull docker://tensorflow/serving:latest-gpu
+node> cd .. 
+node> singularity pull docker://tensorflow/serving:latest-gpu
 ```
-
-Edit /project/bii_dsc_community/$USER/osmi/osmi-bench/benchmark/models.conf to make each base_path correspond to the proper directory e.g. "/project/bii_dsc_community/$USER/osmi/osmi-bench/models/small_lstm",
 
 For this application there is no separate data
 
-## run the client-side tests
+### Compile OSMI Models in Batch Jobs
 
 ```
+rivanna> cd /project/bii_dsc_community/$USER/osmi/osmi/machine/rivanna
+rivanna> sbatch train.slurm
+```
+
+## Run test sweep via batch jobs
+
+```
+cd /project/bii_dsc_community/$USER/osmi/osmi/benchmark
+make run
+```
+*Note: results stored in results.csv
+
+### Run test sweep via interactive jobs
+
+```
+rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00 --partition=bii-gpu --gres=gpu:v100:6
+rivanna> cd /project/bii_dsc_community/$USER/osmi/osmi/benchmark
+rivanna> singularity run --nv --home `pwd` ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
+// wait for lsof -i:8500 to show up
+```
+
+<!-- ```
 rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=1-00:00:00 --partition=bii-gpu --gres=gpu
 node> singularity shell --nv --home `pwd` serving_latest-gpu.sif
 singularity> nvidia-smi #to see if you can use gpus (on node)
@@ -273,7 +272,7 @@ node> CUDA_VISIBLE_DEVICES=1 singularity run --home `pwd` --nv ../serving_latest
 node> cat tf
 ```
 
-do this for all gpus with different ports
+do this for all gpus with different ports -->
 
 ## References
 

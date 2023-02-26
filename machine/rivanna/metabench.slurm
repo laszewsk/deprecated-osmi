@@ -31,7 +31,7 @@ for sec in $(seq -w 10000 -1 1); do
 done
 date
 
-cd /scrath/$USER/osmi/benchmark
+cd /scratch/$USER/osmi/benchmark
 # python metabench.py /project/bii_dsc_community/$USER/osmi/machine/rivanna/rivanna-V100.yaml
 # python metabench.py /scratch/$USER/osmi/machine/rivanna/rivanna-V100.yaml
 python metabench.py /project/bii_dsc_community/$USER/osmi/mlcommons-osmi/rivanna-V100.yaml
