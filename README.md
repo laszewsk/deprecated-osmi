@@ -222,10 +222,20 @@ make run
 
 ```
 rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00 --partition=bii-gpu --gres=gpu:v100:6
-rivanna> cd /project/bii_dsc_community/$USER/osmi/osmi/benchmark
-rivanna> singularity run --nv --home `pwd` ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
+node> cd /project/bii_dsc_community/$USER/osmi/osmi/benchmark
+node> singularity run --nv --home `pwd` ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
 // wait for lsof -i:8500 to show up
+node> python metabench.py /project/bii_dsc_community/$USER/osmi/osmi/machine/rivanna/rivanna-V100.yaml
 ```
+
+### Graphing Results
+
+```
+vi /project/bii_dsc_community/$USER/osmi/osmi/results.ipynb
+```
+graphs are also saved in cd /project/bii_dsc_community/$USER/osmi/osmi/out
+
+The program takes the results from metabench and produces several graphs.
 
 <!-- ```
 rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=1-00:00:00 --partition=bii-gpu --gres=gpu
