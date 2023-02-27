@@ -51,7 +51,8 @@ args = parser.parse_args()
 
 with open (args.outfn, 'w') as csvfile:
     cw = csv.writer(csvfile, delimiter=',')
-    cw.writerow("Timestamp:GPU:Server:Concurrency:Model:# of Requests:BatchSize:Throughput (inf/s):Theta:Latency (ms)".split(":"))
+    cw.writerow("Timestamp:GPU:# of GPUs:Server:Concurrency:Model:# of Requests:BatchSize:Theta (inf/s)".split(":"))
+    # cw.writerow("Timestamp:GPU:# of GPUs:Server:Concurrency:Model:# of Requests:BatchSize:Throughput (inf/s):Theta (inf/s):Latency (ms)".split(":"))
 
 extract = lambda x: float(re.findall('\d+.\d+', x)[0])
 
@@ -97,7 +98,7 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                             process = subprocess.Popen(cmd, stdout=f,
                                                          stderr=subprocess.STDOUT,
                                                          shell=True)
-                            assert process.returncode, "client did not complete successfully"
+                            assert not process.returncode, "client did not complete successfully"
                             proc.append(process)
                             # filenames.append(f"log{server_id}.{client_rank}.txt")
 
@@ -129,12 +130,13 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                     # print(f"\nthroughput: {throughput:.2f}")
                     print(f"theta: {theta:.2f}") 
                     # print(f"avg latency: {avg_latency:.2f}")
-                    StopWatch.event("metabench result", {"throughput": throughput, "theta": theta, "avg latency": avg_latency,
+                    StopWatch.event("metabench result", {"theta": theta,# "throughput": throughput, "avg latency": avg_latency,
                                                          "model": model, "number of requests": nrequests, "batchsize": batchsize,
                                                          "ngpus": ngpus, "concurrency": concurrency, "config file": config_file})
                     with open(args.outfn, 'a') as csvfile:
                         cw = csv.writer(csvfile, delimiter=',')
-                        cw.writerow([timestamp, args.gpu, server_id, concurrency, model, nrequests, batchsize, throughput, theta, avg_latency])    
+                        cw.writerow([timestamp, args.gpu, ngpus, server_id, concurrency, model, nrequests, batchsize, theta])    
+                        # cw.writerow([timestamp, args.gpu, server_id, concurrency, model, nrequests, batchsize, throughput, theta, avg_latency])    
             StopWatch.stop(f"batchsize-{batchsize}")
 StopWatch.stop("loop")
 StopWatch.benchmark()
