@@ -76,16 +76,14 @@ pip install pip -U
 
 ### Get the code
 
-To get the [code](<https://code.ornl.gov/whb/osmi-bench>) we clone a gitlab instance that is hosted at Oakridge National Laboratory , please execute:
+To get the code we clone this github repository (https://github.com/laszewsk/osmi.git). Please execute:
 
 ```
 mkdir ~/osmi
 cd ~/osmi
-git clone git@github.com:DSC-SPIDAL/mlcommons-osmi.git
-# git clone https://github.com/DSC-SPIDAL/mlcommons-osmi.git
-git clone https://code.ornl.gov/whb/osmi-bench.git
-cd osmi-bench
-pip install -r ../../mlcommons-osmi/requirements-ubuntu.txt
+git clone https://github.com/laszewsk/osmi.git
+cd osmi
+pip install -r ~/osmi/osmi/machine/ubuntu/requirements-ubuntu.txt
 ```
 
 **Note: the original version of grpcio 1.0.0 does not distribute valid wheels, hence we assume the library is out of date, but a new version with 1.15.1 is available that is distributed. Gregor strongly recoomnds to swithc to a supported version of grpcio.**
@@ -116,12 +114,12 @@ which tensorflow_model_server
 make image
 ```
 
-Running the program
+## Running the program
 
 ```
+cd ~/osmi/osmi/machine/ubuntu
 make run
-make shell
-python tfs_grpc_client.py -m small_lstm -b 32 -n 48 localhost:8500
+python metabench.py --config=make-yaml-file-for-ubuntu
 ```
 TODO: complete
 
