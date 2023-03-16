@@ -114,7 +114,7 @@ which tensorflow_model_server
 make image
 ```
 
-## Running the program
+### Running the program
 
 ```
 cd ~/osmi/osmi/machine/ubuntu
@@ -132,7 +132,7 @@ To run the OSMI benchmark, you will first need to generate the project directory
 
 As well as the slurm partitions `gpu` and `bii_gpu`
 
-## Set up a project directory and get the code
+### Set up a project directory and get the code
 
 <!-- To get the code we clone a gitlab instance that is hosted at Oakridge National Laboratory (<https://code.ornl.gov/whb/osmi-bench>). -->
 To get the code we clone this github repository (https://github.com/laszewsk/osmi.git)  First you need to create a directory under your username in the project directory. We recommend to use your username. Follow these steps: 
@@ -144,7 +144,7 @@ git clone https://github.com/laszewsk/osmi.git
 cd osmi
 ```
 
-## Set up Python via Conda
+### Set up Python via Conda
 
 Next we recommend that you set up python. Although Conda is not our favorite development environment, we use conda here out of convenience. In future we will also document here how to set OSMI up with an environment from python.org useing vanillla python installs.
 
@@ -166,7 +166,7 @@ rivanna> conda activate OSMI
 
 DO NOT USE CONDA INIT!!!!!
 
-## Interacting with Rivanna
+### Interacting with Rivanna
 
 Rivanna has two brimary modes so users can interact with it. 
 
@@ -177,6 +177,14 @@ Rivanna has two brimary modes so users can interact with it.
 
 *  **Batch Jobs:** The second mode is a batch job that is controlled by a batch script. 
    We will showcase here how to set such scripts up and use them 
+
+
+### Pull Tensorflow Image
+
+```
+node> cd machine/rivanna
+node> make image
+```
 
 ### Compile OSMI Models in Interactive Jobs
 
@@ -190,13 +198,17 @@ rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00
 
 *note: use --partition=bii-gpu --gres=gpu:v100:n to recieve n v100 GPUs
 
-```
+<!-- ```
 node> cd models
 node> python train.py small_lstm
 node> python train.py medium_cnn
 node> python train.py large_tcnn
 node> cd .. 
 node> singularity pull docker://tensorflow/serving:latest-gpu
+``` -->
+
+```
+rivanna> make train
 ```
 
 For this application there is no separate data
@@ -208,7 +220,7 @@ rivanna> cd /project/bii_dsc_community/$USER/osmi/osmi/machine/rivanna
 rivanna> sbatch train.slurm
 ```
 
-## Run test sweep via batch jobs
+### Run test sweep via batch jobs
 
 ```
 cd /project/bii_dsc_community/$USER/osmi/osmi/benchmark

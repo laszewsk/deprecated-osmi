@@ -137,7 +137,6 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                         cw = csv.writer(csvfile, delimiter=',')
                         cw.writerow([timestamp, args.gpu, ngpus, server_id, concurrency, model, nrequests, batchsize, theta])    
                         # cw.writerow([timestamp, args.gpu, server_id, concurrency, model, nrequests, batchsize, throughput, theta, avg_latency])    
-            StopWatch.stop(f"batchsize-{batchsize}")
 StopWatch.stop("loop")
 StopWatch.benchmark()
 StopWatch.benchmark(filename=f"metabench-{args.config}.log")
