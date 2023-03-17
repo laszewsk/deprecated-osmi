@@ -6,7 +6,7 @@ config:
     ngpus: [1] # [1,2,4,6]
     concurrency: [1,2,4] # [1,2,4] # [1,2,4,6]
     ports: [8500]
-    model: ["small_lstm"] # ["small_lstm","medium_cnn","large_tcnn"]
+    model: ["small_lstm","medium_cnn","large_tcnn"]
 
 submission:
     benchmark: osmi
