@@ -51,7 +51,7 @@ args = parser.parse_args()
 
 with open (args.outfn, 'w') as csvfile:
     cw = csv.writer(csvfile, delimiter=',')
-    cw.writerow("Timestamp:GPU:# of GPUs:Server:Concurrency:Model:# of Requests:BatchSize:Theta (inf/s)".split(":"))
+    cw.writerow("Timestamp:GPU:# of GPUs:Server:Concurrency:Model:# of Requests:BatchSize:Theta (inf/s):Time to inference".split(":"))
     # cw.writerow("Timestamp:GPU:# of GPUs:Server:Concurrency:Model:# of Requests:BatchSize:Throughput (inf/s):Theta (inf/s):Latency (ms)".split(":"))
 
 extract = lambda x: float(re.findall('\d+.\d+', x)[0])
@@ -105,7 +105,7 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                     # Barrier 
                     exit_codes = [p.wait() for p in proc]
                     
-                    t_concurrency = time.perf_counter() - start
+                    time_to_inference = time.perf_counter() - start # time to inference
                     StopWatch.stop(f"concurrency-{concurrency}")
 
                     filenames = glob.glob(os.path.join(out_path, "results/log*"))
@@ -125,7 +125,7 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                         os.unlink(fn)
 
                     # total throughput in samples per second - see Brewer et. al (2021) equation 1
-                    theta = nrequests*batchsize*concurrency/t_concurrency
+                    theta = nrequests*batchsize*concurrency/time_to_inference
                     # avg_latency = latency/num_files
                     # print(f"\nthroughput: {throughput:.2f}")
                     print(f"theta: {theta:.2f}") 
@@ -135,7 +135,7 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                                                          "ngpus": ngpus, "concurrency": concurrency, "config file": config_file})
                     with open(args.outfn, 'a') as csvfile:
                         cw = csv.writer(csvfile, delimiter=',')
-                        cw.writerow([timestamp, args.gpu, ngpus, server_id, concurrency, model, nrequests, batchsize, theta])    
+                        cw.writerow([timestamp, args.gpu, ngpus, server_id, concurrency, model, nrequests, batchsize, theta, time_to_inference])    
                         # cw.writerow([timestamp, args.gpu, server_id, concurrency, model, nrequests, batchsize, throughput, theta, avg_latency])    
 StopWatch.stop("loop")
 StopWatch.benchmark()
