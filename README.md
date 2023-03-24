@@ -6,7 +6,7 @@ Authors: Nate Kimball, Gregor von Laszewski
 
 1. [Running OSMI Bench on a local Windows machine running WSL](#running-osmi-bench-on-a-local-windows-wsl)
 
-2. [Running OSMI Bench on a local machine running Ubuntu](#running-osmi-bench-on-ubuntu)
+2. [Running OSMI Bench on a local machine running Ubuntu](#ruN4VCjV9U4Qs$Tvcnning-osmi-bench-on-ubuntu)
 
    1. [Create python virtual environment](#create-python-virtual-environment-on-ubuntu)
    2. [Get the code](#get-the-code)
@@ -58,8 +58,8 @@ wsl>
 wsl> make image
 wsl> cd models
 wsl> time python train.py small_lstm (14.01s user 1.71s system 135% cpu 11.605 total)
-wsl> python train.py medium_cnn (109.20s user 6.84s system 407% cpu 28.481 total)
-wsl> python train.py large_tcnn
+wsl> time python train.py medium_cnn (109.20s user 6.84s system 407% cpu 28.481 total)
+wsl> time python train.py large_tcnn
 cd .. 
 ```
 
