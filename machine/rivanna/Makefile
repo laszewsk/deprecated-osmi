@@ -1,7 +1,7 @@
 run:
 	sbatch metabench-V100.slurm; \
 	sbatch metabench-A100.slurm; \
-	sbatch metabench-cpu.slurm;
+	sbatch metabench-CPU.slurm;
 
 image:
 	cd ../../; \

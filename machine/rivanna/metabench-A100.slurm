@@ -16,8 +16,8 @@
 
 nvidia-smi
 
-dir="/project/bii_dsc_community/$USER/osmi-scratch/osmi"
-output_dir="/project/bii_dsc_community/$USER/osmi-scratch/osmi/osmi-output"
+dir="$PROJECT/osmi"
+output_dir="$dir/osmi-output"
 rivanna="$dir/machine/rivanna"
 benchmark="$dir/benchmark"
 
