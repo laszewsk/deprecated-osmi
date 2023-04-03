@@ -1,6 +1,6 @@
 config:
     server: "localhost"
-    gpu: "V100" #"V100-SXM2-32GB"
+    gpu: "A100" #"V100-SXM2-32GB"
     batch: [1,2,4,8,16,32,64,128, 256, 512, 1024, 2048, 4096]
     nrequests: [32768]
     ngpus: [1]

@@ -1,5 +1,7 @@
 run:
-	sbatch metabench.slurm
+	sbatch metabench-V100.slurm; \
+	sbatch metabench-A100.slurm; \
+	sbatch metabench-cpu.slurm;
 
 image:
 	cd ../../; \
@@ -7,3 +9,6 @@ image:
 
 clean:
 	rm *.err *.out
+
+squeue:
+	squeue -u $$(whoami)
