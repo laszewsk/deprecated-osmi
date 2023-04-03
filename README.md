@@ -138,8 +138,9 @@ As well as the slurm partitions `gpu` and `bii_gpu`
 To get the code we clone this github repository (https://github.com/laszewsk/osmi.git)  First you need to create a directory under your username in the project directory. We recommend to use your username. Follow these steps: 
 
 ```
-mkdir -p /project/bii_dsc_community/$USER/osmi
-cd /project/bii_dsc_community/$USER/osmi
+export PROJECT=/project/bii_dsc_community/$USER/osmi
+mkdir -p $PROJECT
+cd $PROJECT
 git clone https://github.com/laszewsk/osmi.git
 cd osmi
 ```
@@ -179,7 +180,7 @@ Rivanna has two brimary modes so users can interact with it.
    We will showcase here how to set such scripts up and use them 
 
 
-### Pull Tensorflow Image
+### Pull Tensorflow Serving Image
 
 ```
 node> cd machine/rivanna
@@ -216,34 +217,34 @@ For this application there is no separate data
 ### Compile OSMI Models in Batch Jobs
 
 ```
-rivanna> cd /project/bii_dsc_community/$USER/osmi/osmi/machine/rivanna
+rivanna> cd $PROJECT/osmi/machine/rivanna
 rivanna> sbatch train.slurm
 ```
 
 ### Run test sweep via batch jobs
 
 ```
-cd /project/bii_dsc_community/$USER/osmi/osmi/benchmark
+cd $PROJECT/osmi/benchmark
 make run
 ```
-*Note: results stored in results.csv
+*Note: results stored in osmi-output directory
 
 ### Run test sweep via interactive jobs
 
 ```
 rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00 --partition=bii-gpu --gres=gpu:v100:6
-node> cd /project/bii_dsc_community/$USER/osmi/osmi/benchmark
+node> cd $PROJECT/osmi/benchmark
 node> singularity run --nv --home `pwd` ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
 // wait for lsof -i:8500 to show up
-node> python metabench.py /project/bii_dsc_community/$USER/osmi/osmi/machine/rivanna/rivanna-V100.yaml
+node> python metabench.py $PROJECT/osmi/machine/rivanna/rivanna-V100.yaml
 ```
 
 ### Graphing Results
 
 ```
-vi /project/bii_dsc_community/$USER/osmi/osmi/results.ipynb
+vi $PROJECT/osmi/results.ipynb
 ```
-graphs are also saved in cd /project/bii_dsc_community/$USER/osmi/osmi/out
+graphs are also saved in cd $PROJECT/osmi/out
 
 The program takes the results from metabench and produces several graphs.
 
