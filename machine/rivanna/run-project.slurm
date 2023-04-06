@@ -16,11 +16,11 @@
 
 echo "# cloudmesh status=running progress=1 pid=$$"
 nvidia-smi
-echo "# cloudmesh status=running progress=2 pid=$$"
+echo "# cloudmesh status=running progress=3 pid=$$"
 
 
 # need different progress numbers
-# echo "# cloudmesh status=running progress=2 pid=$$"
+# echo "# cloudmesh status=running progress=4 pid=$$"
 # BEST TO DO A SRC_DIR AND COPY FORM SRC_DIR TO RUN_DIR
 # time mkdir -p $RUN_DIR
 # time rsync -r $PROJECT/osmi $RUN_DIR/..
@@ -31,11 +31,11 @@ output_dir="$RUN_DIR/osmi-output"
 benchmark="$RUN_DIR/benchmark"
 rivanna="$RUN_DIR/machine/rivanna"
 
-echo "# cloudmesh status=running progress=3 pid=$$"
-time cd $RUN_DIR
-echo "# cloudmesh status=running progress=4 pid=$$"
-
 echo "# cloudmesh status=running progress=5 pid=$$"
+time cd $RUN_DIR
+echo "# cloudmesh status=running progress=6 pid=$$"
+
+echo "# cloudmesh status=running progress=7 pid=$$"
 module load anaconda
 conda activate OSMI
 time pip install --user -r $rivanna/requirements-rivanna.txt
