@@ -35,7 +35,7 @@ time pip install --user -r $rivanna/requirements-rivanna.txt
 # nextline you comment out initially and next time you run it to see imapct of energy monitoring
 # cms gpu watch --gpu=0 --delay=0.5 --dense > outputs/gpu0.log &
 
-echo "# ======= START"
+echo "# ======= SERVER START"
 cd $benchmark
 time singularity run --nv --home `pwd` $RUN_DIR/serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& $output_dir/log &
 
@@ -45,6 +45,9 @@ for sec in $(seq -w 10000 -1 1); do
 done
 date
 
+echo "# ======= SERVER UP"
+
+echo "# ======= START"
 time python metabench.py $rivanna/rivanna-A100.yaml -o $output_dir/a100-results.csv
 echo "# ======= END"
 
