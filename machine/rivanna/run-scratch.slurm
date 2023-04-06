@@ -10,6 +10,7 @@
 #SBATCH --error=%u-%j.err
 #SBATCH --reservation=bi_fox_dgx
 #SBATCH --constraint=a100_80gb
+#SBATCH --mem=1G
 
 ## SBATCH -c 4
 ## SBATCH --mem=32GB
@@ -24,7 +25,7 @@ rivanna="$RUN_DIR/machine/rivanna"
 
 
 time mkdir -p $RUN_DIR
-time cp -a $PROJECT/osmi $RUN_DIR
+time cp -r $PROJECT/osmi $RUN_DIR/..
 time cd $RUN_DIR
 
 

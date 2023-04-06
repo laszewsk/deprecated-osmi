@@ -24,7 +24,7 @@ rivanna="$RUN_DIR/machine/rivanna"
 
 
 time mkdir -p $RUN_DIR
-time cp -a $PROJECT/osmi $RUN_DIR
+time cp -r $PROJECT/osmi $RUN_DIR/..
 time cd $RUN_DIR
 
 
