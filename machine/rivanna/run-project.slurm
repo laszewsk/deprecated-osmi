@@ -49,12 +49,15 @@ time singularity run --nv --home `pwd` $RUN_DIR/serving_latest-gpu.sif tensorflo
 echo "# cloudmesh status=running progress=45 pid=$$"
 
 
-
-date
+start_wait_for_server=`date +%s`
+echo start_wait_for_server $start_wait_for_server
 for sec in $(seq -w 10000 -1 1); do
     if [[ $(lsof -i :8500) ]]; then break; fi
 done
-date
+end_wait_for_server=`date +%s`
+echo end_wait_for_server $end_wait_for_server
+time_server_wait=$((start_wait_for_server-end_wait_for_server))
+echo time_server_wait $time_server_wait
 echo "# ======= SERVER UP"
 echo "# cloudmesh status=running progress=50 pid=$$"
 
