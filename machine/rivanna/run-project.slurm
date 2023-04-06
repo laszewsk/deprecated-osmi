@@ -19,6 +19,11 @@ nvidia-smi
 echo "# cloudmesh status=running progress=2 pid=$$"
 
 
+# BEST TO DO A SRC_DIR AND COPY FORM SRC_DIR TO RUN_DIR
+# time mkdir -p $RUN_DIR
+# time rsync -r $PROJECT/osmi $RUN_DIR/..
+
+
 export RUN_DIR=$PROJECT/osmi
 output_dir="$RUN_DIR/osmi-output"
 benchmark="$RUN_DIR/benchmark"
