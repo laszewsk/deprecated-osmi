@@ -10,6 +10,7 @@
 #SBATCH --error=%u-%j.err
 #SBATCH --reservation=bi_fox_dgx
 #SBATCH --constraint=a100_80gb
+#SBATCH --mem=1G
 
 ## SBATCH -c 4
 ## SBATCH --mem=32GB

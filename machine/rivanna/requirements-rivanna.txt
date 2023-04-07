@@ -8,3 +8,4 @@ tensorflow-serving-api
 tqdm==4.64.0
 cloudmesh-sbatch
 cloudmesh-common
+cloudmesh-gpu
