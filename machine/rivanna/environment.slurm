@@ -21,6 +21,7 @@ export USER_PROJECT=$BASE/$USER
 export PROJECT_DIR=$PROJECT/osmi
 export EXEC_DIR=$PROJECT_DIR/machine/rivanna
 # export PROJECT_DATA=$USER_SCRATCH/data
+echo "PROJECT_DIR=$PROJECT_DIR"
 
 mkdir -p $PROJECT_DIR
 cd $PROJECT_DIR
@@ -32,11 +33,11 @@ if ! [ -d "$PROJECT_DIR/ENV3" ]; then
 fi
 source $PROJECT_DIR/ENV3/bin/activate
 
-pip install pip -U
+time pip install --user pip -U
+time pip install --user -r $EXEC_DIR/requirements-rivanna.txt
 which python
 
 end_python_install_time=`date +%s`
-echo "server up"
 echo end_python_install_time $end_python_install_time
 time_python_install=$((start_python_install-end_python_install))
 echo time_python_install $time_python_install
