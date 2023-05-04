@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --time=2-00:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --partition=bii-gpu
 #SBATCH --account=bii_dsc_community
 #SBATCH --gres=gpu:a100
@@ -13,15 +13,6 @@
 #SBATCH --mem-per-gpu=128G
 
 
-## SBATCH --mem=32G
-## SBATCH -c 4
-# export USER_SCRATCH=/scratch/$USER
-# export USER_PROJECT=/project/bii_dsc_community/$USER
-# export PROJECT_DIR=$USER_PROJECT/osmi-scratch
-# export PROJECT_DATA=$USER_SCRATCH/data
-
-
-
 echo "# cloudmesh status=running progress=1 pid=$$"
 nvidia-smi
 echo "# cloudmesh status=running progress=2 pid=$$"
@@ -36,8 +27,6 @@ export PROJECT_DIR=$PROJECT/osmi
 # export PROJECT=`realpath $TMP`
 # echo "PROJECT: " $PROJECT
 
-
-
 echo "# cloudmesh status=running progress=1 pid=$$"
 nvidia-smi
 echo "# cloudmesh status=running progress=2 pid=$$"
@@ -51,11 +40,11 @@ export PROJECT_DIR=$PROJECT/osmi
 # TMP=`pwd`/../..
 # export PROJECT=`realpath $TMP`
 # echo "PROJECT: " $PROJECT
-export PORT_TF_SERVER=8500
+export PORT_TF_SERVER=8510
 
 echo "# cloudmesh status=running progress=3 pid=$$"
 time mkdir -p $RUN_DIR
-time rsync -r -v $PROJECT_DIR $RUN_DIR/.. --exclude=.git
+time rsync -r $PROJECT_DIR $RUN_DIR/.. --exclude=.git --exclude=Makefile --exclude=ENV3 --exclude=results.ipynb --exclude=*.md
 echo "# cloudmesh status=running progress=4 pid=$$"
 
 echo "# cloudmesh status=running progress=5 pid=$$"
@@ -67,17 +56,15 @@ echo "# cloudmesh status=running progress=7 pid=$$"
 diff $PROJECT_DIR $RUN_DIR/..
 echo "# cloudmesh status=running progress=8 pid=$$"
 
-# module load anaconda
-# conda activate OSMI
 module purge
 module load  gcc/9.2.0  cuda/11.0.228  openmpi/3.1.6 python/3.8.8
 source $PROJECT_DIR/ENV3/bin/activate
-time pip install --user pip -U
-time pip install --user -r $EXEC_DIR/requirements-rivanna.txt
+# time pip install pip -U
+# time pip install -r $EXEC_DIR/requirements-rivanna.txt
 echo "# cloudmesh status=running progress=10 pid=$$"
 
 # nextline you comment out initially and next time you run it to see imapct of energy monitoring
-# cms gpu watch --gpu=0 --delay=0.5 --dense > outputs/gpu0.log &
+cms gpu watch --gpu=0 --delay=0.5 --dense > $output_dir/a100-gpu.log &
 
 echo "# cloudmesh status=running progress=40 pid=$$"
 echo "# ======= SERVER START"
@@ -87,18 +74,17 @@ echo "# cloudmesh status=running progress=45 pid=$$"
 
 start_wait_for_server=`date +%s`
 echo start_wait_for_server $start_wait_for_server
-# for sec in $(seq -w 10000 -1 1); do
-#     if [[ $(lsof -i :$PORT_TF_SERVER) ]]; then break; fi
-#     sleep 0.5
-#     echo "-"
-# done
-# time python $EXEC_DIR/test-socket.py $PORT_TF_SERVER
-sleep 4
-lsof -i :$PORT_TF_SERVER
+
+for sec in $(seq -w 10000 -1 1); do
+    if [[ $(lsof -i :$PORT_TF_SERVER) ]]; then break; fi
+    sleep 0.5
+    echo "-"
+done
+
 end_wait_for_server=`date +%s`
 echo "server up"
 echo end_wait_for_server $end_wait_for_server
-time_server_wait=$((start_wait_for_server-end_wait_for_server))
+time_server_wait=$((end_wait_for_server-start_wait_for_server))
 echo time_server_wait $time_server_wait
 
 echo "# ======= SERVER UP"
@@ -107,7 +93,7 @@ echo "# cloudmesh status=running progress=50 pid=$$"
 
 echo "# cloudmesh status=running progress=60 pid=$$"
 echo "# ======= START"
-# time python metabench.py $EXEC_DIR/rivanna-A100.yaml -o $output_dir/a100-results-localscratch.csv
+time python metabench.py $EXEC_DIR/rivanna-A100.yaml -o $output_dir/a100-results-localscratch.csv
 time python metabench.py $EXEC_DIR/fig4-A100-n128.yaml -o $output_dir/a100-results-localscratch-fig4.csv
 echo "# ======= END"
 echo "# cloudmesh status=running progress=90 pid=$$"

@@ -13,7 +13,6 @@
 start_python_install=`date +%s`
 echo start_python_install $start_python_install
 
-
 export USER_SCRATCH=/scratch/$USER
 export BASE=/project/bii_dsc_community/
 export USER_PROJECT=$BASE/$USER
@@ -21,7 +20,6 @@ export USER_PROJECT=$BASE/$USER
 export PROJECT_DIR=$PROJECT/osmi
 export EXEC_DIR=$PROJECT_DIR/machine/rivanna
 # export PROJECT_DATA=$USER_SCRATCH/data
-echo "PROJECT_DIR=$PROJECT_DIR"
 
 mkdir -p $PROJECT_DIR
 cd $PROJECT_DIR
@@ -33,8 +31,8 @@ if ! [ -d "$PROJECT_DIR/ENV3" ]; then
 fi
 source $PROJECT_DIR/ENV3/bin/activate
 
-time pip install --user pip -U
-time pip install --user -r $EXEC_DIR/requirements-rivanna.txt
+time pip install pip -U
+time pip install -r $EXEC_DIR/requirements-rivanna.txt
 which python
 
 end_python_install_time=`date +%s`

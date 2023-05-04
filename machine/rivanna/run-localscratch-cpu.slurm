@@ -7,22 +7,16 @@
 #SBATCH --job-name=osmi-cpu-localscratch
 #SBATCH --output=%u-%j.out
 #SBATCH --error=%u-%j.err
-#SBATCH --mem-per-cpu=64G
-
-
-## SBATCH --mem=32G
-## SBATCH -c 4
+#SBATCH --mem-per-cpu=128G
 
 echo "# cloudmesh status=running progress=1 pid=$$"
-nvidia-smi
-echo "# cloudmesh status=running progress=2 pid=$$"
 
 export BASE=/localscratch
-export RUN_DIR=$BASE/$USER/osmi
+export RUN_DIR="$BASE/$USER/osmi"
 export EXEC_DIR="$RUN_DIR/machine/rivanna"
 output_dir="$RUN_DIR/osmi-output"
 benchmark="$RUN_DIR/benchmark"
-export PROJECT_DIR=$PROJECT/osmi
+export PROJECT_DIR="$PROJECT/osmi"
 # TMP=`pwd`/../..
 # export PROJECT=`realpath $TMP`
 # echo "PROJECT: " $PROJECT
@@ -31,7 +25,7 @@ export PORT_TF_SERVER=8504
 
 echo "# cloudmesh status=running progress=3 pid=$$"
 time mkdir -p $RUN_DIR
-time rsync -r -v $PROJECT_DIR $RUN_DIR/.. --exclude=.git
+time rsync -r $PROJECT_DIR $RUN_DIR/.. --exclude=.git --exclude=Makefile --exclude=ENV3 --exclude=results.ipynb --exclude=*.md
 echo "# cloudmesh status=running progress=4 pid=$$"
 
 echo "# cloudmesh status=running progress=5 pid=$$"
@@ -43,16 +37,11 @@ echo "# cloudmesh status=running progress=7 pid=$$"
 diff $PROJECT_DIR $RUN_DIR/..
 echo "# cloudmesh status=running progress=8 pid=$$"
 
-# module load anaconda
-# conda activate OSMI
 module purge
 module load  gcc/9.2.0  cuda/11.0.228  openmpi/3.1.6 python/3.8.8
 source $PROJECT_DIR/ENV3/bin/activate
+# time pip install pip -U
 # time pip install -r $EXEC_DIR/requirements-rivanna.txt
-echo "# cloudmesh status=running progress=10 pid=$$"
-
-# nextline you comment out initially and next time you run it to see imapct of energy monitoring
-# cms gpu watch --gpu=0 --delay=0.5 --dense > outputs/gpu0.log &
 
 echo "# cloudmesh status=running progress=40 pid=$$"
 echo "# ======= SERVER START"
@@ -62,18 +51,17 @@ echo "# cloudmesh status=running progress=45 pid=$$"
 
 start_wait_for_server=`date +%s`
 echo start_wait_for_server $start_wait_for_server
-# for sec in $(seq -w 10000 -1 1); do
-#     if [[ $(lsof -i :$PORT_TF_SERVER) ]]; then break; fi
-#     sleep 0.5
-#     echo "-"
-# done
-sleep 4
-lsof -i :$PORT_TF_SERVER
-time python $EXEC_DIR/test-socket.py $PORT_TF_SERVER
+
+for sec in $(seq -w 10000 -1 1); do
+    if [[ $(lsof -i :$PORT_TF_SERVER) ]]; then break; fi
+    sleep 0.5
+    echo "-"
+done
+
 end_wait_for_server=`date +%s`
 echo "server up"
 echo end_wait_for_server $end_wait_for_server
-time_server_wait=$((start_wait_for_server-end_wait_for_server))
+time_server_wait=$((end_wait_for_server-start_wait_for_server))
 echo time_server_wait $time_server_wait
 
 echo "# ======= SERVER UP"
