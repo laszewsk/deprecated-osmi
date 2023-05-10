@@ -6,18 +6,20 @@ Authors: Nate Kimball, Gregor von Laszewski
 
 1. [Running OSMI Bench on a local Windows machine running WSL](#running-osmi-bench-on-a-local-windows-wsl)
 
-2. [Running OSMI Bench on a local machine running Ubuntu](#ruN4VCjV9U4Qs$Tvcnning-osmi-bench-on-ubuntu)
-
+2. [Running OSMI Bench on a local machine running Ubuntu](#running-osmi-bench-on-ubuntu)
    1. [Create python virtual environment](#create-python-virtual-environment-on-ubuntu)
    2. [Get the code](#get-the-code)
    3. [Running the small OSMI model benchmark](#running-the-small-osmi-model-benchmark)
    4. [Install tensorflow serving in ubuntu](#install-tensorflow-serving-in-ubuntu)
 
-## TODO
 
-1. finish sbatch scripts
-2. automate sbatch scripts
-2. figure out why wsl isn't working
+3. [Running OSMI Bench on Rivanna](#running-osmi-bench-on-rivanna)
+   1. [Get the code](#set-up-a-project-directory-and-get-the-code)
+   2. [Set up Python Environment](#set-up-python-environment)
+   3. [Get Tensorflow Serving](#pull-tensorflow-serving-image)
+   4. [Running the small OSMI model benchmark](#compile-osmi-models-in-interactive-jobs)
+   5. [Running test sweep](#run-test-sweep-via-batch-jobs)
+   6. [Graph Results](#graphing-results)
 
 ## Running OSMI Bench on a local Windows WSL
 
@@ -123,10 +125,9 @@ python metabench.py --config=make-yaml-file-for-ubuntu
 ```
 TODO: complete
 
+## Running OSMI Bench on rivanna
 
-## Running OSMI benchmark on rivanna
-
-To run the OSMI benchmark, you will first need to generate the project directory with the code. We assume you are in the group `bii_dsc_community`. THis allows you access to the directory
+To run the OSMI benchmark, you will first need to generate the project directory with the code. We assume you are in the group `bii_dsc_community`. This allows you access to the directory
 
 ```/project/bii_dsc_community```
 
@@ -138,34 +139,32 @@ As well as the slurm partitions `gpu` and `bii_gpu`
 To get the code we clone this github repository (https://github.com/laszewsk/osmi.git)  First you need to create a directory under your username in the project directory. We recommend to use your username. Follow these steps: 
 
 ```
-export PROJECT=/project/bii_dsc_community/$USER/osmi
+export USER_SCRATCH=/scratch/$USER
+export USER_LOCALSCRATCH=/localscratch/$USER
+export USER_PROJECT=/project/bii_dsc_community/$USER
+export BASE=$USER_PROJECT
+```
+You can have the project in either USER_PROJECT or USER_SCRATCH
+```
+export PROJECT=$BASE
+```
+
+```
 mkdir -p $PROJECT
 cd $PROJECT
 git clone https://github.com/laszewsk/osmi.git
 cd osmi
+export EXEC_DIR=$PROJECT/osmi/machine/rivanna
 ```
 
-### Set up Python via Conda
-
-Next we recommend that you set up python. Although Conda is not our favorite development environment, we use conda here out of convenience. In future we will also document here how to set OSMI up with an environment from python.org useing vanillla python installs.
-
-<!-- ```
-rivanna> wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
-rivanna> bash Miniforge3-Linux-x86_64.sh
-rivanna> source ~/.bashrc
-rivanna> conda create -n osmi python=3.8
-rivanna> conda activate osmi
-``` -->
+### Set up Python Environment
 
 ```
-rivanna> module load anaconda
-rivanna> conda -V    # 4.9.2
-rivanna> anaconda -V # 1.7.2
-rivanna> conda create -n OSMI python=3.8
-rivanna> conda activate OSMI
+rivanna> cd $EXEC_DIR
+rivanna> make environment
+(this may take a while to finish due to rivanna's slow file system)
+rivanna> source ../../ENV3/bin/activate
 ```
-
-DO NOT USE CONDA INIT!!!!!
 
 ### Interacting with Rivanna
 
@@ -183,8 +182,8 @@ Rivanna has two brimary modes so users can interact with it.
 ### Pull Tensorflow Serving Image
 
 ```
-node> cd machine/rivanna
-node> make image
+rivanna> cd $EXEC_DIR
+rivanna> make image
 ```
 
 ### Compile OSMI Models in Interactive Jobs
@@ -199,17 +198,9 @@ rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00
 
 *note: use --partition=bii-gpu --gres=gpu:v100:n to recieve n v100 GPUs
 
-<!-- ```
-node> cd models
-node> python train.py small_lstm
-node> python train.py medium_cnn
-node> python train.py large_tcnn
-node> cd .. 
-node> singularity pull docker://tensorflow/serving:latest-gpu
-``` -->
-
 ```
-rivanna> make train
+node> cd $PROJECT/osmi
+node> make train
 ```
 
 For this application there is no separate data
@@ -217,27 +208,27 @@ For this application there is no separate data
 ### Compile OSMI Models in Batch Jobs
 
 ```
-rivanna> cd $PROJECT/osmi/machine/rivanna
-rivanna> sbatch train.slurm
+rivanna> cd $EXEC_DIR
+rivanna> make train
 ```
 
 ### Run test sweep via batch jobs
 
 ```
-cd $PROJECT/osmi/benchmark
-make run
+rivanna> cd $PROJECT/osmi/benchmark
+rivanna> make run
 ```
-*Note: results stored in osmi-output directory
+*Note: results stored in $PROJECT/osmi/osmi-output directory
 
-### Run test sweep via interactive jobs
+<!-- ### Run test sweep via interactive jobs
 
 ```
-rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00 --partition=bii-gpu --gres=gpu:v100:6
+rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00 --partition=bii-gpu --gres=gpu:v100:1
 node> cd $PROJECT/osmi/benchmark
 node> singularity run --nv --home `pwd` ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
 // wait for lsof -i:8500 to show up
 node> python metabench.py $PROJECT/osmi/machine/rivanna/rivanna-V100.yaml
-```
+``` -->
 
 ### Graphing Results
 
