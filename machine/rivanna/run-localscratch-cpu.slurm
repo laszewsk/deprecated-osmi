@@ -25,7 +25,7 @@ export PORT_TF_SERVER=8504
 
 echo "# cloudmesh status=running progress=3 pid=$$"
 time mkdir -p $RUN_DIR
-time rsync -r $PROJECT_DIR $RUN_DIR/.. --exclude=.git --exclude=Makefile --exclude=ENV3 --exclude=results.ipynb --exclude=*.md
+time rsync -r $PROJECT_DIR $RUN_DIR/.. --exclude=.git --exclude=Makefile --exclude=ENV3 --exclude=results.ipynb --exclude=*.md --exclude=*.sif --exclude=osmi-output/*
 echo "# cloudmesh status=running progress=4 pid=$$"
 
 echo "# cloudmesh status=running progress=5 pid=$$"
@@ -46,7 +46,7 @@ source $PROJECT_DIR/ENV3/bin/activate
 echo "# cloudmesh status=running progress=40 pid=$$"
 echo "# ======= SERVER START"
 cd $benchmark
-time singularity run --home `pwd` $RUN_DIR/serving_latest-gpu.sif tensorflow_model_server --port=$PORT_TF_SERVER --rest_api_port=0 --model_config_file=models.conf >& $output_dir/log &
+time singularity exec --home `pwd` $PROJECT_DIR/serving_latest-gpu.sif tensorflow_model_server --port=$PORT_TF_SERVER --rest_api_port=0 --model_config_file=models.conf >& $output_dir/cpu-log-$PORT_TF_SERVER &
 echo "# cloudmesh status=running progress=45 pid=$$"
 
 start_wait_for_server=`date +%s`
@@ -75,7 +75,7 @@ time python metabench.py $EXEC_DIR/fig4-CPU-n128.yaml -o $output_dir/cpu-results
 echo "# ======= END"
 echo "# cloudmesh status=running progress=90 pid=$$"
 
-time rsync -r -v $output_dir/* $PROJECT_DIR/osmi-output
+time rsync -r -v $output_dir/cpu* $PROJECT_DIR/osmi-output
 
 seff $SLURM_JOB_ID
 echo "# cloudmesh status=running progress=100 pid=$$"
