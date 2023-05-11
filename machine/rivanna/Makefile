@@ -1,14 +1,22 @@
 run:
-	sbatch metabench-V100.slurm; \
-	sbatch metabench-A100.slurm; \
-	sbatch metabench-CPU.slurm;
+	sbatch run-localscratch-v100.slurm; \
+	sbatch run-localscratch-a100.slurm; \
+	sbatch run-localscratch-cpu.slurm
+
+environment:
+	sbatch environment.slurm
 
 image:
-	cd ../../; \
-	singularity pull docker://tensorflow/serving:latest-gpu;
+	singularity pull docker://tensorflow/serving:latest-gpu
+
+train:
+	sbatch train.slurm
 
 clean:
 	rm *.err *.out
 
 squeue:
-	squeue -u $$(whoami)
+	squeue -u $$USER
+
+scancel:
+	scancel -u $$USER
