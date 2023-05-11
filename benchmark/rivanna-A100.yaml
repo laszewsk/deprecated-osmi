@@ -1,9 +1,0 @@
-config:
-    server: "localhost"
-    gpu: "V100-SXM2-32GB"
-    batch: [1,2,4,8]
-    nrequests: 50
-    ngpus: [1]
-    concurrency: [1,2]
-    ports: [8500] 
-    model: "small_lstm"
