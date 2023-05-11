@@ -1,7 +1,7 @@
 config:
     server: "localhost"
     gpu: "A100" #"V100-SXM2-32GB"
-    batch: [1,2,4,8,16,32,64,128, 256, 512, 1024, 2048, 4096]
+    batch: [1,2,4,8,16,32,64,128, 256, 512, 1024]
     nrequests: [32768]
     ngpus: [1]
     concurrency: [1,2,4,6,8]
