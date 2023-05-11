@@ -1,4 +1,3 @@
-#grpcio==1.0.0
 grpcio
 numpy==1.23.5
 requests==2.27.1
@@ -9,3 +8,5 @@ tqdm==4.64.0
 cloudmesh-sbatch
 cloudmesh-common
 cloudmesh-gpu
+pyyaml
+matplotlib
