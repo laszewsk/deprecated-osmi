@@ -38,7 +38,7 @@ source $PROJECT_DIR/ENV3/bin/activate
 
 cd $MODEL_DIR
 
-singularity exec --nv ./$NAME.sif python train.py small_lstm
+singularity exec --nv $RUN_DIR/$NAME.sif python train.py small_lstm
 # singularity exec --nv ./cloudmesh-docker.sif python train.py small_lstm
 
 # singularity exec --nv $CONTAINERDIR/tensorflow-2.10.0.sif python train.py small_lstm

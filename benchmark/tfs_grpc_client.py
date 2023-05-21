@@ -33,7 +33,7 @@ def start(msg):
 def stop(msg):
     StopWatch.stop(f"tfs_grpc_client-py {msg} model={args.model}, batch={args.batch}, num_requests={args.n}, outfile={args.outfile}, redux={args.redux}")
 
-
+start("Total")
 hostport = args.server
 print(hostport)
 
@@ -70,6 +70,8 @@ if args.redux:
 else:
     num_requests = args.n
 
+# tf.debugging.set_log_device_placement(True)
+
 # flag to switch on/off tqdmt
 start("loop total")
 for i in tqdm(range(num_requests)) if tqdm else range(num_requests):
@@ -81,7 +83,7 @@ for i in tqdm(range(num_requests)) if tqdm else range(num_requests):
     request.model_spec.signature_name ='serving_default'
     request.inputs[models[args.model]['inputs']].CopyFrom(tf.make_tensor_proto(data, shape=models[args.model]['shape']))
     results.append(stub.Predict(request))
-    if args.vv: print(results[0])
+    if args.vv: print(results[i])
     tok = time.perf_counter()
     times.append(tok - tik)
     stop(f"loop {i}")
@@ -96,6 +98,7 @@ print(f"throughput: {throughput}")
 print(f"latency: {avg_inference_latency}")
 
 StopWatch.event("client result", {"latency": avg_inference_latency, "throughput": throughput})
+stop("Total")
 StopWatch.benchmark()
 
 # write_header = True if not os.path.exists(args.outfile) else False

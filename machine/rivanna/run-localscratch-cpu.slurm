@@ -46,7 +46,7 @@ source $PROJECT_DIR/ENV3/bin/activate
 echo "# cloudmesh status=running progress=40 pid=$$"
 echo "# ======= SERVER START"
 cd $benchmark
-time singularity exec --home `pwd` $PROJECT_DIR/serving_latest-gpu.sif tensorflow_model_server --port=$PORT_TF_SERVER --rest_api_port=0 --model_config_file=models.conf >& $output_dir/cpu-log-$PORT_TF_SERVER &
+time singularity exec --home `pwd` $HOME_DIR/serving_latest-gpu.sif tensorflow_model_server --port=$PORT_TF_SERVER --rest_api_port=0 --model_config_file=models.conf >& $output_dir/cpu-log-$PORT_TF_SERVER &
 echo "# cloudmesh status=running progress=45 pid=$$"
 
 start_wait_for_server=`date +%s`

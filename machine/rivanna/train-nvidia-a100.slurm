@@ -10,12 +10,9 @@
 #SBATCH --error=train-osmi-%u-%j.err
 #SBATCH --reservation=bi_fox_dgx
 #SBATCH --constraint=a100_80gb
+#SBATCH --mem=32G
 
-## SBATCH -c 4
-## SBATCH --mem=32GB
-
-NAME=cloudmesh-rivanna
-# NAME=cloudmesh-nvidia
+NAME=cloudmesh-nvidia
 PROJECT_DIR="$PROJECT/osmi"
 RUN_DIR="$PROJECT_DIR/machine/rivanna"
 MODEL_DIR="$PROJECT_DIR/models"
@@ -38,7 +35,7 @@ source $PROJECT_DIR/ENV3/bin/activate
 
 cd $MODEL_DIR
 
-singularity exec --nv ./$NAME.sif python train.py small_lstm
+singularity exec --nv $RUN_DIR/$NAME.sif python train.py small_lstm
 # singularity exec --nv ./cloudmesh-docker.sif python train.py small_lstm
 
 # singularity exec --nv $CONTAINERDIR/tensorflow-2.10.0.sif python train.py small_lstm

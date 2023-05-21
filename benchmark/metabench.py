@@ -49,6 +49,8 @@ parser.add_argument('-a', '--algorithm', default='tfs_grpc_client.py')
 parser.add_argument('-y', '--config', type=str)
 args = parser.parse_args()
 
+StopWatch.start("Total")
+
 with open (args.outfn, 'w') as csvfile:
     cw = csv.writer(csvfile, delimiter=',')
     cw.writerow("Timestamp:GPU:# of GPUs:Server:Concurrency:Model:# of Requests:BatchSize:Theta (inf/s):Time to inference".split(":"))
@@ -56,6 +58,7 @@ with open (args.outfn, 'w') as csvfile:
 
 extract = lambda x: float(re.findall('\d+.\d+', x)[0])
 
+StopWatch.start("parse yaml")
 config_file = args.config
 if ".yaml" in args.server:
     # read and parse YAML file
@@ -66,6 +69,7 @@ if ".yaml" in args.server:
     for section, options in sections.items():
         for option, value in options.items():
             setattr(args, option, value)
+StopWatch.stop("parse yaml")
 
 print(args)
 
@@ -138,5 +142,6 @@ for model in args.model: # e.g. ["small_lstm","medium_cnn","large_tcnn"]
                         cw.writerow([timestamp, args.gpu, ngpus, server_id, concurrency, model, nrequests, batchsize, theta, time_to_inference])    
                         # cw.writerow([timestamp, args.gpu, server_id, concurrency, model, nrequests, batchsize, throughput, theta, avg_latency])    
 StopWatch.stop("loop")
+StopWatch.stop("Total")
 StopWatch.benchmark()
 StopWatch.benchmark(filename=f"metabench-{args.config}.log")
