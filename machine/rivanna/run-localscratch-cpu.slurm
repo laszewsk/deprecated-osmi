@@ -20,7 +20,7 @@ export PROJECT_DIR="$PROJECT/osmi"
 # TMP=`pwd`/../..
 # export PROJECT=`realpath $TMP`
 # echo "PROJECT: " $PROJECT
-export PORT_TF_SERVER=8504
+export PORT_TF_SERVER=8500
 
 
 echo "# cloudmesh status=running progress=3 pid=$$"
