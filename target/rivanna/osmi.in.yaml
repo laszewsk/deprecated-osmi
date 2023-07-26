@@ -67,3 +67,19 @@ experiment:
 #   concurrency: [1,2,4,6,8]
 #   ports: [8500]
 #   model: ["small_lstm","medium_cnn","large_tcnn"]
+
+project:
+  user: "/project/bii_dsc_community/{os.USER}"
+  osmi_bench: "/project/bii_dsc_community/{os.USER}/osmi/osmi-bench"
+
+model_config_list:
+  small_lstm:
+    base_path: "{project.user}/osmi/osmi-bench/models/small_lstm"
+    model_platform: "tensorflow"
+  medium_cnn:
+    base_path: "{project.user}/osmi/osmi-bench/models/medium_cnn"
+    model_platform: "tensorflow"
+  large_tcnn:
+    base_path: "/project.user}/osmi/osmi-bench/models/large_tcnn"
+    model_platform: "tensorflow"
+

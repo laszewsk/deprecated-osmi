@@ -10,9 +10,7 @@
 #SBATCH --error=osmi-v100-rivanna-%u-%j.err
 ## SBATCH --mem-per-gpu=48G
 #SBATCH --exclusive
-# double check ntasks, do I need more threads?
-# partition can be gpu
-# look up gpu memory (nvidia-smi)
+
 
 NAME=cloudmesh-rivanna
 # BASE=/localscratch
