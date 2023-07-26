@@ -1,0 +1,18 @@
+config:
+  server: "localhost"
+  gpu: "A100" #"V100-SXM2-32GB"
+  batch: [1,2,4,8,16,32,64,128,256,512,1024]
+  nrequests: [32768]
+  ngpus: [1]
+  concurrency: [1,2,4,6,8]
+  ports: [8500]
+  model: ["small_lstm","medium_cnn","large_tcnn"]
+
+benchmark:
+  name: Osmi
+  user: Gregor von Laszewski
+  e-mail: laszewski@gmail.com
+  organisation: University of Virginia
+  division: closed
+  status: completed
+  platform: rivanna

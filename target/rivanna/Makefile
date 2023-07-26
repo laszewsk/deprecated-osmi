@@ -1,9 +1,9 @@
 NAME=osmi
 
 SHELL=/bin/bash
-USER_SCRATCH=/scratch/${USER}
-PROJECT_DIR=${USER_SCRATCH}/mlcommons/benchmarks/${NAME}
-PROJECT_DATA=${USER_SCRATCH}/data
+#USER_SCRATCH=/scratch/${USER}
+#PROJECT_DIR=${USER_SCRATCH}/mlcommons/benchmarks/${NAME}
+#PROJECT_DATA=${USER_SCRATCH}/data
 
 .PHONY: image-singularity image-docker project
 
@@ -12,19 +12,18 @@ all: requirements data
 requirements:
 	time pip install -r ${PROJECT_DIR}/experiments/rivanna/requirements.txt
 
-hallo:
-	echo "HHHHH"
-
-data: 
-	# mkdir -p ${PROJECT_DATA}/???
-	echo "ERROR NOT IMPLEMENTED"
-
+#hallo:
+#	echo "HHHHH"
+#
+#data:
+#	# mkdir -p ${PROJECT_DATA}/???
+#	echo "ERROR NOT IMPLEMENTED"
 
 project: clean project.json generate
 
-setup:
-	python setup_env_and_yaml.py
-	source ~/ENV3/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/rivanna/requirements.txt
+#setup:
+#	python setup_env_and_yaml.py
+#	source ~/ENV3/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/rivanna/requirements.txt
 
 generate: jobs-project.sh 
 
@@ -53,9 +52,9 @@ simple:
                --verbose
 
 
-%.json: config.in.yaml
+%.json: osmi.in.yaml
 	cms sbatch generate \
-	           --source=${NAME}_v2.in.slurm \
+	           --source=${NAME}.in.slurm \
 	           --config=$< \
 	           --name=$(basename $@) \
 	           --noos \
@@ -63,8 +62,9 @@ simple:
 		       --nocm \
 	           --output_dir=./$(basename $@) \
                --source_dir=. \
-		--copycode="${NAME}_v2.py,data_loader.py,model.py" \
-               --verbose
+		       --verbose
+
+#--copycode="${NAME}.py,data_loader.py,model.py"
 
 kill: stop
 
