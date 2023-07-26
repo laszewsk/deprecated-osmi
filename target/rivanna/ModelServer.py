@@ -20,10 +20,19 @@ class ModelServer:
         # ok
         # failed
         raise NotImplementedError
+        if failed:
+            raise ValueError("Server not properly started")
 
 """
     
 start_tf_servers() {
+
+    source ???/ENV3
+    
+    python ModelServer.py start # docopts, click
+    python ModelServer.py wait status=up timeout=5min  # humanize
+    python ModelServer.py status 
+
     for j in `seq 0 $(($NUM_GPUS_PER_NODE-1))`
     do
         PORT=$(($PORT_TF_SERVER+$j))
