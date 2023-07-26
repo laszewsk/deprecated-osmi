@@ -1,72 +1,128 @@
-NAME=cloudmesh
-BUILD=${NAME}.def
-IMAGE=${NAME}.sif
+NAME=osmi
 
-images: image image-nvidia
+SHELL=/bin/bash
+USER_SCRATCH=/scratch/${USER}
+PROJECT_DIR=${USER_SCRATCH}/mlcommons/benchmarks/${NAME}
+PROJECT_DATA=${USER_SCRATCH}/data
 
-image-docker: ${NAME}-rivanna.def ${NAME}-rivanna.sif
-	cp ${NAME}-rivanna.def build.def
-	sudo /opt/singularity/3.7.1/bin/singularity build output_image.sif build.def
-	cp output_image.sif ${NAME}-rivanna.sif
-	make -f Makefile clean
+.PHONY: image-singularity image-docker project
 
-image-nvidia: ${NAME}-nvidia.def ${NAME}-nvidia.sif
-	cp ${NAME}-nvidia.def build.def
-	sudo /opt/singularity/3.7.1/bin/singularity build output_image.sif build.def
-	cp output_image.sif ${NAME}-nvidia.sif
-	make -f Makefile clean
+all: requirements data
 
-clean:
-	rm -rf build.def output_image.sif
 
-clear:
-	rm -f *.err *.out
+download:
+	git clone git@github.com:laszewsk/mlcommons.git
 
-queue: watch
+requirements:
+	time pip install -r ${PROJECT_DIR}/experiments/rivanna/requirements.txt
+
+data: 
+	mkdir -p ${PROJECT_DATA}/ssts
+	mkdir -p ${PROJECT_DATA}/one-day
+	echo -n "Downloading first portion of data..."
+	cd ${PROJECT_DATA}; ${AWS_S3} sync s3://sciml-datasets/es/cloud_slstr_ds1/one-day ./one-day --cli-read-timeout 0
+	echo -n "Downloading second portion of data..."
+	cd ${PROJECT_DATA}; ${AWS_S3} sync s3://sciml-datasets/es/cloud_slstr_ds1/ssts ./ssts --cli-read-timeout 0
+
+
+project: clean project.json generate
+
+setup:
+	python setup_env_and_yaml.py
+	source ~/ENV3/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/rivanna/requirements.txt
+
+generate: jobs-project.sh 
+
+run: submit
+
+submit:
+	-sh jobs-project.sh
+
+localscratch: localscratch.json
+
+
+jobs-%.sh: %.json
+	cms sbatch generate submit --name=$<  > $@
+
+
+simple:
+	cms sbatch generate \
+	           --source=simple.in.slurm \
+	           --config=$< \
+	           --name=$(basename $@) \
+	           --noos \
+	           --os=USER,HOME \
+		   	   --nocm \
+	           --output_dir=./$(basename $@) \
+               --source_dir=. \
+               --verbose
+
+
+%.json: config.in.yaml
+	cms sbatch generate \
+	           --source=${NAME}_v2.in.slurm \
+	           --config=$< \
+	           --name=$(basename $@) \
+	           --noos \
+	           --os=USER,HOME \
+		       --nocm \
+	           --output_dir=./$(basename $@) \
+               --source_dir=. \
+		--copycode="${NAME}_v2.py,data_loader.py,model.py" \
+               --verbose
+
+kill: stop
+
+stop:
+	for i in "$$(squeue --user $$USER | awk 'NR>1{print $$1}')"; do scancel $$i ; done
+
+inspect:
+	$(eval D=$(shell ls project/$(ls -1) | head -n 1))
+	echo ${D}
+	$(shell emacs project/${D}/config.yaml project/${D}/job.slurm)
 
 watch: status
 
 status:
 	watch squeue --format=\"%.18i %.9P %.50j %.8u %.8T %.10M %.9l %.6D %R\" --me
 
-delete: 
-	rm -f *.out *.err
 
-ijob:
-#	ijob -c 1 -A bii_dsc_community -p bii-gpu --reservation=bi_fox_dgx --gres=gpu:a100:1 --time=0-00:10:00
-	ijob -c 1 -A bii_dsc_community -p bii-gpu --gres=gpu:v100:1 --time=0-00:10:00
-	#ijob -c 1 -A comp4gc -p bii-gpu --gres=gpu:v100:1 --time=0-00:10:00
+clean:
+	@-rm -rf localscratch localscratch.json jobs-localscratch.sh
+	@-rm -rf project project.json jobs-project.sh
+	@-rm -f rivanna.slurm
+	@-rm -rf '__pycache__'
+	@-rm -rf *~
 
-shell:
-	singularity shell mnist.sif
 
-view:
-	watch tail *.out
+# image
 
-all: delete clean image run-a100 watch
 
-all-gpu:
-	make -f Makefile run-v100
-	make -f Makefile run-k80
-	make -f Makefile run-p100
-	make -f Makefile run-rtx3090
+image-singularity:
+	cms rivanna singularity build image-singularity/${NAME}.def
 
-run:
-	sbatch run-localscratch-v100.slurm; \
-	sbatch run-localscratch-a100.slurm; \
-	sbatch run-localscratch-cpu.slurm
+run-singularity:
+	cd image-singularity; make run
 
-environment:
-	sbatch environment.slurm
+shell-singularity:
+	cd image-singularity; make shell
 
-tf-image:
-	singularity pull docker://tensorflow/serving:latest-gpu
+run-localscratch:
+	cd image-singularity; make run-localscratch
 
-train:
-	sbatch train.slurm
+shell-localscratch:
+	cd image-singularity; make shell-localscratch
 
-squeue:
-	squeue -u $$USER
+shell-rivanna:
+	cd image-singularity; make shell-rivanna
 
-scancel:
-	scancel -u $$USER
+run: run-singularity
+
+image: image-singularity
+
+push:
+	-git push
+	ssh -tt rivanna "cd /scratch/thf2bn/mlcommons/benchmarks/${NAME}; ssh-add; git pull"
+
+
+shell: shell-singularity
