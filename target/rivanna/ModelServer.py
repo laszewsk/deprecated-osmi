@@ -1,3 +1,5 @@
+from cloudmesh.common.Shell import Shell
+
 class ModelServer:
 
     def __int__(self, port=None, exec_dir=None):
@@ -8,7 +10,6 @@ class ModelServer:
     def start(self):
         command = f" time {self.visible_devices}=$j singularity exec --nv --home `pwd` $EXEC_DIR/serving_latest-gpu.sif"\
                   f" tensorflow_model_server --port={self.port} --rest_api_port=0 --model_config_file=models.conf >& $OUTPUT_DIR/v100-$PORT.log &
-    done"
         Shell.run (command)
         raise NotImplementedError
 
