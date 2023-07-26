@@ -68,9 +68,12 @@ experiment:
 #   ports: [8500]
 #   model: ["small_lstm","medium_cnn","large_tcnn"]
 
+user: "gregor" # "{os.USER}"
+
 project:
-  user: "/project/bii_dsc_community/{os.USER}"
-  osmi_bench: "/project/bii_dsc_community/{os.USER}/osmi/osmi-bench"
+  #user: "/project/bii_dsc_community/{user}" #BUG
+  user: "/project/bii_dsc_community/gregor"
+  osmi_bench: "/project/bii_dsc_community/{user}/osmi/osmi-bench"
 
 model_config_list:
   small_lstm:
@@ -80,6 +83,6 @@ model_config_list:
     base_path: "{project.user}/osmi/osmi-bench/models/medium_cnn"
     model_platform: "tensorflow"
   large_tcnn:
-    base_path: "/project.user}/osmi/osmi-bench/models/large_tcnn"
+    base_path: "{project.user}/osmi/osmi-bench/models/large_tcnn"
     model_platform: "tensorflow"
 

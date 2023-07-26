@@ -62,9 +62,8 @@ simple:
 		       --nocm \
 	           --output_dir=./$(basename $@) \
                --source_dir=. \
-		       --verbose
-
-#--copycode="${NAME}.py,data_loader.py,model.py"
+		       --verbose \
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,model.py"
 
 kill: stop
 
