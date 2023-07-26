@@ -9,20 +9,15 @@ PROJECT_DATA=${USER_SCRATCH}/data
 
 all: requirements data
 
-
-download:
-	git clone git@github.com:laszewsk/mlcommons.git
-
 requirements:
 	time pip install -r ${PROJECT_DIR}/experiments/rivanna/requirements.txt
 
+hallo:
+	echo "HHHHH"
+
 data: 
-	mkdir -p ${PROJECT_DATA}/ssts
-	mkdir -p ${PROJECT_DATA}/one-day
-	echo -n "Downloading first portion of data..."
-	cd ${PROJECT_DATA}; ${AWS_S3} sync s3://sciml-datasets/es/cloud_slstr_ds1/one-day ./one-day --cli-read-timeout 0
-	echo -n "Downloading second portion of data..."
-	cd ${PROJECT_DATA}; ${AWS_S3} sync s3://sciml-datasets/es/cloud_slstr_ds1/ssts ./ssts --cli-read-timeout 0
+	# mkdir -p ${PROJECT_DATA}/???
+	echo "ERROR NOT IMPLEMENTED"
 
 
 project: clean project.json generate
