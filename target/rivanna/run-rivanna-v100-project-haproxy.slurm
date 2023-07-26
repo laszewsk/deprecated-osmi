@@ -33,6 +33,7 @@ CFG_FILE=$BENCHMARK_DIR/haproxy-grpc.cfg
 # add new variables
 # copy into run-rivanna-v100-project-haproxy-$NUM_NODES-$NUM_GPUS_PER_NODE.slurm
 
+
 start_tf_servers() {
     for j in `seq 0 $(($NUM_GPUS_PER_NODE-1))`
     do
