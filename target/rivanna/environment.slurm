@@ -18,7 +18,7 @@ export BASE=/project/bii_dsc_community/
 export USER_PROJECT=$BASE/$USER
 # this script requires you to set PROJECT in the command line
 export PROJECT_DIR=$PROJECT/osmi
-export EXEC_DIR=$PROJECT_DIR/machine/rivanna
+export EXEC_DIR=$PROJECT_DIR/target/rivanna
 # export PROJECT_DATA=$USER_SCRATCH/data
 
 mkdir -p $PROJECT_DIR

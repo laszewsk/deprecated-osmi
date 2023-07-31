@@ -16,9 +16,9 @@
 
 NAME=cloudmesh-rivanna
 # NAME=cloudmesh-nvidia
-PROJECT_DIR="$PROJECT/osmi"
-RUN_DIR="$PROJECT_DIR/machine/rivanna"
-MODEL_DIR="$PROJECT_DIR/models"
+PROJECT_DIR=$PROJECT/osmi
+RUN_DIR=$PROJECT_DIR/target/rivanna
+MODEL_DIR=$PROJECT_DIR/models
 # export CONTAINERDIR=/share/resources/containers/singularity
 
 module purge
@@ -30,20 +30,14 @@ nvidia-smi
 
 source $PROJECT_DIR/ENV3/bin/activate
 
-# pip install -r $RUN_DIR/requirements-rivanna.txt
-
-# which python
-
 # cms gpu watch --gpu=0 --delay=0.5 --dense > $SLURM_JOBID.gpu.log &
 
 cd $MODEL_DIR
 
-singularity exec --nv ./$NAME.sif python train.py small_lstm
-# singularity exec --nv ./cloudmesh-docker.sif python train.py small_lstm
-
-# singularity exec --nv $CONTAINERDIR/tensorflow-2.10.0.sif python train.py small_lstm
-# singularity run --nv $CONTAINERDIR/tensorflow-2.10.0.sif train.py medium_cnn
-# singularity run --nv $CONTAINERDIR/tensorflow-2.10.0.sif train.py large_tcnn
+for model in small_lstm medium_cnn large_tcnn
+do
+    singularity exec --nv $RUN_DIR/$NAME.sif python train.py $model
+done
 
 # cd $dir
 # time singularity pull docker://tensorflow/serving:latest-gpu 

@@ -8,42 +8,32 @@ import socket
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--port_tf_server_base", type=int, required=True, help="base port for TF servers")
-ap.add_argument("-g", "--num_gpus", type=int, required=True, help="number of GPUs")
+ap.add_argument("-p", "--port_ha_proxy_base", type=int, required=True, help="base port for TF servers")
 ap.add_argument("-o", "--output_dir", type=str, required=True, help="directory to store output logs")
+ap.add_argument("-c", "--config_file", type=str, required=True, help="model config file")
 ap.add_argument("-e", "--exec_dir", type=str, required=False, help="directory of the TF serving singularity image")
-ap.add_argument("-m", "--model_conf_file", type=str, required=False, help="model config file")
 ap.add_argument("-r", "--repeat_no", type=int, required=False, help="repeat number")
 # replace with yaml and get conf from yaml
 args = vars(ap.parse_args())
 
-class ModelServer:
+class HAProxyLoadBalancer:
 
-    def __init__(self, port_tf_server_base, num_gpus, output_dir, exec_dir=None, model_conf_file=None, repeat_no=None):
+    def __init__(self, port_ha_proxy, output_dir, config_file, exec_dir=None, repeat_no=None):
         self.visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
-        self.port_tf_server = port_tf_server_base
+        self.port = port_ha_proxy
         self.output_dir = output_dir
         if repeat_no is not None:
-            self.port_tf_server += repeat_no
-        if model_conf_file is None:
-            self.model_conf_file = "models.conf"
-        else:
-            self.model_conf_file = model_conf_file
-        self.num_gpus = num_gpus
+            self.port += repeat_no
+        self.config_file = config_file
         if exec_dir is None:
             self.exec_dir = os.getcwd()
         else:
             self.exec_dir = exec_dir
 
     def start(self):
-        # for device in self.visible_devices.split(','):
-        for i in range(self.num_gpus):
-            port = self.port_tf_server + i
-            print(f"time CUDA_VISIBLE_DEVICES={i} singularity exec --nv --home `pwd` \
-                {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server \
-                --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} \
-                >& {self.output_dir}/v100-{port}.log &")
-            # Shell.run(f"time {self.visible_devices}={i} singularity exec --nv --home `pwd` {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} >& {self.output_dir}/v100-{port}.log &")
+        command = f"time singularity exec --bind `pwd`:/home --pwd /home {self.exec_dir}/haproxy_latest.sif \
+                        haproxy -d -f {self.config_file} >& {self.output_dir}haproxy.log &"
+        Shell.run(command)
 
     def shutdown(self):
         raise NotImplementedError
@@ -54,21 +44,20 @@ class ModelServer:
     
     def wait_for_server(self):
         start = time.time()
-        while not all([self.status(p+self.port_tf_server) for p in range(self.num_gpus)]):
+        while not self.status(self.port):
             if time.time() - start > 45:
-                print("Server not properly started")
                 raise ValueError("Server not properly started")
             time.sleep(0.5)
             print(".", end="")
         print()
             
 def main():
-    # print(args)
-    model_server = ModelServer(port_tf_server_base=args["port_tf_server_base"], num_gpus=args["num_gpus"], output_dir=args["output_dir"], exec_dir=args["exec_dir"], model_conf_file=args["model_conf_file"], repeat_no=args["repeat_no"])
+    print(args)
+    model_server = HAProxyLoadBalancer(port_ha_proxy=args["port_ha_proxy_base"], output_dir=args["output_dir"], exec_dir=args["exec_dir"], config_file=args["config_file"], repeat_no=args["repeat_no"])
     model_server.start()
     model_server.wait_for_server()
 
-# python ModelServer.py --port=8500 -g=2 -o=../../osmi-output
+# python LoadBalancer.py -p 8443 -o ../../osmi-output/ -c haproxy-grpc.cfg 
 
 if __name__ == '__main__':
     main()
