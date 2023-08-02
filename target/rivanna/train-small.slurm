@@ -5,7 +5,7 @@
 #SBATCH --partition=bii-gpu
 #SBATCH --account=bii_dsc_community
 #SBATCH --gres=gpu:a100:1
-#SBATCH --job-name=train-osmi
+#SBATCH --job-name=small-train-osmi
 #SBATCH --output=train-osmi-%u-%j.out
 #SBATCH --error=train-osmi-%u-%j.err
 #SBATCH --reservation=bi_fox_dgx
