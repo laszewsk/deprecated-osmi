@@ -34,13 +34,8 @@ source $PROJECT_DIR/ENV3/bin/activate
 
 cd $MODEL_DIR
 
-#
-# gvl: i suggest to create 3 scripts so we can run then separately in parallel with sbatch and have slurm deal with paralle execution
-#
-for model in small_lstm medium_cnn large_tcnn
-do
-    time singularity exec --nv $RUN_DIR/$NAME.sif python train.py $model
-done
+MODEL=small_lstm 
+time singularity exec --nv $RUN_DIR/$NAME.sif python train.py $MODEL
 
 # cd $dir
 # time singularity pull docker://tensorflow/serving:latest-gpu 
