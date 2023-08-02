@@ -5,7 +5,7 @@
 #SBATCH --partition=bii-gpu
 #SBATCH --account=bii_dsc_community
 #SBATCH --gres=gpu:a100:1
-#SBATCH --job-name=train-osmi
+#SBATCH --job-name=large-train-osmi
 #SBATCH --output=train-osmi-%u-%j.out
 #SBATCH --error=train-osmi-%u-%j.err
 #SBATCH --reservation=bi_fox_dgx
@@ -34,13 +34,8 @@ source $PROJECT_DIR/ENV3/bin/activate
 
 cd $MODEL_DIR
 
-#
-# gvl: i suggest to create 3 scripts so we can run then separately in parallel with sbatch and have slurm deal with paralle execution
-#
-for model in small_lstm medium_cnn large_tcnn
-do
-    time singularity exec --nv $RUN_DIR/$NAME.sif python train.py $model
-done
+MODEL=large_tcnn
+time singularity exec --nv $RUN_DIR/$NAME.sif python train.py $model
 
 # cd $dir
 # time singularity pull docker://tensorflow/serving:latest-gpu 
