@@ -34,7 +34,7 @@ source $PROJECT_DIR/ENV3/bin/activate
 
 cd $MODEL_DIR
 
-MODEL=medium_lstm 
+MODEL=medium_cnn 
 time singularity exec --nv $RUN_DIR/$NAME.sif python train.py $MODEL
 
 # cd $dir
