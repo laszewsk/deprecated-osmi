@@ -5,17 +5,37 @@ import requests
 import argparse
 import os
 import socket
+from cloudmesh.common.FlatDict import FlatDict
+import yaml_to_conf
 
-# construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
+ap.add_argument("-c", "--config", type=str, required=False, help="config file")
 ap.add_argument("-p", "--port_tf_server_base", type=int, required=True, help="base port for TF servers")
 ap.add_argument("-g", "--num_gpus", type=int, required=True, help="number of GPUs")
 ap.add_argument("-o", "--output_dir", type=str, required=True, help="directory to store output logs")
 ap.add_argument("-e", "--exec_dir", type=str, required=False, help="directory of the TF serving singularity image")
-ap.add_argument("-m", "--model_conf_file", type=str, required=False, help="model config file")
-ap.add_argument("-r", "--repeat_no", type=int, required=False, help="repeat number")
+ap.add_argument("-m", "--model_base_name", type=str, required=False, help="model config file")
 # replace with yaml and get conf from yaml
-args = vars(ap.parse_args())
+args = ap.parse_args()
+
+config_filename = args.config or "config.yaml"
+config = FlatDict()
+config.load(filename=config_filename)
+# construct the argument parse and parse the arguments
+
+arg_to_config_mapping = {
+    "port_tf_server_base": "port_tf_server_base",
+    "num_gpus": "num_gpus",
+    "output_dir": "output_dir",
+    "exec_dir": "exec_dir",
+    "model_conf_file": "model_conf_file",
+    "repeat_no": "repeat_no"
+}
+
+for arg_key, config_key in arg_to_config_mapping.items():
+    arg_value = getattr(args, arg_key)
+    if arg_value is not None:
+        config[config_key] = arg_value
 
 class ModelServer:
 
@@ -39,10 +59,14 @@ class ModelServer:
         # for device in self.visible_devices.split(','):
         for i in range(self.num_gpus):
             port = self.port_tf_server + i
-            print(f"time CUDA_VISIBLE_DEVICES={i} singularity exec --nv --home `pwd` \
-                {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server \
-                --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} \
-                >& {self.output_dir}/v100-{port}.log &")
+            # print(f"time CUDA_VISIBLE_DEVICES={i} singularity exec --nv --home `pwd` \
+            #     {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server \
+            #     --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} \
+            #     >& {self.output_dir}/v100-{port}.log &")
+            command = f"time {self.visible_devices}={i} singularity exec --nv --home `pwd` {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} >& {self.output_dir}/v100-{port}.log &"
+            print(command)
+            r = os.system(command)
+            print(r)
             # Shell.run(f"time {self.visible_devices}={i} singularity exec --nv --home `pwd` {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} >& {self.output_dir}/v100-{port}.log &")
 
     def shutdown(self):
@@ -64,7 +88,7 @@ class ModelServer:
             
 def main():
     # print(args)
-    model_server = ModelServer(port_tf_server_base=args["port_tf_server_base"], num_gpus=args["num_gpus"], output_dir=args["output_dir"], exec_dir=args["exec_dir"], model_conf_file=args["model_conf_file"], repeat_no=args["repeat_no"])
+    model_server = ModelServer(port_tf_server_base=args["port_tf_server_base"], num_gpus=args["num_gpus"], output_dir=args["output_dir"], exec_dir=args["exec_dir"], model_conf_file=args["model_conf_file"])
     model_server.start()
     model_server.wait_for_server()
 
