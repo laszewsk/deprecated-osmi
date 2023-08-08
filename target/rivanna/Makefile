@@ -5,6 +5,7 @@ SHELL=/bin/bash
 #PROJECT_DIR=${USER_SCRATCH}/mlcommons/benchmarks/${NAME}
 #PROJECT_DATA=${USER_SCRATCH}/data
 
+
 .PHONY: image-singularity image-docker project
 
 all: requirements data
@@ -52,7 +53,7 @@ simple:
                --verbose
 
 
-%.json: osmi.in.yaml
+%.json: config.in.yaml
 	cms sbatch generate \
 	           --source=${NAME}.in.slurm \
 	           --config=$< \
@@ -63,7 +64,7 @@ simple:
 	           --output_dir=./$(basename $@) \
                --source_dir=. \
 		       --verbose \
-			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py"
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,simple-osmi.py,yaml_to_conf.py, haproxy-grpc.cfg"
 
 kill: stop
 

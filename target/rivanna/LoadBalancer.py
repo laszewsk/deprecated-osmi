@@ -5,35 +5,45 @@ import requests
 import argparse
 import os
 import socket
+from cloudmesh.common.FlatDict import FlatDict
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--port_ha_proxy_base", type=int, required=True, help="base port for TF servers")
+ap.add_argument("-c", "--config", type=str, required=True, help="model config file")
+ap.add_argument("-p", "--haproxy_port", type=int, required=True, help="port for haproxy server")
 ap.add_argument("-o", "--output_dir", type=str, required=True, help="directory to store output logs")
-ap.add_argument("-c", "--config_file", type=str, required=True, help="model config file")
-ap.add_argument("-e", "--exec_dir", type=str, required=False, help="directory of the TF serving singularity image")
-ap.add_argument("-r", "--repeat_no", type=int, required=False, help="repeat number")
+ap.add_argument("-s", "--sif_dir", type=str, required=False, help="directory of the TF serving singularity image")
 # replace with yaml and get conf from yaml
-args = vars(ap.parse_args())
+args = ap.parse_args()
+
+config_file = getattr(args, "config") or "config.yaml"
+config = FlatDict()
+config.load(config_file, expand=True)
+
+arg_to_config_mapping = {
+    "haproxy_port": "constant.haproxy_port",
+    "sif_dir": "data.sif_dir",
+    "output_dir": "data.output",
+}
+
+for arg_key, config_key in arg_to_config_mapping.items():
+    arg_value = getattr(args, arg_key)
+    if arg_value is not None:
+        config[config_key] = arg_value
 
 class HAProxyLoadBalancer:
-
-    def __init__(self, port_ha_proxy, output_dir, config_file, exec_dir=None, repeat_no=None):
-        self.visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
-        self.port = port_ha_proxy
-        self.output_dir = output_dir
-        if repeat_no is not None:
-            self.port += repeat_no
-        self.config_file = config_file
-        if exec_dir is None:
-            self.exec_dir = os.getcwd()
-        else:
-            self.exec_dir = exec_dir
+    
+    def __init__(self, config):
+        self.port = config["constant.haproxy_port"]
+        self.output_dir = config["data.output"]
+        self.haproxy_config_file = config["data.haproxy_config_file"]
 
     def start(self):
-        command = f"time singularity exec --bind `pwd`:/home --pwd /home {self.exec_dir}/haproxy_latest.sif \
-                        haproxy -d -f {self.config_file} >& {self.output_dir}haproxy.log &"
-        Shell.run(command)
+        command = f"time singularity exec --bind `pwd`:/home --pwd /home {self.sif_dir}/haproxy_latest.sif \
+                        haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}haproxy.log &"
+        print(command)
+        r = os.run(command)
+        print(r)
 
     def shutdown(self):
         raise NotImplementedError
@@ -53,9 +63,10 @@ class HAProxyLoadBalancer:
             
 def main():
     print(args)
-    model_server = HAProxyLoadBalancer(port_ha_proxy=args["port_ha_proxy_base"], output_dir=args["output_dir"], exec_dir=args["exec_dir"], config_file=args["config_file"], repeat_no=args["repeat_no"])
-    model_server.start()
-    model_server.wait_for_server()
+    # model_server = HAProxyLoadBalancer(port_ha_proxy=args["port_ha_proxy_base"], output_dir=args["output_dir"], exec_dir=args["exec_dir"], config_file=args["config_file"], repeat_no=args["repeat_no"])
+    load_balancer = HAProxyLoadBalancer(config)
+    load_balancer.start()
+    load_balancer.wait_for_server()
 
 # python LoadBalancer.py -p 8443 -o ../../osmi-output/ -c haproxy-grpc.cfg 
 
