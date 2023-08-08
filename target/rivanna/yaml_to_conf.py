@@ -4,8 +4,9 @@ from cloudmesh.common.util import banner
 from cloudmesh.common.FlatDict import FlatDict, expand_config_parameters
 import os
 
+
 class YamlToJsonConverter:
-    
+
     def __init__(self, config_file, base_name="models"):
         self.config_file = config_file
         pid = os.getpid()
@@ -27,7 +28,7 @@ class YamlToJsonConverter:
         Extract the 'model_config_list' section from the configuration.
         """
         model_config_list = {}
-        
+
         for key in self.config:
             parts = key.split(".")
             if len(parts) != 3:
@@ -53,16 +54,14 @@ class YamlToJsonConverter:
         self._extract_model_config_list()
         pprint(self.model_config_list)
         self._save_to_json()
-        
+
     def get_name(self):
         return self.json_file
-
 
 
 if __name__ == "__main__":
     converter = YamlToJsonConverter("path_to_config.yaml")
     converter.convert()
-
 
 # from pprint import pprint
 # from cloudmesh.common.util import banner
