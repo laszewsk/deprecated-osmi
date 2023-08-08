@@ -9,10 +9,9 @@ from cloudmesh.common.FlatDict import FlatDict
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-c", "--config", type=str, required=True, help="model config file")
-ap.add_argument("-p", "--haproxy_port", type=int, required=True, help="port for haproxy server")
-ap.add_argument("-o", "--output_dir", type=str, required=True, help="directory to store output logs")
-ap.add_argument("-s", "--sif_dir", type=str, required=False, help="directory of the TF serving singularity image")
+ap.add_argument("-c", "--config", type=str, help="model config file")
+ap.add_argument("-p", "--haproxy_port", type=int, help="port for haproxy server")
+ap.add_argument("-o", "--output_dir", type=str, help="directory to store output logs")
 # replace with yaml and get conf from yaml
 args = ap.parse_args()
 
@@ -38,8 +37,7 @@ class HAProxyLoadBalancer:
     def __init__(self, config):
         self.port = config["constant.haproxy_port"]
         self.output_dir = config["data.output"]
-        self.haproxy_config_file = config["data.haproxy_config_file"]
-        self.sif_dir = config["data.sif_dir"]
+    self.haproxy_config_file = config["data.haproxy_config_file"]
         self.haproxy_sif = config["data.haproxy_sif"]
 
     def start(self):

@@ -10,20 +10,13 @@ from yaml_to_conf import YamlToJsonConverter
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-c", "--config", type=str,
-                required=False,
                 help="config file")
 ap.add_argument("-p", "--port", type=int,
-                required=True,
                 help="base port for TF servers")
 ap.add_argument("-g", "--ngpus", type=int,
-                required=True,
                 help="number of GPUs")
 ap.add_argument("-o", "--output_dir", type=str,
-                required=True,
                 help="directory to store output logs")
-ap.add_argument("-s", "--sif_dir", type=str,
-                required=False,
-                help="directory of the TF serving singularity image")
 # exec dir is wrong, because cloudmesh dynamically cds into the directory
 # ap.add_argument("-m", "--model_conf_base_name", type=str,
 # required=False, help="model config file base name")
@@ -54,7 +47,6 @@ class ModelServer:
         self.tfs_base_port = config["constant.tfs_base_port"]
         self.ngpus = config["experiment.ngpus"]
         self.output_dir = config["data.output"]
-        self.sif_dir = config["data.sif_dir"]
         self.batch = config["experiment.batch"]
         self.tfs_sif = config["data.tfs_sif"]
         self.model_conf_file = self.convert_conf_to_json()
