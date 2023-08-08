@@ -64,7 +64,7 @@ simple:
 	           --output_dir=./$(basename $@) \
                --source_dir=. \
 		       --verbose \
-			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,simple-osmi.py,yaml_to_conf.py, haproxy-grpc.cfg"
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,haproxy-grpc.cfg"
 
 kill: stop
 
