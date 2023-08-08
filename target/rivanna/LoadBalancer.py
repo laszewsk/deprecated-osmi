@@ -37,7 +37,7 @@ class HAProxyLoadBalancer:
     def __init__(self, config):
         self.port = config["constant.haproxy_port"]
         self.output_dir = config["data.output"]
-    self.haproxy_config_file = config["data.haproxy_config_file"]
+        self.haproxy_config_file = config["data.haproxy_config_file"]
         self.haproxy_sif = config["data.haproxy_sif"]
 
     def start(self):
