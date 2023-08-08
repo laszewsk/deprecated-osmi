@@ -59,7 +59,7 @@ echo CONFIG_FILE $CONFIG_FILE
 
 PROGRESS "running" 3
 
-singularity exec --nv --bind /localscratch:/localscratch {data.osmi_sif} \
+singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/osmi.sif \
     python osmi-bench.py --config=$CONFIG_FILE
 
 # singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/$NAME.sif \
