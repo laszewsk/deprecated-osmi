@@ -9,12 +9,24 @@ from cloudmesh.common.FlatDict import FlatDict
 from yaml_to_conf import YamlToJsonConverter
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-c", "--config", type=str, help="config file")
-ap.add_argument("-p", "--port", type=int, required=True, help="base port for TF servers")
-ap.add_argument("-g", "--ngpus", type=int, required=True, help="number of GPUs")
-ap.add_argument("-o", "--output_dir", type=str, required=True, help="directory to store output logs")
-ap.add_argument("-s", "--sif_dir", type=str, required=False, help="directory of the TF serving singularity image") # exec dir is wrong, because cloudmesh dynamically cds into the directory
-# ap.add_argument("-m", "--model_conf_base_name", type=str, required=False, help="model config file base name")
+ap.add_argument("-c", "--config", type=str,
+                required=False,
+                help="config file")
+ap.add_argument("-p", "--port", type=int,
+                required=True,
+                help="base port for TF servers")
+ap.add_argument("-g", "--ngpus", type=int,
+                required=True,
+                help="number of GPUs")
+ap.add_argument("-o", "--output_dir", type=str,
+                required=True,
+                help="directory to store output logs")
+ap.add_argument("-s", "--sif_dir", type=str,
+                required=False,
+                help="directory of the TF serving singularity image")
+# exec dir is wrong, because cloudmesh dynamically cds into the directory
+# ap.add_argument("-m", "--model_conf_base_name", type=str,
+# required=False, help="model config file base name")
 args = ap.parse_args()
 
 config_filename = getattr(args, "config") or "config.yaml"
@@ -34,6 +46,7 @@ for arg_key, config_key in arg_to_config_mapping.items():
     if arg_value is not None:
         config[config_key] = arg_value
 
+
 class ModelServer:
 
     def __init__(self, config):
@@ -48,7 +61,7 @@ class ModelServer:
         converter = YamlToJsonConverter(config_filename, "models")
         converter.convert()
         return converter.get_name()
-                      
+
     def start(self):
         # for device in self.visible_devices.split(','):
         for i in range(self.ngpus):
@@ -57,40 +70,48 @@ class ModelServer:
             #     {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server \
             #     --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} \
             #     >& {self.output_dir}/v100-{port}.log &")
-            command = f"time CUDA_VISIBLE_DEVICES={i} singularity exec --nv --home `pwd` {self.sif_dir}/serving_latest-gpu.sif tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} >& {self.output_dir}/v100-{port}.log &"
+            command = f"time CUDA_VISIBLE_DEVICES={i} "\
+                      f"singularity exec --nv --home `pwd` {self.sif_dir}/serving_latest-gpu.sif "\
+                      f"tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
+                      f">& {self.output_dir}/v100-{port}.log &"
             print(command)
             r = os.system(command)
             print(r)
-            # Shell.run(f"time {self.visible_devices}={i} singularity exec --nv --home `pwd` {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} >& {self.output_dir}/v100-{port}.log &")
+            # Shell.run(f"time {self.visible_devices}={i} singularity exec --nv --home "
+            # "`pwd` {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server --port={port} --rest_api_port=0 "
+            # "--model_config_file={self.model_conf_file} >& {self.output_dir}/v100-{port}.log &")
 
     def shutdown(self):
         raise NotImplementedError
 
     def status(self, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        return sock.connect_ex(('127.0.0.1',port)) == 0
-    
+        return sock.connect_ex(('127.0.0.1', port)) == 0
+
     def wait_for_server(self):
         start = time.time()
-        while not all([self.status(p+self.tfs_base_port) for p in range(self.ngpus)]):
+        while not all([self.status(p + self.tfs_base_port) for p in range(self.ngpus)]):
             if time.time() - start > 45:
                 print("Server not properly started")
                 raise ValueError("Server not properly started")
             time.sleep(0.5)
             print(".", end="")
         print()
-            
+
+
 def main():
     # print(args)
-    model_server = ModelServer(port=args["port"], ngpus=args["ngpus"], output_dir=args["output_dir"], exec_dir=args["exec_dir"], model_conf_file=args["model_conf_file"])
+    model_server = ModelServer(port=args["port"], ngpus=args["ngpus"], output_dir=args["output_dir"], exec_dir=args["exec_dir"],
+                               model_conf_file=args["model_conf_file"])
     model_server.start()
     model_server.wait_for_server()
+
 
 # python ModelServer.py --port=8500 -g=2 -o=../../osmi-output
 
 if __name__ == '__main__':
     main()
-    
+
 """
     
 start_tf_servers() {
@@ -138,20 +159,18 @@ start_tf_servers() {
 }
     """
 
-
-    # def __init__(self, port, ngpus, output_dir, exec_dir=None, model_conf_file=None):
-    #     self.visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
-    #     self.tfs_base_port = port
-    #     self.output_dir = output_dir
-    #     self.ngpus = ngpus
-    #     if exec_dir is None:
-    #         self.exec_dir = os.getcwd()
-    #     else:
-    #         self.exec_dir = exec_dir
-    #     if model_conf_file is None:
-    #         self.model_conf_file = "models.conf"
-    #     else:
-    #         converter = YamlToJsonConverter("models")
-    #         converter.convert()
-    #         self.model_conf_file = converter.get_name()
-    
+# def __init__(self, port, ngpus, output_dir, exec_dir=None, model_conf_file=None):
+#     self.visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
+#     self.tfs_base_port = port
+#     self.output_dir = output_dir
+#     self.ngpus = ngpus
+#     if exec_dir is None:
+#         self.exec_dir = os.getcwd()
+#     else:
+#         self.exec_dir = exec_dir
+#     if model_conf_file is None:
+#         self.model_conf_file = "models.conf"
+#     else:
+#         converter = YamlToJsonConverter("models")
+#         converter.convert()
+#         self.model_conf_file = converter.get_name()

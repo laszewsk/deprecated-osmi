@@ -37,8 +37,9 @@ for arg_key, config_key in arg_to_config_mapping.items():
     if arg_value is not None:
         config[config_key] = arg_value
 
+
 class OSMI:
-    
+
     def __init__(self, config):
         self.model = config["experiment.model"]
         self.nrequests = config["constant.nrequests"]
@@ -46,12 +47,14 @@ class OSMI:
         self.server = config["constant.server"]
         self.port = config["constant.haproxy_port"]
         self.log_file = f"results/log-{self.model}-{self.nrequests}-{self.batch}-{self.server_id}-{self.port}.txt"
-        
+
     def run(self):
-        cmd = f"time singularity exec --bind `pwd`:/home --pwd /home {self.sif_dir}/cloudmesh-nvidia.sif python {self.algorithm} {self.server}:{self.port} -m {self.model} -b {self.batch} -n {self.nrequests} &> {self.log_file}"
+        cmd = f"time singularity exec --bind `pwd`:/home --pwd /home {self.sif_dir}/cloudmesh-nvidia.sif "\
+              f"python {self.algorithm} {self.server}:{self.port} -m {self.model} -b {self.batch} -n {self.nrequests} &> {self.log_file}"
         print(cmd)
         r = os.system(cmd)
         print(r)
+
 
 # def osmi(args):
 #     log_file = f"results/log-{args.model}-{args.nrequests}-{args.batchsize}-{args.ngpus}-{args.concurrency}-{args.server_id}-{args.port}.txt"

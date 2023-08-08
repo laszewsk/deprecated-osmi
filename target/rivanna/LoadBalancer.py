@@ -31,8 +31,9 @@ for arg_key, config_key in arg_to_config_mapping.items():
     if arg_value is not None:
         config[config_key] = arg_value
 
+
 class HAProxyLoadBalancer:
-    
+
     def __init__(self, config):
         self.port = config["constant.haproxy_port"]
         self.output_dir = config["data.output"]
@@ -51,8 +52,8 @@ class HAProxyLoadBalancer:
 
     def status(self, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        return sock.connect_ex(('127.0.0.1',port)) == 0
-    
+        return sock.connect_ex(('127.0.0.1', port)) == 0
+
     def wait_for_server(self):
         start = time.time()
         while not self.status(self.port):
@@ -61,19 +62,23 @@ class HAProxyLoadBalancer:
             time.sleep(0.5)
             print(".", end="")
         print()
-            
+
+
 def main():
     print(args)
-    # model_server = HAProxyLoadBalancer(port_ha_proxy=args["port_ha_proxy_base"], output_dir=args["output_dir"], exec_dir=args["exec_dir"], config_file=args["config_file"], repeat_no=args["repeat_no"])
+    # model_server = HAProxyLoadBalancer(port_ha_proxy=args["port_ha_proxy_base"],
+    #                output_dir=args["output_dir"], exec_dir=args["exec_dir"],
+    #                config_file=args["config_file"], repeat_no=args["repeat_no"])
     load_balancer = HAProxyLoadBalancer(config)
     load_balancer.start()
     load_balancer.wait_for_server()
 
-# python LoadBalancer.py -p 8443 -o ../../osmi-output/ -c haproxy-grpc.cfg 
+
+# python LoadBalancer.py -p 8443 -o ../../osmi-output/ -c haproxy-grpc.cfg
 
 if __name__ == '__main__':
     main()
-    
+
 """
     
 start_tf_servers() {
