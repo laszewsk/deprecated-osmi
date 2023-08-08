@@ -25,7 +25,7 @@ parser.add_argument("-g", "--ngpus", type=int, required=True, help="number of GP
 args = parser.parse_args()
 
 config = FlatDict()
-config.load(getattr('config'), expand=True)
+config.load(getattr(args, 'config'), expand=True)
 
 config["experiment.ngpus"] = int(config["experiment.ngpus"])
 config["experiment.batch"] = int(config["experiment.batch"])
