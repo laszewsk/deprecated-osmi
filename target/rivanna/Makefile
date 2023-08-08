@@ -92,6 +92,9 @@ clean:
 	@-rm -rf '__pycache__'
 	@-rm -rf *~
 
+# run-osmi:
+# 	# cd image-singularity; make run
+
 
 image-tfs:
 	cd image-singularity; time singularity pull docker://tensorflow/serving:latest-gpu
