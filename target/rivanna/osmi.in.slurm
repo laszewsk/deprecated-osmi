@@ -6,7 +6,6 @@
 {slurm.sbatch}
 #SBATCH --nodes={sbatch.nodes}
 #SBATCH --ntasks={sbatch.ntasks}
-#SBATCH -c {sbatch.cpu_num}
 #SBATCH --mem={sbatch.mem}
 #SBATCH --gres=gpu:{experiment.card_name}:{experiment.ngpus}
 #SBATCH --cpus-per-task=1

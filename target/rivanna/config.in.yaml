@@ -7,7 +7,6 @@ sbatch:
   dir: scratch
   nodes: 1
   ntasks: 2
-  cpu_num: 1
   mem: 16G
 
 system:

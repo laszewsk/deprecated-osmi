@@ -166,6 +166,15 @@ rivanna> make environment
 rivanna> source ../../ENV3/bin/activate
 ```
 
+```
+module load gcc/11.2.0 openmpi/4.1.4 python/3.11.1
+python -m venv /project/bii_dsc_community/$USER/ENV3
+pip install pip -U
+source /project/bii_dsc_community/$USER/ENV3/bin/activate
+pip install cloudmesh-sbatch
+pip install cloudmesh-rivanna
+```
+
 ### Interacting with Rivanna
 
 Rivanna has two brimary modes so users can interact with it. 
