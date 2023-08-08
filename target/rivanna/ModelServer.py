@@ -24,7 +24,7 @@ args = ap.parse_args()
 
 config_filename = getattr(args, "config") or "config.yaml"
 config = FlatDict()
-config.load(filename=config_filename)
+config.load(content=config_filename, expand=True)
 config["experiment.ngpus"] = int(config["experiment.ngpus"])
 
 arg_to_config_mapping = {
