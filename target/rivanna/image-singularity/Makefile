@@ -34,7 +34,7 @@ run:
 #singularity exec --nv ${NAME}.sif papermill ${NAME}.ipynb ${NAME}_output.ipynb
 
 shell:
-	singularity ${BIND} shell --nv ${IMAGE}
+	singularity shell --nv osmi.sif
 
 run-localscratch:
 	cd ${CODE_DIR}; mkdir -p outputs

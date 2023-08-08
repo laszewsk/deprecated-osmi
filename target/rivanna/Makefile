@@ -102,6 +102,9 @@ image-tfs:
 image-osmi:
 	cd image-singularity; cms rivanna singularity build ${NAME}.def
 
+shell:
+	singularity ${BIND} shell --nv ${IMAGE}
+
 run-singularity:
 	cd image-singularity; make run
 
