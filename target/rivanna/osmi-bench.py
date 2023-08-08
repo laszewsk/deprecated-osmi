@@ -17,7 +17,6 @@ parser.add_argument('-m', '--model', type=str, help='model name, e.g. small_lstm
 parser.add_argument('-n', '--nrequests', type=int, help='number of requests')
 parser.add_argument("-h", "--haproxy_port", type=int, help="port for haproxy server")
 parser.add_argument("-o", "--output_dir", type=str, help="directory to store output logs")
-parser.add_argument("-s", "--sif_dir", type=str, required=False, help="directory of the TF serving singularity image")
 parser.add_argument("-c", "--config", type=str, help="model config file")
 parser.add_argument("-t", "--tfs_base_port", type=int, help="base port for TF servers")
 parser.add_argument("-g", "--ngpus", type=int, help="number of GPUs")
@@ -38,7 +37,6 @@ arg_to_config_mapping = {
     "batch": "experiment.batch",
     "model": "experiment.model",
     "nrequests": "constant.nrequests",
-    "sif_dir": "data.sif_dir",
     "tfs_base_port": "constant.tfs_base_port",
     "ngpus": "experiment.ngpus",
     "output_dir": "data.output",
