@@ -68,13 +68,16 @@ constant:
   # config: "config.yaml"
   nrequests: 32768
 
+project:
+  user: "/project/bii_dsc_community/{os.USER}"
+  dir: "/project/bii_dsc_community/{os.USER}/osmi"
+
 data:
-  project: "/project/bii_dsc_community/{project.user}/osmi/osmi-bench"
   output: "./outputs"
-  sif_dir: "{data.project}/target/rivanna/image_singularity"
-  haproxy_sif: "{data.sif_dir}/haproxy_latest.sif"
-  tfs_sif: "{data.sif_dir}/serving_latest-gpu.sif"
-  osmi_sif: "{data.sif_dir}/osmi.sif"
+  sif_dir: "{project.dir}/target/rivanna/image_singularity"
+  haproxy_sif: "{project.dir}/image-singularity/haproxy_latest.sif"
+  tfs_sif: "{project.dir}/image-singularity/serving_latest-gpu.sif"
+  osmi_sif: "{project.dir}/image-singularity/osmi.sif"
   haproxy_cfg_file: haproxy-grpc.cfg
 
 # config:
@@ -88,11 +91,6 @@ data:
 #   model: ["small_lstm","medium_cnn","large_tcnn"]
 
 user: "{os.USER}"
-
-project:
-  #user: "/project/bii_dsc_community/{user}" #BUG
-  user: "/project/bii_dsc_community/{os.USER}"
-  osmi_bench: "/project/bii_dsc_community/{os.USER}/osmi/osmi-bench"
 
 model_config_list:
   small_lstm:
