@@ -9,7 +9,7 @@ from cloudmesh.common.FlatDict import FlatDict
 from yaml_to_conf import YamlToJsonConverter
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-c", "--config", type=str, required=False, help="config file")
+ap.add_argument("-c", "--config", type=str, help="config file")
 ap.add_argument("-p", "--port", type=int, required=True, help="base port for TF servers")
 ap.add_argument("-g", "--ngpus", type=int, required=True, help="number of GPUs")
 ap.add_argument("-o", "--output_dir", type=str, required=True, help="directory to store output logs")

@@ -17,7 +17,7 @@ parser.add_argument("-c", "--config", type=str, required=True, help="model confi
 args = parser.parse_args()
 
 config = FlatDict()
-config.load(args.config, expand=True)
+config.load(getattr(args,'config'), expand=True)
 
 config["experiment.batch"] = int(config["experiment.batch"])
 # config["experiment.repeat"] = int(config["experiment.repeat"])

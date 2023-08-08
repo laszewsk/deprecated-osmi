@@ -37,6 +37,7 @@ class HAProxyLoadBalancer:
         self.port = config["constant.haproxy_port"]
         self.output_dir = config["data.output"]
         self.haproxy_config_file = config["data.haproxy_config_file"]
+        self.sif_dir = config["data.sif_dir"]
 
     def start(self):
         command = f"time singularity exec --bind `pwd`:/home --pwd /home {self.sif_dir}/haproxy_latest.sif \
