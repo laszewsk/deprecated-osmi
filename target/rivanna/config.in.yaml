@@ -72,12 +72,13 @@ project:
   user: "/project/bii_dsc_community/{os.USER}"
   dir: "/project/bii_dsc_community/{os.USER}/osmi"
 
+# this is a bug we should be able to use project.dir, it does not show properly in the slurm script
 data:
   output: "./outputs"
-  sif_dir: "{project.dir}/target/rivanna/image_singularity"
-  haproxy_sif: "{project.dir}/image-singularity/haproxy_latest.sif"
-  tfs_sif: "{project.dir}/image-singularity/serving_latest-gpu.sif"
-  osmi_sif: "{project.dir}/image-singularity/osmi.sif"
+  sif_dir: "/project/bii_dsc_community/{os.USER}/osmi/image-singularity"
+  haproxy_sif: "/project/bii_dsc_community/{os.USER}/osmi/image-singularity/haproxy_latest.sif"
+  tfs_sif: "/project/bii_dsc_community/{os.USER}/osmi/image-singularity/serving_latest-gpu.sif"
+  osmi_sif: "/project/bii_dsc_community/{os.USER}/osmi/image-singularity/osmi.sif"
   haproxy_cfg_file: haproxy-grpc.cfg
 
 # config:
