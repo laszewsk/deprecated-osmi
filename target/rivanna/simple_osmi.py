@@ -37,6 +37,7 @@ for arg_key, config_key in arg_to_config_mapping.items():
     if arg_value is not None:
         config[config_key] = arg_value
 
+SINGULARITY = "singularity exec --bind `pwd`:/home --pwd /home"
 
 class OSMI:
 
@@ -46,10 +47,11 @@ class OSMI:
         self.batch = config["experiment.batch"]
         self.server = config["constant.server"]
         self.port = config["constant.haproxy_port"]
+        self.osmi_sif = config["data.osmi_sif"]
         self.log_file = f"results/log-{self.model}-{self.nrequests}-{self.batch}-{self.server_id}-{self.port}.txt"
 
     def run(self):
-        cmd = f"time singularity exec --bind `pwd`:/home --pwd /home {self.sif_dir}/cloudmesh-nvidia.sif "\
+        cmd = f"time {SINGULARITY} {self.osmi_sif} "\
               f"python {self.algorithm} {self.server}:{self.port} -m {self.model} -b {self.batch} -n {self.nrequests} &> {self.log_file}"
         print(cmd)
         r = os.system(cmd)

@@ -46,6 +46,7 @@ for arg_key, config_key in arg_to_config_mapping.items():
     if arg_value is not None:
         config[config_key] = arg_value
 
+SINGULARITY = "singularity exec --bind `pwd`:/home --pwd /home"
 
 class ModelServer:
 
@@ -55,6 +56,7 @@ class ModelServer:
         self.output_dir = config["data.output"]
         self.sif_dir = config["data.sif_dir"]
         self.batch = config["experiment.batch"]
+        self.tfs_sif = config["data.tfs_sif"]
         self.model_conf_file = self.convert_conf_to_json()
 
     def convert_conf_to_json(self):
@@ -71,7 +73,7 @@ class ModelServer:
             #     --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} \
             #     >& {self.output_dir}/v100-{port}.log &")
             command = f"time CUDA_VISIBLE_DEVICES={i} "\
-                      f"singularity exec --nv --home `pwd` {self.sif_dir}/serving_latest-gpu.sif "\
+                      f"{SINGULARITY} {self.tfs_sif} "\
                       f"tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
                       f">& {self.output_dir}/v100-{port}.log &"
             print(command)

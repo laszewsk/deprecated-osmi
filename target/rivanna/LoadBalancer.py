@@ -31,6 +31,7 @@ for arg_key, config_key in arg_to_config_mapping.items():
     if arg_value is not None:
         config[config_key] = arg_value
 
+SINGULARITY = "singularity exec --bind `pwd`:/home --pwd /home"
 
 class HAProxyLoadBalancer:
 
@@ -39,10 +40,11 @@ class HAProxyLoadBalancer:
         self.output_dir = config["data.output"]
         self.haproxy_config_file = config["data.haproxy_config_file"]
         self.sif_dir = config["data.sif_dir"]
+        self.haproxy_sif = config["data.haproxy_sif"]
 
     def start(self):
-        command = f"time singularity exec --bind `pwd`:/home --pwd /home {self.sif_dir}/haproxy_latest.sif \
-                        haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}haproxy.log &"
+        command = f"time {SINGULARITY} {self.haproxy_sif} " \
+                  f"haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}haproxy.log &"
         print(command)
         r = os.run(command)
         print(r)
