@@ -86,11 +86,13 @@ status:
 
 
 clean:
-	@-rm -rf localscratch localscratch.json jobs-localscratch.sh
 	@-rm -rf project project.json jobs-project.sh
-	@-rm -f rivanna.slurm
 	@-rm -rf '__pycache__'
 	@-rm -rf *~
+
+clean-images:
+	@-rm -rf image-singularity/*.sif
+
 
 # run-osmi:
 # 	# cd image-singularity; make run
