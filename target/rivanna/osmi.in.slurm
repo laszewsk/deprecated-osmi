@@ -45,7 +45,7 @@ echo "# ==================================="
 echo "# PROJECT info"
 echo "# ==================================="
 
-NAME=cloudmesh-nvidia
+NAME=osmi
 USER_PROJECT=/project/bii_dsc_community/$USER
 WORKDIR=$USER_PROJECT/osmi
 SIF_DIR=$WORKDIR/target/rivanna/image-singularity
@@ -59,7 +59,7 @@ echo CONFIG_FILE $CONFIG_FILE
 
 PROGRESS "running" 3
 
-singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/$NAME.sif \
+singularity exec --nv --bind /localscratch:/localscratch {data.osmi_sif} \
     python osmi-bench.py --config=$CONFIG_FILE
 
 # singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/$NAME.sif \
