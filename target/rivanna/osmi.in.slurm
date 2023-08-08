@@ -24,8 +24,6 @@ PROGRESS () {
 
 PROGRESS "running" 1
 
-
-
 echo "# ==================================="
 echo "# SLURM info"
 echo "# ==================================="
@@ -37,28 +35,47 @@ echo ngpus {experiment.ngpus}
 echo repeat {experiment.repeat}
 echo jobno $SLURM_JOB_ID
 echo {slurm.sbatch}
-echo cpu num {sbatch.cpu_num}
 echo mem {sbatch.mem}
 echo USER $USER
 
+
+PROGRESS "running" 2
+
+echo "# ==================================="
+echo "# PROJECT info"
+echo "# ==================================="
+
+NAME=cloudmesh-nvidia
+USER_PROJECT=/project/bii_dsc_community/$USER
+WORKDIR=$USER_PROJECT/osmi
+SIF_DIR=$WORKDIR/target/rivanna/image-singularity
 CONFIG_FILE=config.yaml
 
-PROGRESS "running" 2
-
-singularity exec --nv --bind /localscratch:/localscratch $EXEC_DIR/$NAME.sif \
-    python ModelServer.py --config=$CONFIG_FILE
-    # python ModelServer.py --port=$PORT_TF_SERVER_BASE --num_gpus=$NUM_GPUS_PER_NODE --output_dir=$OUTPUT_DIR
-
-PROGRESS "running" 2
-
-singularity exec --nv --bind /localscratch:/localscratch $EXEC_DIR/$NAME.sif \
-    python LoadBalancer.py --config=$CONFIG_FILE
-    # python LoadBalancer.py -p 8443 -o ../../osmi-output/ -c haproxy-grpc.cfg
+echo NAME $NAME
+echo USER_PROJECT $USER_PROJECT
+echo WORKDIR $WORKDIR
+echo SIF_DIR $SIF_DIR
+echo CONFIG_FILE $CONFIG_FILE
 
 PROGRESS "running" 3
 
-singularity exec --nv --bind /localscratch:/localscratch $EXEC_DIR/$NAME.sif \
-    python Client.py --config=$CONFIG_FILE
+singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/$NAME.sif \
+    python osmi-bench.py --config=$CONFIG_FILE
+
+# singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/$NAME.sif \
+#     python ModelServer.py --config=$CONFIG_FILE
+#     # python ModelServer.py --port=$PORT_TF_SERVER_BASE --num_gpus=$NUM_GPUS_PER_NODE --output_dir=$OUTPUT_DIR
+
+# PROGRESS "running" 2
+
+# singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/$NAME.sif \
+#     python LoadBalancer.py --config=$CONFIG_FILE
+#     # python LoadBalancer.py -p 8443 -o ../../osmi-output/ -c haproxy-grpc.cfg
+
+# PROGRESS "running" 3
+
+# singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/$NAME.sif \
+#     python Client.py --config=$CONFIG_FILE
 
 # echo "# ==================================="
 # echo "# Set up file system"

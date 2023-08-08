@@ -71,7 +71,7 @@ constant:
 data:
   project: "/project/bii_dsc_community/{project.user}/osmi/osmi-bench"
   output: "./outputs"
-  sif_dir: "{data.project}/target/rivanna/"
+  sif_dir: "{data.project}/target/rivanna/image_singularity"
   haproxy_cfg_file: haproxy-grpc.cfg
 
 # config:

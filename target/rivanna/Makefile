@@ -5,10 +5,13 @@ SHELL=/bin/bash
 #PROJECT_DIR=${USER_SCRATCH}/mlcommons/benchmarks/${NAME}
 #PROJECT_DATA=${USER_SCRATCH}/data
 
-
 .PHONY: image-singularity image-docker project
 
 all: requirements data
+
+image-haproxy:
+	mkdir -p image-singularity
+	cd image-singularity; time singularity pull docker://haproxy
 
 requirements:
 	time pip install -r ${PROJECT_DIR}/experiments/rivanna/requirements.txt
@@ -64,7 +67,7 @@ simple:
 	           --output_dir=./$(basename $@) \
                --source_dir=. \
 		       --verbose \
-			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,haproxy-grpc.cfg"
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,simple_osmi.py,osmi-bench.py,haproxy-grpc.cfg"
 
 kill: stop
 
@@ -90,11 +93,11 @@ clean:
 	@-rm -rf *~
 
 
-# image
+image-tfs:
+	cd image-singularity; time singularity pull docker://tensorflow/serving:latest-gpu
 
-
-image-singularity:
-	cms rivanna singularity build image-singularity/${NAME}.def
+image-osmi:
+	cd image-singularity; cms rivanna singularity build ${NAME}.def
 
 run-singularity:
 	cd image-singularity; make run
@@ -113,7 +116,7 @@ shell-rivanna:
 
 run: run-singularity
 
-image: image-singularity
+image: image-haproxy image-osmi image-tfs
 
 push:
 	-git push
