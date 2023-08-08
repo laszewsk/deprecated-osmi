@@ -15,11 +15,10 @@
 NAME=cloudmesh-rivanna
 # BASE=/localscratch
 # RUN_DIR=$BASE/$USER/osmi
-# EXEC_DIR="$RUN_DIR/machine/rivanna"
 RUN_DIR=$PROJECT/osmi
 OUTPUT_DIR="$RUN_DIR/osmi-output"
 BENCHMARK_DIR="$RUN_DIR/benchmark"
-EXEC_DIR=$RUN_DIR/machine/rivanna
+EXEC_DIR=$RUN_DIR/target/rivanna
 PORT_TF_SERVER=8500
 
 REPEAT=0
@@ -42,6 +41,7 @@ start_tf_servers() {
     done
 
     # time CUDA_VISIBLE_DEVICES=1 singularity exec --nv --home `pwd` $EXEC_DIR/serving_latest-gpu.sif tensorflow_model_server --port=8501 --rest_api_port=0 --model_config_file=models.conf >& $OUTPUT_DIR/v100-8501.log &
+    # time CUDA_VISIBLE_DEVICES=0 singularity exec --nv --home `pwd` $EXEC_DIR/serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& $OUTPUT_DIR/v100-8500.log &
     echo "# cloudmesh status=running progress=45 pid=$$"
     start_wait_for_server=`date +%s`
     echo start_wait_for_server $start_wait_for_server
@@ -99,7 +99,8 @@ run_metabench() {
 
 run_benchmark() {
     echo "# cloudmesh status=running progress=50 pid=$$"
-    start_tf_servers
+    # start_tf_servers
+    python ModelServer.py --port=$PORT_TF_SERVER_BASE --num_gpus=$NUM_GPUS_PER_NODE
     echo "# cloudmesh status=running progress=60 pid=$$"
     start_load_balancer
     echo "# cloudmesh status=running progress=90 pid=$$"
@@ -134,7 +135,16 @@ echo "# cloudmesh status=running progress=40 pid=$$"
 echo "# ======= SERVER START"
 cd $BENCHMARK_DIR
 
-run_benchmark
+echo "# cloudmesh status=running progress=50 pid=$$"
+singularity exec --nv --bind /localscratch:/localscratch $EXEC_DIR/$NAME.sif \
+    python ModelServer.py --port=$PORT_TF_SERVER_BASE --num_gpus=$NUM_GPUS_PER_NODE --output_dir=$OUTPUT_DIR
+
+singularity exec --nv --bind /localscratch:/localscratch $EXEC_DIR/$NAME.sif \
+    python LoadBalancer.py -p 8443 -o ../../osmi-output/ -c haproxy-grpc.cfg
+echo "# cloudmesh status=running progress=60 pid=$$"
+# start_load_balancer
+echo "# cloudmesh status=running progress=90 pid=$$"
+run_metabench
 
 seff $SLURM_JOB_ID
 echo "# cloudmesh status=running progress=100 pid=$$"

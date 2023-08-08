@@ -10,3 +10,4 @@ cloudmesh-common
 cloudmesh-gpu
 pyyaml
 matplotlib
+docopt
