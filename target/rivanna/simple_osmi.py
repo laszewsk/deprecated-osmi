@@ -8,12 +8,13 @@ from cloudmesh.common.FlatDict import FlatDict
 from cloudmesh.common.FlatDict import expand_config_parameters
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-s', 'server', help='server ip, e.g. 10.1.1.37')
+parser.add_argument('-s', '--server', help='server ip, e.g. 10.1.1.37')
 parser.add_argument('-p', '--port', type=int, help='server port, e.g. 8443')
 parser.add_argument('-b', '--batch', type=int, help='batch size')
 parser.add_argument('-m', '--model', type=str, help='model name, e.g. small_lstm')
 parser.add_argument('-n', '--nrequests', type=int, help='number of requests')
 parser.add_argument("-c", "--config", type=str, help="model config file")
+parser.add_argument("-o", "--osmi_sif", type=str, help="osmi singularity image")
 args = parser.parse_args()
 
 config = FlatDict()
@@ -29,7 +30,7 @@ arg_to_config_mapping = {
     "batch": "experiment.batch",
     "model": "experiment.model",
     "nrequests": "constant.nrequests",
-    "sif_dir": "data.sif_dir",
+    "osmi_sif": "data.sif_dir",
 }
 
 for arg_key, config_key in arg_to_config_mapping.items():

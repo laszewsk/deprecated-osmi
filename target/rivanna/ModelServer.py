@@ -17,6 +17,8 @@ ap.add_argument("-g", "--ngpus", type=int,
                 help="number of GPUs")
 ap.add_argument("-o", "--output_dir", type=str,
                 help="directory to store output logs")
+ap.add_argument("-t", "--tfs_sif", type=str,
+                help="tensorflow serving singularity image")
 # exec dir is wrong, because cloudmesh dynamically cds into the directory
 # ap.add_argument("-m", "--model_conf_base_name", type=str,
 # required=False, help="model config file base name")
@@ -28,10 +30,10 @@ config.load(content=config_filename, expand=True)
 config["experiment.ngpus"] = int(config["experiment.ngpus"])
 
 arg_to_config_mapping = {
-    "tfs_base_port": "constant.tfs_base_port",
+    "port": "constant.tfs_base_port",
     "ngpus": "experiment.ngpus",
     "output_dir": "data.output",
-    "sif_dir": "data.sif_dir",
+    "tfs_sif": "data.tfs_sif",
 }
 
 for arg_key, config_key in arg_to_config_mapping.items():
