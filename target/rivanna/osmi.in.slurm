@@ -45,22 +45,27 @@ echo "# ==================================="
 echo "# PROJECT info"
 echo "# ==================================="
 
-NAME=osmi
-USER_PROJECT=/project/bii_dsc_community/$USER
-WORKDIR=$USER_PROJECT/osmi
-SIF_DIR=$WORKDIR/target/rivanna/image-singularity
+# NAME=osmi
+# USER_PROJECT=/project/bii_dsc_community/$USER
+# WORKDIR=$USER_PROJECT/osmi
+# SIF_DIR=$WORKDIR/target/rivanna/image-singularity
 CONFIG_FILE=config.yaml
+OSMI_SIF={data.osmi_sif}
 
-echo NAME $NAME
-echo USER_PROJECT $USER_PROJECT
-echo WORKDIR $WORKDIR
-echo SIF_DIR $SIF_DIR
+# echo NAME $NAME
+# echo USER_PROJECT $USER_PROJECT
+# echo WORKDIR $WORKDIR
+# echo SIF_DIR $SIF_DIR
 echo CONFIG_FILE $CONFIG_FILE
+echo OSMI_SIF $OSMI_SIF
 
 PROGRESS "running" 3
 
-singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/osmi.sif \
+singularity exec --nv --bind /localscratch:/localscratch $OSMI_SIF \
     python osmi-bench.py --config=$CONFIG_FILE
+
+# singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/osmi.sif \
+#     python osmi-bench.py --config=$CONFIG_FILE
 
 # singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/$NAME.sif \
 #     python ModelServer.py --config=$CONFIG_FILE

@@ -12,6 +12,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-c", "--config", type=str, help="model config file")
 ap.add_argument("-p", "--haproxy_port", type=int, help="port for haproxy server")
 ap.add_argument("-o", "--output_dir", type=str, help="directory to store output logs")
+ap.add_argument("-s", "--haproxy_sif", type=str, help="haproxy singularity image")
 # replace with yaml and get conf from yaml
 args = ap.parse_args()
 
@@ -21,7 +22,7 @@ config.load(config_file, expand=True)
 
 arg_to_config_mapping = {
     "haproxy_port": "constant.haproxy_port",
-    "sif_dir": "data.sif_dir",
+    "haproxy_sif": "data.haproxy_sif",
     "output_dir": "data.output",
 }
 
