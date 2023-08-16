@@ -99,19 +99,19 @@ images: image
 
 image: image-haproxy image-osmi image-tfs
 
-image-haproxy: image-singularity/haproxy_latest.sif
-	mkdir -p image-singularity
-	cd image-singularity; time singularity pull docker://haproxy
+image-haproxy: # image-singularity/haproxy_latest.sif
+	-mkdir -p image-singularity
+	-cd image-singularity; time singularity pull docker://haproxy
 
 
 
-image-tfs: image-singularity/serving_latest-gpu.sif
-	mkdir -p image-singularity
-	cd image-singularity; time singularity pull docker://tensorflow/serving:latest-gpu
+image-tfs: # image-singularity/serving_latest-gpu.sif
+	-mkdir -p image-singularity
+	-cd image-singularity; time singularity pull docker://tensorflow/serving:latest-gpu
 
-image-osmi: image-singularity/osmi.sif
-	mkdir -p image-singularity
-	cd image-singularity; cms rivanna singularity build ${NAME}.def
+image-osmi: # image-singularity/osmi.sif
+	-mkdir -p image-singularity
+	-cd image-singularity; cms rivanna singularity build ${NAME}.def
 
 shell:
 	singularity ${BIND} shell --nv ${IMAGE}
