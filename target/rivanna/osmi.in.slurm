@@ -37,7 +37,7 @@ echo jobno $SLURM_JOB_ID
 echo {slurm.sbatch}
 echo mem {sbatch.mem}
 echo USER $USER
-
+echo {data.sif_dir}
 
 PROGRESS "running" 2
 

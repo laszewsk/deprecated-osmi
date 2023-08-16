@@ -40,11 +40,11 @@ localscratch: localscratch.json
 
 
 jobs-%.sh: %.json
-	cms sbatch generate submit --name=$<  > $@
+	cms ee generate submit --name=$<  > $@
 
 
 simple:
-	cms sbatch generate \
+	cms ee generate \
 	           --source=simple.in.slurm \
 	           --config=$< \
 	           --name=$(basename $@) \
@@ -57,7 +57,7 @@ simple:
 
 
 %.json: config.in.yaml
-	cms sbatch generate \
+	cms ee generate \
 	           --source=${NAME}.in.slurm \
 	           --config=$< \
 	           --name=$(basename $@) \

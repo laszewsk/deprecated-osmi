@@ -1,7 +1,7 @@
 
 name: cloudmask-rivanna
 
-sbatch:
+ee:
   time: "6:00:00"
   mode: h
   dir: scratch
@@ -43,9 +43,9 @@ benchmark:
 
 experiment:
 #  card_name: "a100" # "v100,p100"
-  card_name: "a100" # "v100,p100"
+  card_name: "a100,v100" # "v100,p100"
   # batch: "1,2,4,8,16,32,64,128,256,512,1024"
-  batch: "1"
+  batch: "1,2"
   ngpus: "1"
   concurrency: "1"
   model: "small_lstm"
@@ -76,10 +76,14 @@ project:
 data:
   output: "./outputs"
   sif_dir: "/project/bii_dsc_community/{os.USER}/osmi/target/rivanna/image-singularity"
-  haproxy_sif: "/project/bii_dsc_community/{os.USER}/osmi/target/rivanna/image-singularity/haproxy_latest.sif"
-  tfs_sif: "/project/bii_dsc_community/{os.USER}/osmi/target/rivanna/image-singularity/serving_latest-gpu.sif"
-  osmi_sif: "/project/bii_dsc_community/{os.USER}/osmi/target/rivanna/image-singularity/osmi.sif"
+  haproxy_sif: "{project.dir}/haproxy_latest.sif"
+  tfs_sif: "{project.dir}/serving_latest-gpu.sif"
+  osmi_sif: "{project.dir}/osmi.sif"
   haproxy_cfg_file: haproxy-grpc.cfg
+
+test:
+  a: "a"
+  b: "{test.a}"
 
 # config:
 #   server: "localhost"
