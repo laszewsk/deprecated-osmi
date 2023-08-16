@@ -36,6 +36,12 @@ run:
 shell:
 	singularity shell --nv osmi.sif
 
+
+image-haproxy: haproxy_latest.sif
+	mkdir -p image-singularity
+	cd image-singularity; time singularity pull docker://haproxy
+
+
 run-localscratch:
 	cd ${CODE_DIR}; mkdir -p outputs
 	cd ${CODE_DIR}; singularity exec ${BIND_LOCALSCRATCH} --nv cloudmask.sif bash -c "python cloudmask_v2.py --config=config-new.yaml"
@@ -47,6 +53,7 @@ shell-localscratch:
 
 shell-rivanna:
 	singularity shell --nv ${IMAGE}
+
 
 
 cancel: stop

@@ -9,19 +9,16 @@ SHELL=/bin/bash
 
 all: requirements data
 
-image-haproxy:
-	mkdir -p image-singularity
-	cd image-singularity; time singularity pull docker://haproxy
+# #####################################################################
+# REQUIERMENTS
+# #####################################################################
 
 requirements:
 	time pip install -r ${PROJECT_DIR}/experiments/rivanna/requirements.txt
 
-#hallo:
-#	echo "HHHHH"
-#
-#data:
-#	# mkdir -p ${PROJECT_DATA}/???
-#	echo "ERROR NOT IMPLEMENTED"
+# #####################################################################
+# PROJECT MANAGEMENT
+# #####################################################################
 
 project: clean project.json generate
 
@@ -90,22 +87,43 @@ clean:
 	@-rm -rf '__pycache__'
 	@-rm -rf *~
 
+
+# #####################################################################
+# SINGULARITY IMAGE MANAGEMENT
+# #####################################################################
+
 clean-images:
 	@-rm -rf image-singularity/*.sif
 
+images: image
 
-# run-osmi:
-# 	# cd image-singularity; make run
+image: image-haproxy image-osmi image-tfs
+
+image-haproxy: image-singularity/haproxy_latest.sif
+	mkdir -p image-singularity
+	cd image-singularity; time singularity pull docker://haproxy
 
 
-image-tfs:
+
+image-tfs: image-singularity/serving_latest-gpu.sif
+	mkdir -p image-singularity
 	cd image-singularity; time singularity pull docker://tensorflow/serving:latest-gpu
 
-image-osmi:
+image-osmi: image-singularity/osmi.sif
+	mkdir -p image-singularity
 	cd image-singularity; cms rivanna singularity build ${NAME}.def
 
 shell:
 	singularity ${BIND} shell --nv ${IMAGE}
+
+
+# #####################################################################
+# THESE ARE NOT YET DONE AND JUST PLACEHOLDERS
+# #####################################################################
+
+# run-osmi:
+# 	# cd image-singularity; make run
+
 
 run-singularity:
 	cd image-singularity; make run
@@ -124,11 +142,13 @@ shell-rivanna:
 
 run: run-singularity
 
-image: image-haproxy image-osmi image-tfs
+# #####################################################################
+# THESE COMMANDS ARE ONLY FOR GREGOR
+# #####################################################################
 
 push:
 	-git push
 	ssh -tt rivanna "cd /scratch/thf2bn/mlcommons/benchmarks/${NAME}; ssh-add; git pull"
 
 
-shell: shell-singularity
+
