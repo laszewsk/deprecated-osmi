@@ -3,6 +3,7 @@
 #SBATCH --job-name=o-m-{experiment.model}-b-{experiment.batch}-n-{experiment.ngpus}-g-{experiment.card_name}-c-{experiment.concurrency}-{experiment.repeat}
 #SBATCH --output=osmi-{experiment.repeat}-%u-%j.out
 #SBATCH --error=osmi-{experiment.repeat}-%u-%j.err
+#SBATCH --partition=bii
 {slurm.sbatch}
 #SBATCH --nodes={sbatch.nodes}
 #SBATCH --ntasks={sbatch.ntasks}
@@ -59,8 +60,12 @@ OSMI_SIF={data.osmi_sif}
 echo CONFIG_FILE $CONFIG_FILE
 echo OSMI_SIF $OSMI_SIF
 
+mkdir -p {data.output}
+
 PROGRESS "running" 3
 
+module purge
+module load singularity
 singularity exec --nv --bind /localscratch:/localscratch $OSMI_SIF \
     python osmi-bench.py --config=$CONFIG_FILE
 

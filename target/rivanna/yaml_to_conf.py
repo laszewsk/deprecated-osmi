@@ -45,8 +45,20 @@ class YamlToJsonConverter:
         """
         Save data to a JSON file.
         """
+        # with open(self.json_file, 'w+') as f:
+        #     json.dump(self.model_config_list, f)
+        
         with open(self.json_file, 'w+') as f:
-            json.dump(self.model_config_list, f)
+            f.write("model_config_list: {\n")
+            for model in self.model_config_list:
+                f.write("  config: {\n")
+                f.write(f'    name: "{model}",\n')
+                for k in self.model_config_list[model]:
+                    f.write(f'    {k}: "{self.model_config_list[model][k]}",\n')
+                f.write("  },\n")
+            f.write("}\n")
+            
+        
 
     def convert(self):
         banner(self.config_file)

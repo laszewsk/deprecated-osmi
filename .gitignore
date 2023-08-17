@@ -1,8 +1,8 @@
 .nv
 __pycache__
-serving_latest-gpu.sif
 models/large_tcnn
 models/medium_cnn
 models/small_lstm
 *.err
 *.out
+*.sif

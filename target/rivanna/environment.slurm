@@ -25,8 +25,7 @@ mkdir -p $PROJECT_DIR
 cd $PROJECT_DIR
 
 module purge
-# module load  gcc/9.2.0  cuda/11.0.228  openmpi/3.1.6 python/3.8.8
-odule load  gcc/11.2.0 openmpi/4.1.4 python/3.11.1
+module load  gcc/11.2.0 openmpi/4.1.4 python/3.11.1
 if ! [ -d "$PROJECT_DIR/ENV3" ]; then
     time python -m venv $PROJECT_DIR/ENV3
 fi

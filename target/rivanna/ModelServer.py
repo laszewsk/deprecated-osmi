@@ -59,6 +59,7 @@ class ModelServer:
         return converter.get_name()
 
     def start(self):
+        print(self.model_conf_file)
         # for device in self.visible_devices.split(','):
         for i in range(self.ngpus):
             port = self.tfs_base_port + i
