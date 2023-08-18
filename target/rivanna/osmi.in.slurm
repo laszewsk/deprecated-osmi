@@ -3,14 +3,13 @@
 #SBATCH --job-name=o-m-{experiment.model}-b-{experiment.batch}-n-{experiment.ngpus}-g-{experiment.card_name}-c-{experiment.concurrency}-{experiment.repeat}
 #SBATCH --output=osmi-{experiment.repeat}-%u-%j.out
 #SBATCH --error=osmi-{experiment.repeat}-%u-%j.err
-#SBATCH --partition=bii
-{slurm.sbatch}
-#SBATCH --nodes={sbatch.nodes}
-#SBATCH --ntasks={sbatch.ntasks}
-#SBATCH --mem={sbatch.mem}
+{slurm.ee}
+#SBATCH --nodes={ee.nodes}
+#SBATCH --ntasks={ee.ntasks}
+#SBATCH --mem={ee.mem}
 #SBATCH --gres=gpu:{experiment.card_name}:{experiment.ngpus}
 #SBATCH --cpus-per-task=1
-#SBATCH --time={sbatch.time}
+#SBATCH --time={ee.time}
 
 
 # xSBATCH --partition=gpu
@@ -35,8 +34,8 @@ echo cardname {experiment.card_name}
 echo ngpus {experiment.ngpus}
 echo repeat {experiment.repeat}
 echo jobno $SLURM_JOB_ID
-echo {slurm.sbatch}
-echo mem {sbatch.mem}
+echo {slurm.ee}
+echo mem {ee.mem}
 echo USER $USER
 echo {data.sif_dir}
 
@@ -51,6 +50,8 @@ echo "# ==================================="
 # WORKDIR=$USER_PROJECT/osmi
 # SIF_DIR=$WORKDIR/target/rivanna/image-singularity
 CONFIG_FILE=config.yaml
+TFS_SIF={data.tfs_sif}
+HAPROXY_SIF={data.haproxy_sif}
 OSMI_SIF={data.osmi_sif}
 
 # echo NAME $NAME
@@ -58,6 +59,8 @@ OSMI_SIF={data.osmi_sif}
 # echo WORKDIR $WORKDIR
 # echo SIF_DIR $SIF_DIR
 echo CONFIG_FILE $CONFIG_FILE
+echo TFS_SIF $TFS_SIF
+echo HAPROXY_SIF $HAPROXY_SIF
 echo OSMI_SIF $OSMI_SIF
 
 mkdir -p {data.output}
@@ -66,10 +69,25 @@ PROGRESS "running" 3
 
 module purge
 module load singularity
-singularity exec --nv --bind /localscratch:/localscratch $OSMI_SIF \
-    python osmi-bench.py --config=$CONFIG_FILE
 
-# singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/osmi.sif \
+
+singularity exec --nv --bind /localscratch:/localscratch $TFS_SIF \
+    python ModelServer.py --config=$CONFIG_FILE
+
+singularity exec --nv --bind /localscratch:/localscratch $HAPROXY_SIF \
+    python LoadBalancer.py --config=$CONFIG_FILE
+
+singularity exec --nv --bind /localscratch:/localscratch $OSMI_SIF \
+    python simple_osmi.py --config=$CONFIG_FILE
+# start osmi bench program with correct number of instanciations (concurrency) through command line
+# singularity exec??
+# shutdown model server
+# shutdown haproxy
+
+
+
+
+# singularity exec --nv --bind /localscratch:/localscratch $OSMI_SIF \
 #     python osmi-bench.py --config=$CONFIG_FILE
 
 # singularity exec --nv --bind /localscratch:/localscratch $SIF_DIR/$NAME.sif \
@@ -106,7 +124,7 @@ singularity exec --nv --bind /localscratch:/localscratch $OSMI_SIF \
 # export CODE_DIR=$PROJECT_DIR/target/rivanna
 # export CONTAINERDIR=${CODE_DIR}
 
-# export OUTPUTS_DIR="${CODE_DIR}/project/{sbatch.identifier}/outputs"
+# export OUTPUTS_DIR="${CODE_DIR}/project/{ee.identifier}/outputs"
 
 # #
 # # DATA
@@ -209,7 +227,7 @@ singularity exec --nv --bind /localscratch:/localscratch $OSMI_SIF \
 # echo "# start gpu log"
 # echo "# ==================================="
 
-# cms gpu watch --gpu=0 --delay=0.5 --dense > project/{sbatch.identifier}/gpu0-{experiment.card_name}-$USER-$SLURM_JOB_ID.log &
+# cms gpu watch --gpu=0 --delay=0.5 --dense > project/{ee.identifier}/gpu0-{experiment.card_name}-$USER-$SLURM_JOB_ID.log &
 
 # PROGRESS "running" 21
 

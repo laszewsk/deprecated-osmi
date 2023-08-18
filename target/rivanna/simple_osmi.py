@@ -15,6 +15,8 @@ parser.add_argument('-m', '--model', type=str, help='model name, e.g. small_lstm
 parser.add_argument('-n', '--nrequests', type=int, help='number of requests')
 parser.add_argument("-c", "--config", type=str, help="model config file")
 parser.add_argument("-o", "--osmi_sif", type=str, help="osmi singularity image")
+parser.add_argument("-a", "--algorithm", type=str, help="client program")
+parser.add_argument("--output_dir", type=str, help="output directory")
 args = parser.parse_args()
 
 config = FlatDict()
@@ -31,6 +33,8 @@ arg_to_config_mapping = {
     "model": "experiment.model",
     "nrequests": "constant.nrequests",
     "osmi_sif": "data.sif_dir",
+    "algorithm": "constant.algorithm",
+    "output_dir": "data.output",
 }
 
 for arg_key, config_key in arg_to_config_mapping.items():
@@ -49,11 +53,13 @@ class OSMI:
         self.server = config["constant.server"]
         self.port = config["constant.haproxy_port"]
         self.osmi_sif = config["data.osmi_sif"]
-        self.log_file = f"results/log-{self.model}-{self.nrequests}-{self.batch}-{self.server_id}-{self.port}.txt"
+        self.algorithm = config["constant.algorithm"]
+        self.output_dir = config["data.output"]
+        self.log_file = f"{self.output_dir}/log-{self.model}-{self.nrequests}-{self.batch}-{self.port}.txt"
 
     def run(self):
-        cmd = f"time {SINGULARITY} {self.osmi_sif} "\
-              f"python {self.algorithm} {self.server}:{self.port} -m {self.model} -b {self.batch} -n {self.nrequests} &> {self.log_file}"
+        # cmd = f"time {SINGULARITY} {self.osmi_sif} "\
+        cmd = f"time python {self.algorithm} {self.server}:{self.port} -m {self.model} -b {self.batch} -n {self.nrequests} &> {self.log_file}"
         print(cmd)
         r = os.system(cmd)
         print(r)

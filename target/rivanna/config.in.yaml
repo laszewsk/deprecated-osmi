@@ -67,6 +67,7 @@ constant:
   haproxy_port: 8443
   # config: "config.yaml"
   nrequests: 32768
+  algorithm: tfs_grpc_client.py
 
 project:
   user: "/project/bii_dsc_community/{os.USER}"
@@ -99,12 +100,12 @@ user: "{os.USER}"
 
 model_config_list:
   small_lstm:
-    base_path: "{project.user}/osmi/osmi-bench/models/small_lstm"
+    base_path: "{project.user}/osmi/models/small_lstm"
     model_platform: "tensorflow"
   medium_cnn:
-    base_path: "{project.user}/osmi/osmi-bench/models/medium_cnn"
+    base_path: "{project.user}/osmi/models/medium_cnn"
     model_platform: "tensorflow"
   large_tcnn:
-    base_path: "{project.user}/osmi/osmi-bench/models/large_tcnn"
+    base_path: "{project.user}/osmi/models/large_tcnn"
     model_platform: "tensorflow"
 

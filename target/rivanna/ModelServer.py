@@ -59,7 +59,6 @@ class ModelServer:
         return converter.get_name()
 
     def start(self):
-        print(self.model_conf_file)
         # for device in self.visible_devices.split(','):
         for i in range(self.ngpus):
             port = self.tfs_base_port + i
@@ -67,8 +66,9 @@ class ModelServer:
             #     {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server \
             #     --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} \
             #     >& {self.output_dir}/v100-{port}.log &")
+            # command = f"time {SINGULARITY} {self.tfs_sif} "\
+            
             command = f"time CUDA_VISIBLE_DEVICES={i} "\
-                      f"{SINGULARITY} {self.tfs_sif} "\
                       f"tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
                       f">& {self.output_dir}/v100-{port}.log &"
             print(command)
@@ -97,9 +97,8 @@ class ModelServer:
 
 
 def main():
-    # print(args)
-    model_server = ModelServer(port=args["port"], ngpus=args["ngpus"], output_dir=args["output_dir"], exec_dir=args["exec_dir"],
-                               model_conf_file=args["model_conf_file"])
+    print(config)
+    model_server = ModelServer(config)
     model_server.start()
     model_server.wait_for_server()
 
