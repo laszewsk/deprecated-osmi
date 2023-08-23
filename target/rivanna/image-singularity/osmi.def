@@ -14,5 +14,6 @@ From:  nvcr.io/nvidia/tensorflow:23.04-tf2-py3
 	pip install git+https://github.com/mlperf/logging.git
 	pip install cloudmesh-common
 	pip install cloudmesh-gpu
+	pip install tensorflow-serving-api
 
 

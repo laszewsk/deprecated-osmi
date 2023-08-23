@@ -72,10 +72,10 @@ module load singularity
 
 
 singularity exec --nv --bind /localscratch:/localscratch $TFS_SIF \
-    python ModelServer.py --config=$CONFIG_FILE
+    python3 ModelServer.py --config=$CONFIG_FILE
 
 singularity exec --nv --bind /localscratch:/localscratch $HAPROXY_SIF \
-    python LoadBalancer.py --config=$CONFIG_FILE
+    python3 LoadBalancer.py --config=$CONFIG_FILE
 
 singularity exec --nv --bind /localscratch:/localscratch $OSMI_SIF \
     python simple_osmi.py --config=$CONFIG_FILE

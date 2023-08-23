@@ -103,7 +103,9 @@ image-haproxy: # image-singularity/haproxy_latest.sif
 	-mkdir -p image-singularity
 	-cd image-singularity; time singularity pull docker://haproxy
 
-
+image-serving:
+	-mkdir -p image-singularity
+	-cd image-singularity; cms rivanna singularity build serving.def
 
 image-tfs: # image-singularity/serving_latest-gpu.sif
 	-mkdir -p image-singularity
@@ -116,6 +118,8 @@ image-osmi: # image-singularity/osmi.sif
 shell:
 	singularity ${BIND} shell --nv ${IMAGE}
 
+shell-serving:
+	singularity ${BIND} shell --nv image-singularity/serving.sif
 
 # #####################################################################
 # THESE ARE NOT YET DONE AND JUST PLACEHOLDERS

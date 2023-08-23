@@ -44,7 +44,7 @@ class HAProxyLoadBalancer:
 
     def start(self):
         # command = f"time {SINGULARITY} {self.haproxy_sif} " \
-        command = f"time haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}haproxy.log &"
+        command = f"time haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}/haproxy.log &"
         print(command)
         r = os.run(command)
         print(r)
