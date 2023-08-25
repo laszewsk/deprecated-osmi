@@ -35,7 +35,7 @@ echo "# ==================================="
 mkdir -p ./outputs
 CUDA_VISIBLE_DEVICES=0 singularity exec --bind `pwd`:/home --pwd /home image-singularity/serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf > outputs/g-3-a100_test_0.log 2>&1 &
 CUDA_VISIBLE_DEVICES=1 singularity exec --bind `pwd`:/home --pwd /home image-singularity/serving_latest-gpu.sif tensorflow_model_server --port=8501 --rest_api_port=0 --model_config_file=models.conf > outputs/g-3-a100_test_1.log 2>&1 &
-CUDA_VISIBLE_DEVICES=2 singularity exec --bind `pwd`:/home --pwd /home image-singularity/serving_latest-gpu.sif tensorflow_model_server --port=8501 --rest_api_port=0 --model_config_file=models.conf > outputs/g-3-a100_test_2.log 2>&1 &
+CUDA_VISIBLE_DEVICES=2 singularity exec --bind `pwd`:/home --pwd /home image-singularity/serving_latest-gpu.sif tensorflow_model_server --port=8502 --rest_api_port=0 --model_config_file=models.conf > outputs/g-3-a100_test_2.log 2>&1 &
 
 echo "# ==================================="
 echo "# START HAPROXY"
