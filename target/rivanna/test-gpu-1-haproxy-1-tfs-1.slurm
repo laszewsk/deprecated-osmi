@@ -13,6 +13,9 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --time=6:00:00
 
+HAPROXY_CFG_FILE=haproxy_test.cfg
+MODEL=small_lstm
+
 echo "# ==================================="
 echo "# SLURM info"
 echo "# ==================================="
@@ -25,6 +28,7 @@ echo repeat 1
 echo jobno $SLURM_JOB_ID
 echo mem 16G
 echo USER $USER
+echo HAPROXY_CFG_FILE $HAPROXY_CFG_FILE
 
 echo "# ==================================="
 echo "# START TF_SERVING"
@@ -38,29 +42,9 @@ echo "# ==================================="
 echo "# START HAPROXY"
 echo "# ==================================="
 
-# cat >haproxy_test.cfg <<EOL
-# global
-#   tune.ssl.default-dh-param 1024
- 
-# defaults
-#   timeout connect 10000ms
-#   timeout client 60000ms
-#   timeout server 60000ms
- 
-# frontend fe_https
-#   mode tcp
-#   bind *:8443 npn spdy/2 alpn h2,http/1.1
-#   default_backend be_grpc
+singularity exec --bind `pwd`:/home --pwd /home image-singularity/osmi.sif python haproxy-cfg-generator.py -p 8500 -g 1 -o $HAPROXY_CFG_FILE -s localhost
 
-# backend be_grpc
-#   mode tcp
-#   balance roundrobin
-#   server tfs0 localhost:8500
-
-# EOL
-# cat haproxy_test.cfg
-
-singularity exec --bind `pwd`:/home --pwd /home image-singularity/haproxy_latest.sif haproxy -d -f haproxy_test.cfg >& outputs/haproxy_test.log &
+singularity exec --bind `pwd`:/home --pwd /home image-singularity/haproxy_latest.sif haproxy -d -f $HAPROXY_CFG_FILE >& outputs/haproxy_test.log &
 
 sleep 5
 
@@ -68,4 +52,4 @@ echo "# ==================================="
 echo "# START CLIENT"
 echo "# ==================================="
 
-singularity exec --bind `pwd`:/home --pwd /home image-singularity/osmi.sif python tfs_grpc_client.py localhost:8443 -m small_lstm -b 1024 -n 32678 &> outputs/small_test.log
+singularity exec --bind `pwd`:/home --pwd /home image-singularity/osmi.sif python tfs_grpc_client.py localhost:8443 -m $MODEL -b 1024 -n 32678 &> outputs/"$MODEL"_test.log
