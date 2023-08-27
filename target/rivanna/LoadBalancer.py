@@ -7,6 +7,7 @@ import os
 import socket
 from cloudmesh.common.FlatDict import FlatDict
 from pprint import pprint
+from haproxy_cfg_generator import generate_haproxy_cfg
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -39,14 +40,15 @@ class HAProxyLoadBalancer:
     def __init__(self, config):
         self.port = config["constant.haproxy_port"]
         self.output_dir = config["data.output"]
-        self.haproxy_config_file = config["data.haproxy_config_file"]
+        generate_haproxy_cfg()
+        self.haproxy_config_file = config["data.haproxy_cfg_file"]
         self.haproxy_sif = config["data.haproxy_sif"]
 
     def start(self):
-        # command = f"time {SINGULARITY} {self.haproxy_sif} " \
-        command = f"time haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}/haproxy.log &"
+        command = f"time {SINGULARITY} {self.haproxy_sif} " \
+                  f"haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}/haproxy.log &"
         print(command)
-        r = os.run(command)
+        r = os.system(command)
         print(r)
 
     def shutdown(self):

@@ -57,7 +57,11 @@ backend be_grpc
   balance roundrobin
 '''
 
-with open(config["data.haproxy_cfg_file"], 'w+') as f:
-    f.write(base)
-    for i in range(config["experiment.ngpus"]):
-        f.write(f"  server tfs{i} {config['constant.server']}:{config['constant.tfs_base_port']+i}\n")
+def generate_haproxy_cfg():  
+  with open(config["data.haproxy_cfg_file"], 'w+') as f:
+      f.write(base)
+      for i in range(config["experiment.ngpus"]):
+          f.write(f"  server tfs{i} {config['constant.server']}:{config['constant.tfs_base_port']+i}\n")
+
+if __name__ == "__main__":
+  generate_haproxy_cfg()

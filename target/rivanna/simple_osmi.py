@@ -58,8 +58,8 @@ class OSMI:
         self.log_file = f"{self.output_dir}/log-{self.model}-{self.nrequests}-{self.batch}-{self.port}.txt"
 
     def run(self):
-        # cmd = f"time {SINGULARITY} {self.osmi_sif} "\
-        cmd = f"time python {self.algorithm} {self.server}:{self.port} -m {self.model} -b {self.batch} -n {self.nrequests} &> {self.log_file}"
+        cmd = f"time {SINGULARITY} {self.osmi_sif} "\
+              f"python {self.algorithm} {self.server}:{self.port} -m {self.model} -b {self.batch} -n {self.nrequests} &> {self.log_file}"
         print(cmd)
         r = os.system(cmd)
         print(r)

@@ -66,9 +66,9 @@ class ModelServer:
             #     {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server \
             #     --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} \
             #     >& {self.output_dir}/v100-{port}.log &")
-            # command = f"time {SINGULARITY} {self.tfs_sif} "\
             
             command = f"time CUDA_VISIBLE_DEVICES={i} "\
+                      f"{SINGULARITY} {self.tfs_sif} "\
                       f"tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
                       f">& {self.output_dir}/v100-{port}.log &"
             print(command)
