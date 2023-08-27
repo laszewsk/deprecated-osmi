@@ -1,3 +1,6 @@
+#
+# this is just an idea
+#
 Bootstrap: docker
 From: ubuntu:latest
 
