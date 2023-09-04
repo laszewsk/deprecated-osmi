@@ -1,72 +1,54 @@
-# from cloudmesh.common.Shell import Shell
-import time
-import requests
-# from docopt import docopt
-import argparse
+"""
+Usage:
+  ModelServer.py start_and_wait [-c <config>] [-p <port>] [-g <ngpus>] [-o <output_dir>] [-t <tfs_sif>]
+  ModelServer.py start [-c <config>] [-p <port>] [-g <ngpus>] [-o <output_dir>] [-t <tfs_sif>]
+  ModelServer.py wait [--timeout=<timeout>]
+  ModelServer.py status [-p <port>]
+  ModelServer.py (-h | --help)
+
+Options:
+  -c <config> --config=<config>       Config file [default: config.yaml].
+  -p <port> --port=<port>             Base port for TF servers.
+  -g <ngpus> --ngpus=<ngpus>          Number of GPUs.
+  -o <output_dir> --output_dir=<output_dir>   Directory to store output logs.
+  -t <tfs_sif> --tfs_sif=<tfs_sif>    Tensorflow serving singularity image.
+  --status=<status>                   Server status (for wait command).
+  --timeout=<timeout>                 Timeout (for wait command).
+  -h --help                           Show this screen.
+"""
+
+from cloudmesh.common.FlatDict import FlatDict
+from cloudmesh.common.StopWatch import StopWatch
+from yaml_to_conf import YamlToJsonConverter
 import os
 import socket
-from cloudmesh.common.FlatDict import FlatDict
-from yaml_to_conf import YamlToJsonConverter
-
-ap = argparse.ArgumentParser()
-ap.add_argument("-c", "--config", type=str,
-                help="config file")
-ap.add_argument("-p", "--port", type=int,
-                help="base port for TF servers")
-ap.add_argument("-g", "--ngpus", type=int,
-                help="number of GPUs")
-ap.add_argument("-o", "--output_dir", type=str,
-                help="directory to store output logs")
-ap.add_argument("-t", "--tfs_sif", type=str,
-                help="tensorflow serving singularity image")
-# exec dir is wrong, because cloudmesh dynamically cds into the directory
-# ap.add_argument("-m", "--model_conf_base_name", type=str,
-# required=False, help="model config file base name")
-args = ap.parse_args()
-
-config_filename = getattr(args, "config") or "config.yaml"
-config = FlatDict()
-config.load(content=config_filename, expand=True)
-config["experiment.ngpus"] = int(config["experiment.ngpus"])
-
-arg_to_config_mapping = {
-    "port": "constant.tfs_base_port",
-    "ngpus": "experiment.ngpus",
-    "output_dir": "data.output",
-    "tfs_sif": "data.tfs_sif",
-}
-
-for arg_key, config_key in arg_to_config_mapping.items():
-    arg_value = getattr(args, arg_key)
-    if arg_value is not None:
-        config[config_key] = arg_value
+import time
+from docopt import docopt
+from pprint import pprint
 
 SINGULARITY = "singularity exec --bind `pwd`:/home --pwd /home"
 
 class ModelServer:
 
-    def __init__(self, config):
+    def __init__(self, config, config_filename=None):
         self.tfs_base_port = config["constant.tfs_base_port"]
         self.ngpus = config["experiment.ngpus"]
         self.output_dir = config["data.output"]
         self.batch = config["experiment.batch"]
         self.tfs_sif = config["data.tfs_sif"]
-        self.model_conf_file = self.convert_conf_to_json()
+        self.timeout = config["constant.timeout"]
+        self.model_conf_file = self.convert_conf_to_json(config_filename)
 
-    def convert_conf_to_json(self):
+    def convert_conf_to_json(self, config_filename):
         converter = YamlToJsonConverter(config_filename, "models")
         converter.convert()
         return converter.get_name()
 
     def start(self):
         # for device in self.visible_devices.split(','):
+        StopWatch.event("ModelServer: start")
         for i in range(self.ngpus):
             port = self.tfs_base_port + i
-            # print(f"time CUDA_VISIBLE_DEVICES={i} singularity exec --nv --home `pwd` \
-            #     {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server \
-            #     --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} \
-            #     >& {self.output_dir}/v100-{port}.log &")
-            
             command = f"time CUDA_VISIBLE_DEVICES={i} "\
                       f"{SINGULARITY} {self.tfs_sif} "\
                       f"tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
@@ -74,99 +56,61 @@ class ModelServer:
             print(command)
             r = os.system(command)
             print(r)
-            # Shell.run(f"time {self.visible_devices}={i} singularity exec --nv --home "
-            # "`pwd` {self.exec_dir}/serving_latest-gpu.sif tensorflow_model_server --port={port} --rest_api_port=0 "
-            # "--model_config_file={self.model_conf_file} >& {self.output_dir}/v100-{port}.log &")
-
+    
     def shutdown(self):
         raise NotImplementedError
 
     def status(self, port):
+        StopWatch.event("ModelServer: status")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         return sock.connect_ex(('127.0.0.1', port)) == 0
 
     def wait_for_server(self):
+        StopWatch.event("ModelServer: wait for server")
         start = time.time()
         while not all([self.status(p + self.tfs_base_port) for p in range(self.ngpus)]):
-            if time.time() - start > 45:
+            if time.time() - start > self.timeout:
                 print("Server not properly started")
                 raise ValueError("Server not properly started")
             time.sleep(0.5)
             print(".", end="")
+        StopWatch.event("ModelServer: server up")
         print()
 
 
 def main():
-    print(config)
-    model_server = ModelServer(config)
-    model_server.start()
-    model_server.wait_for_server()
+    args = docopt(__doc__)
+    pprint(args)
+    config_filename = args["--config"] or "config.yaml"
+    config = FlatDict()
+    config.load(content=config_filename, expand=True)
+    config["experiment.ngpus"] = int(config["experiment.ngpus"])
+    pprint(config)
 
+    arg_to_config_mapping = {
+        "--port": "constant.tfs_base_port",
+        "--ngpus": "experiment.ngpus",
+        "--output_dir": "data.output",
+        "--tfs_sif": "data.tfs_sif",
+        "--timeout": "constant.timeout",
+    }
 
-# python ModelServer.py --port=8500 -g=2 -o=../../osmi-output
+    for arg_key, config_key in arg_to_config_mapping.items():
+        arg_value = args[arg_key]
+        if arg_value:
+            config[config_key] = arg_value
+
+    model_server = ModelServer(config, config_filename)
+    if args['start']:
+        model_server.start()
+    elif args['wait']:
+        model_server.wait_for_server()
+    elif args['status']:
+        status = model_server.status(config["constant.tfs_base_port"])
+        print(f"Server Status: {status}")
+    elif args['start_and_wait']:
+        model_server.start()
+        model_server.wait_for_server()
 
 if __name__ == '__main__':
     main()
-
-"""
-    
-start_tf_servers() {
-
-    source ???/ENV3
-    
-    python ModelServer.py start # docopts, click
-    python ModelServer.py wait status=up timeout=5min  # humanize
-    python ModelServer.py status 
-
-    for j in `seq 0 $(($ngpus_PER_NODE-1))`
-    do
-        PORT=$(($PORT_TF_SERVER+$j))
-        time CUDA_VISIBLE_DEVICES=$j singularity exec --nv --home `pwd` $EXEC_DIR/serving_latest-gpu.sif tensorflow_model_server --port=$PORT --rest_api_port=0 --model_config_file=models.conf >& $OUTPUT_DIR/v100-$PORT.log &
-    done
-
-    # time CUDA_VISIBLE_DEVICES=1 singularity exec --nv --home `pwd` $EXEC_DIR/serving_latest-gpu.sif tensorflow_model_server --port=8501 --rest_api_port=0 --model_config_file=models.conf >& $OUTPUT_DIR/v100-8501.log &
-    echo "# cloudmesh status=running progress=45 pid=$$"
-    start_wait_for_server=`date +%s`
-    echo start_wait_for_server $start_wait_for_server
-
-    # for sec in $(seq -w 10000 -1 1); do
-    #     if [[ $(lsof -i :8500) && $(lsof -i :8501) ]]; then break; fi
-    #     sleep 0.5
-    #     echo "-"
-    # done
-    for sec in $(seq -w 10000 -1 1); do
-        valid=1
-        for PORT in `seq $PORT_TF_SERVER $(($PORT_TF_SERVER+$ngpus_PER_NODE-1))`; do
-            if ! [[ $(lsof -i :$PORT) ]]; then
-                valid=0;
-                break;
-            fi
-        done
-        if [ $valid = 1 ]; then break; fi;
-        sleep 0.5
-        echo "-"
-    done
-
-    end_wait_for_server=`date +%s`
-    echo "server up"
-    echo end_wait_for_server $end_wait_for_server
-    time_server_wait=$((end_wait_for_server-start_wait_for_server))
-    echo time_server_wait $time_server_wait
-}
-    """
-
-# def __init__(self, port, ngpus, output_dir, exec_dir=None, model_conf_file=None):
-#     self.visible_devices = os.getenv("CUDA_VISIBLE_DEVICES")
-#     self.tfs_base_port = port
-#     self.output_dir = output_dir
-#     self.ngpus = ngpus
-#     if exec_dir is None:
-#         self.exec_dir = os.getcwd()
-#     else:
-#         self.exec_dir = exec_dir
-#     if model_conf_file is None:
-#         self.model_conf_file = "models.conf"
-#     else:
-#         converter = YamlToJsonConverter("models")
-#         converter.convert()
-#         self.model_conf_file = converter.get_name()

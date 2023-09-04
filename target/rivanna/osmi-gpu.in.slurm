@@ -71,11 +71,11 @@ module load singularity gcc/11.2.0 openmpi/4.1.4 python/3.11.1
 
 source $USER_PROJECT/ENV3/bin/activate
 
-python ModelServer.py --config=$CONFIG_FILE
+python ModelServer.py start_and_wait --config=$CONFIG_FILE
 
-python LoadBalancer.py --config=$CONFIG_FILE
+python LoadBalancer.py start_and_wait --config=$CONFIG_FILE
 
-python simple_osmi.py --config=$CONFIG_FILE
+python Client.py --config=$CONFIG_FILE
 
 
 # singularity exec --nv --bind /localscratch:/localscratch $TFS_SIF \
@@ -98,7 +98,6 @@ python simple_osmi.py --config=$CONFIG_FILE
 
 #     # python ModelServer.py --port=$PORT_TF_SERVER_BASE --num_gpus=$NUM_GPUS_PER_NODE --output_dir=$OUTPUT_DIR
 
-# PROGRESS "running" 2
 #     # python LoadBalancer.py -p 8443 -o ../../osmi-output/ -c haproxy-grpc.cfg
 
 # PROGRESS "running" 3

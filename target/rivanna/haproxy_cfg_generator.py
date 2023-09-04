@@ -1,42 +1,22 @@
-from pprint import pprint
-import json
+"""
+HAProxy Config Generator
+
+Usage:
+  generate_config.py (-c <config> | --config=<config>) [-p <port>] [-g <ngpus>] [-s <server>] [-o <haproxy_cfg_file>]
+  generate_config.py (-h | --help)
+
+Options:
+  -h --help                              Show this screen.
+  -c <config> --config=<config>          Config file.
+  -p <port> --port=<port>                Base port for TF servers.
+  -g <ngpus> --ngpus=<ngpus>             Number of GPUs.
+  -s <server> --server=<server>          Server IP.
+  -o <haproxy_cfg_file> --haproxy_cfg_file=<haproxy_cfg_file>  Name of file to store haproxy config file.
+"""
+
 from cloudmesh.common.util import banner
-from cloudmesh.common.FlatDict import FlatDict, expand_config_parameters
-import os
-import argparse
-
-ap = argparse.ArgumentParser()
-ap.add_argument("-c", "--config", type=str,
-                help="config file")
-ap.add_argument("-p", "--port", type=int,
-                help="base port for TF servers")
-ap.add_argument("-g", "--ngpus", type=int,
-                help="number of GPUs")
-ap.add_argument("-s", "--server", type=str,
-                help="server ip")
-ap.add_argument("-o", "--haproxy_cfg_file", type=str,
-                help="name of file to store haproxy config file")
-
-args = ap.parse_args()
-
-config_filename = getattr(args, "config")
-config = FlatDict()
-if config_filename is not None:
-  config.load(content=config_filename, expand=True)
-
-arg_to_config_mapping = {
-    "port": "constant.tfs_base_port",
-    "ngpus": "experiment.ngpus",
-    "haproxy_cfg_file": "data.haproxy_cfg_file",
-    "server": "constant.server",
-}
-
-for arg_key, config_key in arg_to_config_mapping.items():
-    arg_value = getattr(args, arg_key)
-    if arg_value is not None:
-        config[config_key] = arg_value
-
-config["experiment.ngpus"] = int(config["experiment.ngpus"])
+from cloudmesh.common.FlatDict import FlatDict
+from docopt import docopt
 
 base = '''
 global
@@ -57,11 +37,29 @@ backend be_grpc
   balance roundrobin
 '''
 
-def generate_haproxy_cfg():  
-  with open(config["data.haproxy_cfg_file"], 'w+') as f:
-      f.write(base)
-      for i in range(config["experiment.ngpus"]):
-          f.write(f"  server tfs{i} {config['constant.server']}:{config['constant.tfs_base_port']+i}\n")
+def generate_haproxy_cfg(config):
+    with open(config["data.haproxy_cfg_file"], 'w+') as f:
+        f.write(base)
+        for i in range(config["experiment.ngpus"]):
+            f.write(f"  server tfs{i} {config['constant.server']}:{config['constant.tfs_base_port']+i}\n")
 
 if __name__ == "__main__":
-  generate_haproxy_cfg()
+  args = docopt(__doc__)
+
+  config = FlatDict()
+  if args["--config"] is not None:
+      config.load(content=open(args["--config"]), expand=True)
+
+  arg_to_config_mapping = {
+      "--port": "constant.tfs_base_port",
+      "--ngpus": "experiment.ngpus",
+      "--haproxy_cfg_file": "data.haproxy_cfg_file",
+      "--server": "constant.server",
+  }
+
+  for arg_key, config_key in arg_to_config_mapping.items():
+      if args[arg_key]:
+          config[config_key] = args[arg_key]
+
+  config["experiment.ngpus"] = int(config["experiment.ngpus"])
+  generate_haproxy_cfg(config)

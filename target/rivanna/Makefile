@@ -10,7 +10,7 @@ SHELL=/bin/bash
 all: requirements data
 
 # #####################################################################
-# REQUIERMENTS
+# REQUIREMENTS
 # #####################################################################
 
 requirements:
@@ -20,25 +20,28 @@ requirements:
 # PROJECT MANAGEMENT
 # #####################################################################
 
-project: clean project.json generate
+project-gpu: clean project-gpu.json generate-gpu
+
+project-cpu: clean project-cpu.json generate-cpu
 
 #setup:
 #	python setup_env_and_yaml.py
 #	source ~/ENV3/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/rivanna/requirements.txt
 
-generate: jobs-project.sh 
+generate-gpu: jobs-project-gpu.sh 
+
+generate-cpu: jobs-project-cpu.sh
 
 run: submit
 
 submit:
-	-sh jobs-project.sh
+	-sh jobs-project-gpu.sh
 
 localscratch: localscratch.json
 
 
 jobs-%.sh: %.json
 	cms ee generate submit --name=$<  > $@
-
 
 simple:
 	cms ee generate \
@@ -53,9 +56,9 @@ simple:
                --verbose
 
 
-%.json: config.in.yaml
+%-cpu.json: slurm-cpu.in.yaml
 	cms ee generate \
-	           --source=${NAME}.in.slurm \
+	           --source=${NAME}-cpu.in.slurm \
 	           --config=$< \
 	           --name=$(basename $@) \
 	           --noos \
@@ -64,7 +67,20 @@ simple:
 	           --output_dir=./$(basename $@) \
                --source_dir=. \
 		       --verbose \
-			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,simple_osmi.py,osmi-bench.py,haproxy_cfg_generator.py"
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py"
+
+%-gpu.json: slurm-gpu.in.yaml
+	cms ee generate \
+	           --source=${NAME}-gpu.in.slurm \
+	           --config=$< \
+	           --name=$(basename $@) \
+	           --noos \
+	           --os=USER,HOME \
+		       --nocm \
+	           --output_dir=./$(basename $@) \
+               --source_dir=. \
+		       --verbose \
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py"
 
 kill: stop
 
@@ -81,12 +97,13 @@ watch: status
 status:
 	watch squeue --format=\"%.18i %.9P %.50j %.8u %.8T %.10M %.9l %.6D %R\" --me
 
-
 clean:
-	@-rm -rf project project.json jobs-project.sh
+	@-rm -rf project-gpu project-cpu project*.json jobs-project*.sh
 	@-rm -rf '__pycache__'
 	@-rm -rf *~
 
+get-results:
+	rsync -av --progress rivanna:/project/bii_dsc_community/tma5gv/${NAME}/target/rivanna/project-gpu project-gpu
 
 # #####################################################################
 # SINGULARITY IMAGE MANAGEMENT

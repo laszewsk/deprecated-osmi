@@ -9,8 +9,7 @@ class YamlToJsonConverter:
 
     def __init__(self, config_file, base_name="models"):
         self.config_file = config_file
-        pid = os.getpid()
-        self.json_file = f"{base_name}_{pid}.conf"
+        self.json_file = f"{base_name}_{os.getpid()}.conf"
         self.config = None
         self.model_config_list = None
 
