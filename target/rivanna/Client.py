@@ -19,6 +19,7 @@ Options:
 """
 
 from cloudmesh.common.Shell import Shell
+from cloudmesh.common.StopWatch import StopWatch
 import time
 import requests
 from docopt import docopt
@@ -74,6 +75,7 @@ class OSMI:
 
 if __name__ == "__main__":
     osmi = OSMI(config)
+    StopWatch.start("wrapper-total")
     processes = []
     for idx in range(config["experiment.concurrency"]):
         p = Process(target=osmi.run, args=(idx,))
@@ -82,3 +84,5 @@ if __name__ == "__main__":
 
     for p in processes:
         p.join()
+    StopWatch.stop("wrapper-total")
+    StopWatch.benchmark(sysinfo=False, csv=True)
