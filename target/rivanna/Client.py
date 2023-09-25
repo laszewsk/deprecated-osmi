@@ -85,4 +85,12 @@ if __name__ == "__main__":
     for p in processes:
         p.join()
     StopWatch.stop("wrapper-total")
+    # result = {
+    #     "model": config["experiment.model"],
+    #     "nrequests": config["constant.nrequests"],
+    #     "batch": config["experiment.batch"],
+    #     "algorithm": config["constant.algorithm"],
+    #     "concurrency": config["experiment.concurrency"],
+    # }
+    # StopWatch.event("client result", {"latency": avg_inference_latency, "throughput": throughput})
     StopWatch.benchmark(sysinfo=False, csv=True)
