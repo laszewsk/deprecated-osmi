@@ -3,7 +3,7 @@
 #SBATCH --job-name=o-m-{experiment.model}-b-{experiment.batch}-n-{experiment.ngpus}-g-{experiment.card_name}-c-{experiment.concurrency}-{experiment.repeat}
 #SBATCH --output=osmi-{experiment.repeat}-%u-%j.out
 #SBATCH --error=osmi-{experiment.repeat}-%u-%j.err
-{slurm.ee}
+{slurm.sbatch}
 #SBATCH --nodes={ee.nodes}
 #SBATCH --ntasks={ee.ntasks}
 #SBATCH --mem={ee.mem}
@@ -61,10 +61,15 @@ echo CONFIG_FILE $CONFIG_FILE
 echo TFS_SIF $TFS_SIF
 echo HAPROXY_SIF $HAPROXY_SIF
 echo OSMI_SIF $OSMI_SIF
+echo CLOUDMESH_CONFIG_DIR $CLOUDMESH_CONFIG_DIR
 
 mkdir -p {data.output}
 
+mkdir -p $USER
+
 PROGRESS "running" 3
+
+head /proc/meminfo
 
 module purge
 module load singularity gcc/11.2.0 openmpi/4.1.4 python/3.11.1
@@ -85,4 +90,4 @@ python Client.py --config=$CONFIG_FILE
 
 # python LoadBalancer.py wait --config=$CONFIG_FILE
 
-# python Client.py --config=$CONFIG_FILE
+# time python Client.py --config=$CONFIG_FILE

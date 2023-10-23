@@ -2,7 +2,7 @@
 Usage:
   ModelServer.py start_and_wait [-c <config>] [-p <port>] [-g <ngpus>] [-o <output_dir>] [-t <tfs_sif>]
   ModelServer.py start [-c <config>] [-p <port>] [-g <ngpus>] [-o <output_dir>] [-t <tfs_sif>]
-  ModelServer.py wait [--timeout=<timeout>]
+  ModelServer.py wait [-c <config>] [--timeout=<timeout>]
   ModelServer.py status [-p <port>]
   ModelServer.py (-h | --help)
 
@@ -85,7 +85,8 @@ def main():
     config = FlatDict()
     config.load(content=config_filename, expand=True)
     config["experiment.ngpus"] = int(config["experiment.ngpus"])
-    pprint(config)
+    # if debug:
+    print("ModelServer:", config)
 
     arg_to_config_mapping = {
         "--port": "constant.tfs_base_port",

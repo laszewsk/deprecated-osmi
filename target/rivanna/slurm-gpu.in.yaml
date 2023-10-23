@@ -2,14 +2,13 @@
 name: cloudmask-rivanna
 
 ee:
-  time: "6:00:00"
+  time: "2-00:00:00"
   mode: h
   dir: scratch
   nodes: 1
-  # ntasks: 10
   # ntasks: 37
-  ntasks: 5
-  mem: 16G
+  ntasks: 10
+  mem: 256G
 
 system:
   host: "rivanna"
@@ -43,28 +42,23 @@ benchmark:
   status: completed
   platform: rivanna
   
-# experiment:
-#   card_name: "a100,v100"
-#   # 2,4,8 are not that interesting
-#   batch: "1,2,4,8,16,32,64,128,256,512,1024"
-#   ngpus: "1,2,3,4"
-#   # concurrency: "1,2,4,8"
-#   concurrency: "1"
-#   # concurrency: "2"
-#   # concurrency: "4"
-#   # concurrency: "8"
-#   # concurrency: "16"
-#   model: "small_lstm,medium_cnn,large_tcnn"
-#   repeat: "1"
-#   # repeat: "1,2,3,4,5,6,7,8,9,10"
-
 experiment:
-  card_name: "a100,v100"
-  batch: "1"
+  directive: "a100,v100"
+  # 2,4,8 are not that interesting
+  batch: "1,2,4,8,16,32,64,128"
   ngpus: "1,2,3,4"
+  # concurrency: "1,2,4,8,16"
   concurrency: "1"
   model: "small_lstm,medium_cnn,large_tcnn"
-  repeat: "1"
+  repeat: "1,2,3,4"
+
+# experiment:
+#   directive: "a100,v100"
+#   batch: "128,256"
+#   ngpus: "1"
+#   concurrency: "1"
+#   model: "large_tcnn"
+#   repeat: "1"
 
 constant:
   server: "localhost"

@@ -4,7 +4,7 @@ LoadBalancer
 Usage:
   LoadBalancer.py start_and_wait [-c <config> | --config=<config>] [-p <port> | --haproxy_port=<port>] [-o <output> | --output_dir=<output>] [-s <image> | --haproxy_sif=<image>] [--timeout=<timeout>] [--tfs_base_port=<port>] [--ngpus=<ngpus>] [--haproxy_cfg_file=<haproxy_cfg_file>] [--server=<server>]
   LoadBalancer.py start [-c <config> | --config=<config>] [-p <port> | --haproxy_port=<port>] [-o <output> | --output_dir=<output>] [-s <image> | --haproxy_sif=<image>]
-  LoadBalancer.py wait
+  LoadBalancer.py wait [-c <config> | --config=<config>]
   LoadBalancer.py (-h | --help)
 
 Options:
