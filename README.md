@@ -43,12 +43,11 @@ wsl> pip install pip -U
 To get the [code](<https://code.ornl.gov/whb/osmi-bench>) we clone a gitlab instance that is hosted at Oakridge National Laboratory , please execute:
 
 ```
-export PROJECT=/home/$USER/project/osmi
+export PROJECT=/home/$USER/project/
 mkdir -p $PROJECT
 cd $PROJECT
-git clone https://github.com/DSC-SPIDAL/mlcommons-osmi.git
-git clone https://code.ornl.gov/whb/osmi-bench.git
-cd osmi-bench
+git clone https://github.com/laszewsk/osmi #git@github.com:laszewsk/osmi.git
+cd osmi/
 pip install -r $PROJECT/mlcommons-osmi/wsl/requirements.txt
 ```
 
@@ -143,36 +142,38 @@ export USER_SCRATCH=/scratch/$USER
 export USER_LOCALSCRATCH=/localscratch/$USER
 export USER_PROJECT=/project/bii_dsc_community/$USER
 export BASE=$USER_PROJECT
+export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
+
+mkdir -p $BASE
+cd $BASE
+git clone https://github.com/laszewsk/osmi.git
+cd osmi
 ```
 You can have the project in either USER_PROJECT or USER_SCRATCH
 ```
-export PROJECT=$BASE
-```
-
-```
-mkdir -p $PROJECT
-cd $PROJECT
-git clone https://github.com/laszewsk/osmi.git
-cd osmi
-export EXEC_DIR=$PROJECT/osmi/machine/rivanna
+export PROJECT=$BASE/osmi
+export EXEC_DIR=$PROJECT/target/rivanna
 ```
 
 ### Set up Python Environment
 
 ```
 rivanna> cd $EXEC_DIR
-rivanna> make environment
+rivanna> module load gcc/11.2.0 openmpi/4.1.4 python/3.11.1
+rivanna> python -m venv $BASE/ENV3
 (this may take a while to finish due to rivanna's slow file system)
-rivanna> source ../../ENV3/bin/activate
+rivanna> source $BASE/ENV3/bin/activate
+pip install pip -U
+pip install -r $EXEC_DIR/requirements.txt
+cms help
 ```
 
+alternatively
 ```
-module load gcc/11.2.0 openmpi/4.1.4 python/3.11.1
-python -m venv /project/bii_dsc_community/$USER/ENV3
-pip install pip -U
-source /project/bii_dsc_community/$USER/ENV3/bin/activate
-pip install cloudmesh-sbatch
-pip install cloudmesh-rivanna
+rivanna> cd $EXEC_DIR
+rivanna> sbatch environment.slurm
+(this may take a while)
+rivanna> source $BASE/ENV3/bin/activate
 ```
 
 ### Interacting with Rivanna
@@ -188,11 +189,11 @@ Rivanna has two brimary modes so users can interact with it.
    We will showcase here how to set such scripts up and use them 
 
 
-### Pull Tensorflow Serving Image
+### Build Tensorflow Serving, Haproxy, and OSMI Images
 
 ```
 rivanna> cd $EXEC_DIR
-rivanna> make image
+rivanna> make images
 ```
 
 ### Compile OSMI Models in Interactive Jobs
@@ -208,8 +209,10 @@ rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00
 *note: use --partition=bii-gpu --gres=gpu:v100:n to recieve n v100 GPUs
 
 ```
-node> cd $PROJECT/osmi
-node> make train
+node> cd $PROJECT/models
+node> python train.py small_lstm
+node> python train.py medium_tcnn
+node> python train.py large_cnn
 ```
 
 For this application there is no separate data
@@ -218,33 +221,25 @@ For this application there is no separate data
 
 ```
 rivanna> cd $EXEC_DIR
-rivanna> make train
+rivanna> sbatch train-small.slurm
+rivanna> sbatch train-medium.slurm
+rivanna> sbatch train-large.slurm
 ```
 
-### Run test sweep via batch jobs
+### Run benchmark with experiment executor
 
 ```
-rivanna> cd $PROJECT/osmi/benchmark
-rivanna> make run
+rivanna> cd $EXEC_DIR
+rivanna> make project-gpu
+rivanna> sh jobs-project-gpu.sh
 ```
-*Note: results stored in $PROJECT/osmi/osmi-output directory
-
-<!-- ### Run test sweep via interactive jobs
-
-```
-rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00 --partition=bii-gpu --gres=gpu:v100:1
-node> cd $PROJECT/osmi/benchmark
-node> singularity run --nv --home `pwd` ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
-// wait for lsof -i:8500 to show up
-node> python metabench.py $PROJECT/osmi/machine/rivanna/rivanna-V100.yaml
-``` -->
 
 ### Graphing Results
 
 ```
-vi $PROJECT/osmi/results.ipynb
+vi $EXEC_DIR/analysis/analysis-simple.ipynb
 ```
-graphs are also saved in cd $PROJECT/osmi/out
+graphs are also saved in cd $EXEC_DIR/analysis/out
 
 The program takes the results from metabench and produces several graphs.
 
