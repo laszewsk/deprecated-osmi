@@ -1,15 +1,16 @@
 """
 Usage:
-  ModelServer.py start_and_wait [-c <config>] [-p <port>] [-g <ngpus>] [-o <output_dir>] [-t <tfs_sif>]
-  ModelServer.py start [-c <config>] [-p <port>] [-g <ngpus>] [-o <output_dir>] [-t <tfs_sif>]
-  ModelServer.py wait [-c <config>] [--timeout=<timeout>]
+  ModelServer.py start_and_wait [-c <config>] [-p <port>] [-n <ngpus>] [--gpus <gpus>] [-o <output_dir>] [-t <tfs_sif>]
+  ModelServer.py start [-c <config>] [-p <port>] [-g <ngpus>] [--gpus <gpus>] [-o <output_dir>] [-t <tfs_sif>]
+  ModelServer.py wait [--timeout=<timeout>]
   ModelServer.py status [-p <port>]
   ModelServer.py (-h | --help)
 
 Options:
   -c <config> --config=<config>       Config file [default: config.yaml].
   -p <port> --port=<port>             Base port for TF servers.
-  -g <ngpus> --ngpus=<ngpus>          Number of GPUs.
+  -n <ngpus> --ngpus=<ngpus>          List of gpus by ID
+  --gpus=<gpus>                       List of gpus by ID
   -o <output_dir> --output_dir=<output_dir>   Directory to store output logs.
   -t <tfs_sif> --tfs_sif=<tfs_sif>    Tensorflow serving singularity image.
   --status=<status>                   Server status (for wait command).
@@ -19,6 +20,7 @@ Options:
 
 from cloudmesh.common.FlatDict import FlatDict
 from cloudmesh.common.StopWatch import StopWatch
+from cloudmesh.common.Console import Console
 from yaml_to_conf import YamlToJsonConverter
 import os
 import socket
@@ -33,6 +35,13 @@ class ModelServer:
     def __init__(self, config, config_filename=None):
         self.tfs_base_port = config["constant.tfs_base_port"]
         self.ngpus = config["experiment.ngpus"]
+        try:
+            self.gpus = config["system.gpus"]    
+            if self.gpus is not None:
+                self.gpus = self.gpus.split(",")
+        except:
+            # figure out which gpus can be used
+            Console.error("gpus not properly defined")
         self.output_dir = config["data.output"]
         self.batch = config["experiment.batch"]
         self.tfs_sif = config["data.tfs_sif"]
@@ -45,11 +54,10 @@ class ModelServer:
         return converter.get_name()
 
     def start(self):
-        # for device in self.visible_devices.split(','):
         StopWatch.event("ModelServer: start")
         for i in range(self.ngpus):
             port = self.tfs_base_port + i
-            command = f"time CUDA_VISIBLE_DEVICES={i} "\
+            command = f"time CUDA_VISIBLE_DEVICES={self.gpus[i]} "\
                       f"{SINGULARITY} {self.tfs_sif} "\
                       f"tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
                       f">& {self.output_dir}/v100-{port}.log &"
@@ -85,8 +93,7 @@ def main():
     config = FlatDict()
     config.load(content=config_filename, expand=True)
     config["experiment.ngpus"] = int(config["experiment.ngpus"])
-    # if debug:
-    print("ModelServer:", config)
+    pprint(config)
 
     arg_to_config_mapping = {
         "--port": "constant.tfs_base_port",
@@ -94,6 +101,7 @@ def main():
         "--output_dir": "data.output",
         "--tfs_sif": "data.tfs_sif",
         "--timeout": "constant.timeout",
+        "--gpus": "system.gpus"
     }
 
     for arg_key, config_key in arg_to_config_mapping.items():

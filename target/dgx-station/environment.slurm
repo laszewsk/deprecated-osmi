@@ -10,27 +10,32 @@
 #SBATCH --error=%u-%j.err
 #SBATCH --mem-per-gpu=64G
 
-if [ -z "$BASE" ]; then
-    echo "BASE is not set"
-    exit 1
-fi
-
 start_python_install=`date +%s`
 echo start_python_install $start_python_install
 
+export USER_SCRATCH=/scratch/$USER
+export BASE=/project/bii_dsc_community/
+export USER_PROJECT=$BASE/$USER
+# this script requires you to set PROJECT in the command line
+export PROJECT_DIR=$PROJECT/osmi
+export EXEC_DIR=$PROJECT_DIR/target/rivanna
+# export PROJECT_DATA=$USER_SCRATCH/data
+
+mkdir -p $PROJECT_DIR
+cd $PROJECT_DIR
+
 module purge
 module load  gcc/11.2.0 openmpi/4.1.4 python/3.11.1
-if ! [ -d "$BASE/ENV3" ]; then
-    time python -m venv $BASE/ENV3
+if ! [ -d "$PROJECT_DIR/ENV3" ]; then
+    time python -m venv $PROJECT_DIR/ENV3
 fi
-source $BASE/ENV3/bin/activate
+source $PROJECT_DIR/ENV3/bin/activate
 
 time pip install pip -U
-time pip install -r $EXEC_DIR/requirements.txt
-cms help
+time pip install -r $EXEC_DIR/requirements-rivanna.txt
 which python
 
 end_python_install_time=`date +%s`
 echo end_python_install_time $end_python_install_time
-time_python_install=$((end_python_install-start_python_install))
+time_python_install=$((start_python_install-end_python_install))
 echo time_python_install $time_python_install
