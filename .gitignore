@@ -6,3 +6,4 @@ models/small_lstm
 *.err
 *.out
 *.sif
+target/rivanna/project-gpu

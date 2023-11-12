@@ -102,9 +102,12 @@ clean:
 	@-rm -rf '__pycache__'
 	@-rm -rf *~
 
+# PROJECT_USER=/project/bii_dsc_community/tma5gv
+PROJECT_USER=/scratch/tma5gv
+
 get-results:
-	-rsync -av --progress rivanna:/project/bii_dsc_community/tma5gv/${NAME}/target/rivanna/project-gpu .
-	-rsync -av --progress rivanna:/project/bii_dsc_community/tma5gv/${NAME}/target/rivanna/project-cpu .
+	-rsync -av --progress rivanna:${PROJECT_USER}/${NAME}/target/rivanna/project-gpu .
+	-rsync -av --progress rivanna:${PROJECT_USER}/${NAME}/target/rivanna/project-cpu .
 
 # #####################################################################
 # SINGULARITY IMAGE MANAGEMENT
