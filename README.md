@@ -126,6 +126,7 @@ which tensorflow_model_server
 make image
 ```
 
+<!--
 ### Running the program (obsolete)
 
 ```
@@ -134,7 +135,9 @@ make run
 python metabench.py --config=make-yaml-file-for-ubuntu
 ```
 TODO: complete
+-->
 
+## Running on rivanna
 
 ## Logging into rivanna
 
@@ -152,9 +155,9 @@ local machine, so that login and management of the machine is
 simplified
 
 ```
-laptop> python -m venv ~/ENV3
-laptop> pip install cloudmesh-rivanna
-laptop> pip install cloudmesh-vpn
+local> python -m venv ~/ENV3
+local> pip install cloudmesh-rivanna
+local> pip install cloudmesh-vpn
 ```
 
 IN case you have set up the vpn client correctly you can now activate
@@ -166,8 +169,8 @@ In case you followed our documentation you will be able to say
 
 
 ```
-laptop> cms vpn activate
-laptop> ssh b1
+local> cms vpn activate
+local> ssh b1
 ```
 
 Furthermore we assume that you have the code also checked out on your
@@ -176,22 +179,24 @@ super computer.
 
 
 ```
-mkdir ~/github
-cd ~/github
-git clone git clone https://github.com/laszewsk/osmi.git
-cd osmi
+local>
+  mkdir ~/github
+  cd ~/github
+  git clone git clone https://github.com/laszewsk/osmi.git
+  cd osmi
 ```
 
 To have the same environment variables to access the code on rivanna
 we introduce
 
 ```
-export USER_SCRATCH=/scratch/$USER
-export USER_LOCALSCRATCH=/localscratch/$USER
-export BASE=$USER_SCRATCH
-export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
-export PROJECT=$BASE/osmi
-export EXEC_DIR=$PROJECT/target/rivanna
+local>
+  export USER_SCRATCH=/scratch/$USER
+  export USER_LOCALSCRATCH=/localscratch/$USER
+  export BASE=$USER_SCRATCH
+  export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
+  export PROJECT=$BASE/osmi
+  export EXEC_DIR=$PROJECT/target/rivanna
 ```
 
 This will come in handy when we rsync the results
@@ -231,22 +236,24 @@ it and make the instalation uniform.
 
 
 <!--
-export USER_PROJECT=/project/bii_dsc_community/$USER
-export BASE=$USER_PROJECT
+b1>
+  export USER_PROJECT=/project/bii_dsc_community/$USER
+  export BASE=$USER_PROJECT
 -->
 
 ```
-export USER_SCRATCH=/scratch/$USER
-export USER_LOCALSCRATCH=/localscratch/$USER
-export BASE=$USER_SCRATCH
-export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
-export PROJECT=$BASE/osmi
-export EXEC_DIR=$PROJECT/target/rivanna
+b1>
+  export USER_SCRATCH=/scratch/$USER
+  export USER_LOCALSCRATCH=/localscratch/$USER
+  export BASE=$USER_SCRATCH
+  export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
+  export PROJECT=$BASE/osmi
+  export EXEC_DIR=$PROJECT/target/rivanna
 
-mkdir -p $BASE
-cd $BASE
-git clone https://github.com/laszewsk/osmi.git
-cd osmi
+  mkdir -p $BASE
+  cd $BASE
+  git clone https://github.com/laszewsk/osmi.git
+  cd osmi
 ```
 
 You now have the code in `$PROJECT`
@@ -261,10 +268,10 @@ faster, but also gurantees that the worker node itself is ued to
 install it to avoid software incompatibilities.
 
 ```
-rivanna> cd $EXEC_DIR
-rivanna> sbatch environment.slurm
+b1> cd $EXEC_DIR
+b1> sbatch environment.slurm
 (this may take a while)
-rivanna> source $BASE/ENV3/bin/activate
+b1> source $BASE/ENV3/bin/activate
 ```
 
 An alternate way is to experiment with the setup on the login node in
@@ -277,11 +284,11 @@ what the batch script does internaly.
 It basically executes the following.
 
 ```
-rivanna> cd $EXEC_DIR
-rivanna> module load gcc/11.2.0 openmpi/4.1.4 python/3.11.1
-rivanna> python -m venv $BASE/ENV3
+b1> cd $EXEC_DIR
+b1> module load gcc/11.2.0 openmpi/4.1.4 python/3.11.1
+b1> python -m venv $BASE/ENV3
 (this may take a while to finish due to rivanna's slow file system)
-rivanna> source $BASE/ENV3/bin/activate
+b1> source $BASE/ENV3/bin/activate
 pip install pip -U
 pip install -r $EXEC_DIR/requirements.txt
 cms help
@@ -296,8 +303,8 @@ haproxy, and the code to be executed. This is done with
 
 
 ```
-rivanna> cd $EXEC_DIR
-rivanna> make images
+b1> cd $EXEC_DIR
+b1> make images
 ```
 
 
@@ -307,10 +314,10 @@ To run some of the test jobs to run a model and see if things work you
 can use the commands
 
 ```
-rivanna> cd $EXEC_DIR
-rivanna> sbatch train-small.slurm
-rivanna> sbatch train-medium.slurm
-rivanna> sbatch train-large.slurm
+b1> cd $EXEC_DIR
+b1> sbatch train-small.slurm
+b1> sbatch train-medium.slurm
+b1> sbatch train-large.slurm
 ```
 
 ### Run benchmark with cloudmesh experiment executor
@@ -319,9 +326,9 @@ To run many different jobs that are created based on config.in.slurm
 You can use the following
 
 ```
-rivanna> cd $EXEC_DIR
-rivanna> make project-gpu
-rivanna> sh jobs-project-gpu.sh
+b1> cd $EXEC_DIR
+b1> make project-gpu
+b1> sh jobs-project-gpu.sh
 ```
 
 The results will be stored in a projects directory.
@@ -332,17 +339,19 @@ To analyse the program it is best to copy the results into your local
 computer and use a jupyter notebook.
 
 ```
-laptop> cd ~/github/osmi/target/rivanna
-laptop> rsync rivanna:$EXEC_DIR/project ./project
+local>
+  cd ~/github/osmi/target/rivanna
+  rsync rivanna:$EXEC_DIR/project ./project
 ```
 
 Now we can analyse the data with 
 
 ```
-pyCharm ./analysis/analysis-simple.ipynb
+local>
+	open ./analysis/analysis-simple.ipynb
 ```
 
-graphs are also saved in cd $EXEC_DIR/analysis/out
+graphs are also saved in `./analysis/out`
 
 The program takes the results from clodmesh experiment executir and
 produces several graphs.
