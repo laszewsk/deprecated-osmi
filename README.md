@@ -26,7 +26,8 @@ Authors: Nate Kimball, Gregor von Laszewski
 TODO: Nate
 
 1. create isolated new wsl environment
-2. use what we do in the ubuntu thing, but do separate documentation er as the ubuntu native install may have other steps or issuse
+2. use what we do in the ubuntu thing, but do separate documentation
+   er as the ubuntu native install may have other steps or issuse
 
 
 ### Create python virtual environment on WSL Ubuntu
@@ -40,7 +41,9 @@ wsl> pip install pip -U
 
 ### Get the code
 
-To get the [code](<https://code.ornl.gov/whb/osmi-bench>) we clone a gitlab instance that is hosted at Oakridge National Laboratory , please execute:
+To get the [code](<https://code.ornl.gov/whb/osmi-bench>) we clone a
+gitlab instance that is hosted at Oakridge National Laboratory,
+please execute:
 
 ```
 export PROJECT=/home/$USER/project/
@@ -77,7 +80,8 @@ pip install pip -U
 
 ### Get the code
 
-To get the code we clone this github repository (https://github.com/laszewsk/osmi.git). Please execute:
+To get the code we clone this github repository
+(https://github.com/laszewsk/osmi.git). Please execute:
 
 ```
 mkdir ~/osmi
@@ -87,7 +91,10 @@ cd osmi
 pip install -r ~/osmi/osmi/machine/ubuntu/requirements-ubuntu.txt
 ```
 
-**Note: the original version of grpcio 1.0.0 does not distribute valid wheels, hence we assume the library is out of date, but a new version with 1.15.1 is available that is distributed. Gregor strongly recoomnds to swithc to a supported version of grpcio.**
+**Note:** the original version of grpcio 1.0.0 does not distribute
+valid wheels, hence we assume the library is out of date, but a new
+version with 1.15.1 is available that is distributed. Gregor
+strongly recoomnds to swithc to a supported version of grpcio.
 
 ### Running the small OSMI model benchmark
 
@@ -100,11 +107,15 @@ time python train.py large_tcnn  # takes less the 30s on an 5950X
 
 ### Install tensorflow serving in ubuntu
 
-Unclear. the documentation do this with singularity, I do have singularity on desktop, but can we use it natively and compare with singularity performance?
+Unclear. the documentation do this with singularity, I do have
+singularity on desktop, but can we use it natively and compare with
+singularity performance?
 
-Nate will explore theoretically how to isntall tensorflow servving on ubuntu
+Nate will explore theoretically how to isntall tensorflow servving on
+ubuntu
 
-compare if others have install instructions, these are old from 16.01 but we want 21. ...
+compare if others have install instructions, these are old from 16.01
+but we want 21. ...
 
 ```
 sudo pip install tensorflow-serving-api
@@ -115,7 +126,7 @@ which tensorflow_model_server
 make image
 ```
 
-### Running the program
+### Running the program (obsolete)
 
 ```
 cd ~/osmi/osmi/machine/ubuntu
@@ -124,38 +135,146 @@ python metabench.py --config=make-yaml-file-for-ubuntu
 ```
 TODO: complete
 
-## Running OSMI Bench on rivanna
 
-To run the OSMI benchmark, you will first need to generate the project directory with the code. We assume you are in the group `bii_dsc_community`. This allows you access to the directory
+## Logging into rivanna
 
-```/project/bii_dsc_community```
+The easiest way to log into rivanna is to use ssh. However as we are
+creating singularity images, we need to use either bihead1 or bihead2
 
-As well as the slurm partitions `gpu` and `bii_gpu`
+Please follow the documentation at
 
-### Set up a project directory and get the code
+LINK MISSING
 
-<!-- To get the code we clone a gitlab instance that is hosted at Oakridge National Laboratory (<https://code.ornl.gov/whb/osmi-bench>). -->
-To get the code we clone this github repository (https://github.com/laszewsk/osmi.git)  First you need to create a directory under your username in the project directory. We recommend to use your username. Follow these steps: 
+to set this up
+
+Best is to also install cloudmesh-rivanna and cloudmesh-vpn on your
+local machine, so that login and management of the machine is
+simplified
+
+```
+laptop> python -m venv ~/ENV3
+laptop> pip install cloudmesh-rivanna
+laptop> pip install cloudmesh-vpn
+```
+
+IN case you have set up the vpn client correctly you can now activate
+it from the terminal including gitbash on windows. If this does not
+work, you can alternatively just use the cisco vpn gu client and ssh
+to one of biheads.
+
+In case you followed our documentation you will be able to say
+
+
+```
+laptop> cms vpn activate
+laptop> ssh b1
+```
+
+Furthermore we assume that you have the code also checked out on your
+laptop as we use this to sync later on the results created with the
+super computer.
+
+
+```
+mkdir ~/github
+cd ~/github
+git clone git clone https://github.com/laszewsk/osmi.git
+cd osmi
+```
+
+To have the same environment variables to access the code on rivanna
+we introduce
 
 ```
 export USER_SCRATCH=/scratch/$USER
 export USER_LOCALSCRATCH=/localscratch/$USER
+export BASE=$USER_SCRATCH
+export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
+export PROJECT=$BASE/osmi
+export EXEC_DIR=$PROJECT/target/rivanna
+```
+
+This will come in handy when we rsync the results
+
+
+Now you are looged in on  frontend node to rivanna.
+
+
+
+## Running OSMI Bench on rivanna
+
+To run the OSMI benchmark, you will first need to generate the project
+directory with the code. We assume you are in the group
+`bii_dsc_community`, and
+
+SOME OTHERS MISSING COPY FROM OUR DOCUMENTATION
+
+so you can create singularity images on rivanna.
+
+
+<!-- This allows you access to the directory
+```/project/bii_dsc_community```-->
+
+As well as the slurm partitions `gpu` and `bii_gpu`
+
+We will set up OSMI in the /scratch/$USER directory.
+
+### Set up a project directory and get the code
+
+<!-- To get the code we clone a gitlab instance that is hosted at -->
+<!-- Oakridge National Laboratory -->
+<!-- (<https://code.ornl.gov/whb/osmi-bench>). -->
+
+
+First you need to create the directory. The following steps simplify
+it and make the instalation uniform.
+
+
+<!--
 export USER_PROJECT=/project/bii_dsc_community/$USER
 export BASE=$USER_PROJECT
+-->
+
+```
+export USER_SCRATCH=/scratch/$USER
+export USER_LOCALSCRATCH=/localscratch/$USER
+export BASE=$USER_SCRATCH
 export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
+export PROJECT=$BASE/osmi
+export EXEC_DIR=$PROJECT/target/rivanna
 
 mkdir -p $BASE
 cd $BASE
 git clone https://github.com/laszewsk/osmi.git
 cd osmi
 ```
-You can have the project in either USER_PROJECT or USER_SCRATCH
-```
-export PROJECT=$BASE/osmi
-export EXEC_DIR=$PROJECT/target/rivanna
-```
+
+You now have the code in `$PROJECT`
+
 
 ### Set up Python Environment
+
+OSMI will run in batch mode this is also valid for setting up the
+environment for which we created abatch script.  This has the
+advantage that it installed via the worker nodes, which is typically
+faster, but also gurantees that the worker node itself is ued to
+install it to avoid software incompatibilities.
+
+```
+rivanna> cd $EXEC_DIR
+rivanna> sbatch environment.slurm
+(this may take a while)
+rivanna> source $BASE/ENV3/bin/activate
+```
+
+An alternate way is to experiment with the setup on the login node in
+acse you like to explore other libraries. However  once you find other
+improvements, you ought to include them in the batch script. Here is
+what the batch script does internaly.
+
+[environment.slurm](https://github.com/laszewsk/osmi/blob/main/target/rivanna/environment.slurm)
+
+It basically executes the following.
 
 ```
 rivanna> cd $EXEC_DIR
@@ -168,37 +287,81 @@ pip install -r $EXEC_DIR/requirements.txt
 cms help
 ```
 
-alternatively
-```
-rivanna> cd $EXEC_DIR
-rivanna> sbatch environment.slurm
-(this may take a while)
-rivanna> source $BASE/ENV3/bin/activate
-```
-
-### Interacting with Rivanna
-
-Rivanna has two brimary modes so users can interact with it. 
-
-* **Interactive Jobs:** The first one are interactive jobs that allow you to 
-  reserve a node on rivanna so it looks like a login node. This interactive mode is
-  usefull only during the debug phase and can serve as a convenient way to quickly create 
-  batch scripts that are run in the second mode.
-
-*  **Batch Jobs:** The second mode is a batch job that is controlled by a batch script. 
-   We will showcase here how to set such scripts up and use them 
 
 
 ### Build Tensorflow Serving, Haproxy, and OSMI Images
+
+We created convenient singularity images for tensorflow serving,
+haproxy, and the code to be executed. This is done with
+
 
 ```
 rivanna> cd $EXEC_DIR
 rivanna> make images
 ```
 
-### Compile OSMI Models in Interactive Jobs
 
-Once you know hwo to create jobs with a propper batch script you will likely no longer need to use interactive jobs. We keep this documentation for beginners that like to experiement in interactive mode to develop batch scripts.
+### Compile OSMI Models in Batch Jobs
+
+To run some of the test jobs to run a model and see if things work you
+can use the commands
+
+```
+rivanna> cd $EXEC_DIR
+rivanna> sbatch train-small.slurm
+rivanna> sbatch train-medium.slurm
+rivanna> sbatch train-large.slurm
+```
+
+### Run benchmark with cloudmesh experiment executor
+
+To run many different jobs that are created based on config.in.slurm
+You can use the following
+
+```
+rivanna> cd $EXEC_DIR
+rivanna> make project-gpu
+rivanna> sh jobs-project-gpu.sh
+```
+
+The results will be stored in a projects directory.
+
+### Graphing Results
+
+To analyse the program it is best to copy the results into your local
+computer and use a jupyter notebook.
+
+```
+laptop> cd ~/github/osmi/target/rivanna
+laptop> rsync rivanna:$EXEC_DIR/project ./project
+```
+
+Now we can analyse the data with 
+
+```
+pyCharm ./analysis/analysis-simple.ipynb
+```
+
+graphs are also saved in cd $EXEC_DIR/analysis/out
+
+The program takes the results from clodmesh experiment executir and
+produces several graphs.
+
+
+
+
+
+### Compile OSMI Models in Interactive Jobs (avpid using)
+
+**Interactive Jobs:** allow you to reserve a node on rivanna so it
+looks like a login node. This interactive mode is usefull only during
+the debug phase and can serve as a convenient way to debug and to
+interactively experiment running the program.
+
+Once you know hwo to create jobs with a propper batch script you will
+likely no longer need to use interactive jobs. We keep this
+documentation for beginners that like to experiement in interactive
+mode to develop batch scripts.
 
 First, obtain an interactive job with
 
@@ -206,7 +369,14 @@ First, obtain an interactive job with
 rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00
 ```
 
-*note: use --partition=bii-gpu --gres=gpu:v100:n to recieve n v100 GPUs
+To specify a particular GPU please use. 
+
+```
+export GPUS=1
+v100 rivanna> ijob -c 1 -A bii_dsc_community --partition=bii-gpu --gres=gpu:v100:$GPUS --time=01:00:00
+a100 rivanna> ijob -c 1 -A bii_dsc_community --partition=bii-gpu --gres=gpu:a100:$GPUS --time=01:00:00
+```
+
 
 ```
 node> cd $PROJECT/models
@@ -217,33 +387,14 @@ node> python train.py large_cnn
 
 For this application there is no separate data
 
-### Compile OSMI Models in Batch Jobs
+
+
+<!--
+
+
+----------------------------------------------------------------------
 
 ```
-rivanna> cd $EXEC_DIR
-rivanna> sbatch train-small.slurm
-rivanna> sbatch train-medium.slurm
-rivanna> sbatch train-large.slurm
-```
-
-### Run benchmark with experiment executor
-
-```
-rivanna> cd $EXEC_DIR
-rivanna> make project-gpu
-rivanna> sh jobs-project-gpu.sh
-```
-
-### Graphing Results
-
-```
-vi $EXEC_DIR/analysis/analysis-simple.ipynb
-```
-graphs are also saved in cd $EXEC_DIR/analysis/out
-
-The program takes the results from metabench and produces several graphs.
-
-<!-- ```
 rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=1-00:00:00 --partition=bii-gpu --gres=gpu
 node> singularity shell --nv --home `pwd` serving_latest-gpu.sif
 singularity> nvidia-smi #to see if you can use gpus (on node)
@@ -253,8 +404,9 @@ singularity> cat log //to check its working
 singularity> lsof -i :8500 // to make sure it an accept incoming directions
 ```
 
-Edit /project/bii_dsc_community/$USER/osmi/osmi-bench/benchmark/tfs_grpc_client.py to make sure all the models use float32
-To run the client:
+Edit
+/project/bii_dsc_community/$USER/osmi/osmi-bench/benchmark/tfs_grpc_client.py
+to make sure all the models use float32 To run the client:
 
 ```
 python tfs_grpc_client.py -m [model, e.g. small_lstm] -b [batch size, e.g. 32] -n [# of batches, e.g. 10]  localhost:8500
@@ -288,23 +440,32 @@ node> CUDA_VISIBLE_DEVICES=1 singularity run --home `pwd` --nv ../serving_latest
 node> cat tf
 ```
 
-do this for all gpus with different ports -->
+do this for all gpus with different ports
+
+----------------------------------------------------------------------
+
+-->
 
 ## References
 
-1. Production Deployment of Machine-Learned Rotorcraft Surrogate Models on HPC, Wesley Brewer, Daniel Martinez, 
-   Mathew Boyer, Dylan Jude, Andy Wissink, Ben Parsons, Junqi Yin, Valentine Anantharaj
-   2021 IEEE/ACM Workshop on Machine Learning in High Performance Computing Environments (MLHPC),
-   978-1-6654-1124-0/21/$31.00 ©2021 IEEE | DOI: 10.1109/MLHPC54614.2021.00008, <https://ieeexplore.ieee.org/document/9652868>
-   TODO: please ask wess what the free pdf link is all gov organizations have one. for example as ornl is coauther it 
-   must be on their site somewhere.
+1. Production Deployment of Machine-Learned Rotorcraft Surrogate
+   Models on HPC, Wesley Brewer, Daniel Martinez, Mathew Boyer, Dylan
+   Jude, Andy Wissink, Ben Parsons, Junqi Yin, Valentine Anantharaj
+   2021 IEEE/ACM Workshop on Machine Learning in High Performance
+   Computing Environments (MLHPC), 978-1-6654-1124-0/21/$31.00 ©2021
+   IEEE | DOI: 10.1109/MLHPC54614.2021.00008,
+   <https://ieeexplore.ieee.org/document/9652868> TODO: please ask
+   wess what the free pdf link is all gov organizations have one. for
+   example as ornl is coauther it must be on their site somewhere.
    
 
-2. Using Rivanna for GPU ussage, Gregor von Laszewski, JP. Fleischer 
+2. Using Rivanna for GPU ussage, Gregor von Laszewski, JP. Fleischer
    <https://github.com/cybertraining-dsc/reu2022/blob/main/project/hpc/rivanna-introduction.md>
 
-3. Setting up a Windows computer for research, Gregor von Laszewski, J.P Fleischer 
+3. Setting up a Windows computer for research, Gregor von Laszewski,
+   J.P Fleischer
    <https://github.com/cybertraining-dsc/reu2022/blob/main/project/windows-configuration.md>
    
-4. Initial notes to be deleted, Nate: <https://docs.google.com/document/d/1luDAAatx6ZD_9-gM5HZZLcvglLuk_OqswzAS2n_5rNA>
+4. Initial notes to be deleted, Nate:
+   <https://docs.google.com/document/d/1luDAAatx6ZD_9-gM5HZZLcvglLuk_OqswzAS2n_5rNA>
 
