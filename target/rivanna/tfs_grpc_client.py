@@ -20,20 +20,21 @@ parser.add_argument('-m', '--model', required=True, default='medium_cnn', type=s
 parser.add_argument('-n', default=128, type=int, help='number of requests')
 parser.add_argument('-o', '--outfile', default='results.csv', help='name of output file')
 parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
-parser.add_argument('-vv', action='store_true', help='extra verbose output')
+parser.add_argument('-vv', action='store_true', default=False, help='extra verbose output')
 parser.add_argument('--redux', action='store_true', help='divide args.n by args.batch')
 parser.add_argument('-t', '--tqdm', action='store_true')
+parser.add_argument('--identifier', default=0, type=int, help='identifier')
 # store true or false?
 args = parser.parse_args()
 
 
 def start(msg):
-    StopWatch.start(f"tfs_grpc_client-py {msg} model={args.model}, batch={args.batch}, "
+    StopWatch.start(f"tfs_grpc_client-py {msg} id={args.identifier}, model={args.model}, batch={args.batch}, "
                     f"num_requests={args.n}, outfile={args.outfile}, redux={args.redux}")
 
 
 def stop(msg):
-    StopWatch.stop(f"tfs_grpc_client-py {msg} model={args.model}, batch={args.batch}, "
+    StopWatch.stop(f"tfs_grpc_client-py {msg} id={args.identifier}, model={args.model}, batch={args.batch}, "
                    f"num_requests={args.n}, outfile={args.outfile}, redux={args.redux}")
 
 
@@ -79,7 +80,7 @@ else:
 # flag to switch on/off tqdmt
 start("loop total")
 for i in tqdm(range(num_requests)) if tqdm else range(num_requests):
-    start(f"loop {i}")
+    # start(f"loop {i}")
     data = np.array(np.random.random(models[args.model]['shape']), dtype=models[args.model]['dtype'])
     tik = time.perf_counter()
     request = predict_pb2.PredictRequest()
@@ -91,7 +92,7 @@ for i in tqdm(range(num_requests)) if tqdm else range(num_requests):
         print(results[i])
     tok = time.perf_counter()
     times.append(tok - tik)
-    stop(f"loop {i}")
+    # stop(f"loop {i}")
 stop("loop total")
 
 elapsed = sum(times)

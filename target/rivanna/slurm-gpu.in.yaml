@@ -9,6 +9,7 @@ ee:
   # ntasks: 37
   ntasks: 10
   mem: 256G
+  # mem_per_gpu: 64G
 
 system:
   host: "rivanna"
@@ -32,7 +33,6 @@ submission:
   platform: rivanna
   accelerators_per_node: 1
 
-
 benchmark:
   name: Osmi
   user: Gregor von Laszewski
@@ -43,18 +43,18 @@ benchmark:
   platform: rivanna
   
 experiment:
-  directive: "a100,v100"
+  directive: "a100-dgx,v100"
   # 2,4,8 are not that interesting
   batch: "1,2,4,8,16,32,64,128"
   ngpus: "1,2,3,4"
   # concurrency: "1,2,4,8,16"
   concurrency: "1"
   model: "small_lstm,medium_cnn,large_tcnn"
-  repeat: "1,2,3,4"
+  repeat: "1,2"
 
 # experiment:
-#   directive: "a100,v100"
-#   batch: "128,256"
+#   directive: "a100,v100" #nate
+#   batch: "64,128,256,512"
 #   ngpus: "1"
 #   concurrency: "1"
 #   model: "large_tcnn"
@@ -64,7 +64,7 @@ constant:
   server: "localhost"
   tfs_base_port: 8500
   haproxy_port: 8443
-  nrequests: 32768
+  nrequests: 16384
   algorithm: tfs_grpc_client.py
   timeout: 45
 

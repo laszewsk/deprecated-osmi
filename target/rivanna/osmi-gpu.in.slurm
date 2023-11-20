@@ -11,9 +11,12 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --time={ee.time}
 
-
-# xSBATCH --partition=gpu
-# xSBATCH --mem=64GB
+# slurm.sbatch
+# #SBATCH --gres=gpu:a100:1
+# #SBATCH --partition=gpu
+# #SBATCH --account=bii_dsc_community
+# #SBATCH --mem-per-gpu={ee.mem_per_gpu}
+# #SBATCH --exclusive
 
 
 PROGRESS () {
