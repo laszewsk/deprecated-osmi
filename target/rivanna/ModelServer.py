@@ -25,13 +25,14 @@ import socket
 import time
 from docopt import docopt
 from pprint import pprint
+from port_generator import unique_base_port
 
 SINGULARITY = "singularity exec --bind `pwd`:/home --pwd /home"
 
 class ModelServer:
 
     def __init__(self, config, config_filename=None):
-        self.tfs_base_port = config["constant.tfs_base_port"]
+        self.tfs_base_port = unique_base_port(config) + 1
         self.ngpus = config["experiment.ngpus"]
         self.output_dir = config["data.output"]
         self.batch = config["experiment.batch"]
@@ -45,14 +46,13 @@ class ModelServer:
         return converter.get_name()
 
     def start(self):
-        # for device in self.visible_devices.split(','):
         StopWatch.event("ModelServer: start")
         for i in range(self.ngpus):
             port = self.tfs_base_port + i
             command = f"time CUDA_VISIBLE_DEVICES={i} "\
                       f"{SINGULARITY} {self.tfs_sif} "\
-                      f"tensorflow_model_server --port={port} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
-                      f">& {self.output_dir}/v100-{port}.log &"
+                      f"tensorflow_model_server --port={port:04d} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
+                      f">& {self.output_dir}/v100-{port:04d}.log &"
             print(command)
             r = os.system(command)
             print(r)
@@ -71,7 +71,7 @@ class ModelServer:
         while not all([self.status(p + self.tfs_base_port) for p in range(self.ngpus)]):
             if time.time() - start > self.timeout:
                 print("Server not properly started")
-                raise ValueError("Server not properly started")
+                raise ValueError("Model server not properly started")
             time.sleep(0.5)
             print(".", end="")
         StopWatch.event("ModelServer: server up")

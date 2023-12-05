@@ -10,13 +10,13 @@
 #SBATCH --gres=gpu:{experiment.card_name}:{experiment.ngpus}
 #SBATCH --cpus-per-task=1
 #SBATCH --time={ee.time}
+#SBATCH --exclusive
 
 # slurm.sbatch
 # #SBATCH --gres=gpu:a100:1
 # #SBATCH --partition=gpu
 # #SBATCH --account=bii_dsc_community
 # #SBATCH --mem-per-gpu={ee.mem_per_gpu}
-# #SBATCH --exclusive
 
 
 PROGRESS () {
@@ -48,25 +48,22 @@ echo "# ==================================="
 echo "# PROJECT info"
 echo "# ==================================="
 
-# WORKDIR=$USER_PROJECT/osmi
-# SIF_DIR=$WORKDIR/target/rivanna/image-singularity
 USER_PROJECT={project.user}
 CONFIG_FILE=config.yaml
 TFS_SIF={data.tfs_sif}
 HAPROXY_SIF={data.haproxy_sif}
 OSMI_SIF={data.osmi_sif}
+OUTPUT_DIR={data.output}
 
-# echo NAME $NAME
-# echo WORKDIR $WORKDIR
-# echo SIF_DIR $SIF_DIR
 echo USER_PROJECT $USER_PROJECT
 echo CONFIG_FILE $CONFIG_FILE
 echo TFS_SIF $TFS_SIF
 echo HAPROXY_SIF $HAPROXY_SIF
 echo OSMI_SIF $OSMI_SIF
 echo CLOUDMESH_CONFIG_DIR $CLOUDMESH_CONFIG_DIR
+echo OUTPUT_DIR $OUTPUT_DIR
 
-mkdir -p {data.output}
+mkdir -p $OUTPUT_DIR
 
 mkdir -p $USER
 
@@ -79,11 +76,17 @@ module load singularity gcc/11.2.0 openmpi/4.1.4 python/3.11.1
 
 source $USER_PROJECT/ENV3/bin/activate
 
+for gpu in $(seq 0 {experiment.ngpus}); do
+    cms gpu watch --gpu=$gpu --delay=0.5 --dense > $OUTPUT_DIR/gpu-0.log &
+done
+
 python ModelServer.py start_and_wait --config=$CONFIG_FILE
 
 python LoadBalancer.py start_and_wait --config=$CONFIG_FILE
 
 python Client.py --config=$CONFIG_FILE
+
+nvidia-smi
 
 # python ModelServer.py start --config=$CONFIG_FILE &
 

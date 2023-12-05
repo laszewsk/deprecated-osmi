@@ -67,7 +67,7 @@ simple:
 	           --output_dir=./$(basename $@) \
                --source_dir=. \
 		       --verbose \
-			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py"
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
 
 %-gpu.json: slurm-gpu.in.yaml
 	cms ee generate \
@@ -80,7 +80,7 @@ simple:
 	           --output_dir=./$(basename $@) \
                --source_dir=. \
 		       --verbose \
-			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py"
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
 
 kill: stop
 

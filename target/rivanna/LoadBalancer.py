@@ -17,20 +17,20 @@ Options:
 
 from cloudmesh.common.Shell import Shell
 import time
-import requests
 from docopt import docopt
 import os
 import socket
 from cloudmesh.common.FlatDict import FlatDict
 from pprint import pprint
 from haproxy_cfg_generator import generate_haproxy_cfg
+from port_generator import unique_base_port
 
 SINGULARITY = "singularity exec --bind `pwd`:/home --pwd /home"
 
 class HAProxyLoadBalancer:
 
     def __init__(self, config):
-        self.port = config["constant.haproxy_port"]
+        self.port = unique_base_port(config)
         self.output_dir = config["data.output"]
         generate_haproxy_cfg(config)
         self.haproxy_config_file = config["data.haproxy_cfg_file"]
@@ -54,7 +54,7 @@ class HAProxyLoadBalancer:
         start = time.time()
         while not self.status(self.port):
             if time.time() - start > 45:
-                raise ValueError("Server not properly started")
+                raise ValueError("Load balancer not properly started")
             time.sleep(0.5)
             print(".", end="")
         print()
