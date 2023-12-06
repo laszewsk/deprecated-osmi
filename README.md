@@ -54,7 +54,6 @@ cd osmi/
 pip install -r $PROJECT/mlcommons-osmi/wsl/requirements.txt
 ```
 
-###
 
 ```
 wsl> cd $PROJECT/mlcommons-osmi/wsl
@@ -139,7 +138,7 @@ TODO: complete
 
 ## Running on rivanna
 
-## Logging into rivanna
+### Logging into rivanna
 
 The easiest way to log into rivanna is to use ssh. However as we are
 creating singularity images, we need to use either bihead1 or bihead2
@@ -206,7 +205,7 @@ Now you are looged in on  frontend node to rivanna.
 
 
 
-## Running OSMI Bench on rivanna
+### Running OSMI Bench on rivanna
 
 To run the OSMI benchmark, you will first need to generate the project
 directory with the code. We assume you are in the group
