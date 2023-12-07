@@ -56,14 +56,14 @@ pip install -r $PROJECT/mlcommons-osmi/wsl/requirements.txt
 
 
 ```
-wsl> cd $PROJECT/mlcommons-osmi/wsl
-wsl> 
-wsl> make image
-wsl> cd models
-wsl> time python train.py small_lstm (14.01s user 1.71s system 135% cpu 11.605 total)
-wsl> time python train.py medium_cnn (109.20s user 6.84s system 407% cpu 28.481 total)
-wsl> time python train.py large_tcnn
-cd .. 
+wsl>
+  cd $PROJECT/mlcommons-osmi/wsl
+  make image
+  cd models
+  time python train.py small_lstm (14.01s user 1.71s system 135% cpu 11.605 total)
+  time python train.py medium_cnn (109.20s user 6.84s system 407% cpu 28.481 total)
+  time python train.py large_tcnn
+  cd .. 
 ```
 
 ## Running OSMI Bench on Ubuntu
@@ -154,9 +154,10 @@ local machine, so that login and management of the machine is
 simplified
 
 ```
-local> python -m venv ~/ENV3
-local> pip install cloudmesh-rivanna
-local> pip install cloudmesh-vpn
+local>
+  python -m venv ~/ENV3
+  pip install cloudmesh-rivanna
+  pip install cloudmesh-vpn
 ```
 
 IN case you have set up the vpn client correctly you can now activate
@@ -168,8 +169,9 @@ In case you followed our documentation you will be able to say
 
 
 ```
-local> cms vpn activate
-local> ssh b1
+local>
+  cms vpn activate
+  ssh b1
 ```
 
 Furthermore we assume that you have the code also checked out on your
@@ -267,10 +269,11 @@ faster, but also gurantees that the worker node itself is ued to
 install it to avoid software incompatibilities.
 
 ```
-b1> cd $EXEC_DIR
-b1> sbatch environment.slurm
-(this may take a while)
-b1> source $BASE/ENV3/bin/activate
+b1>
+  cd $EXEC_DIR
+  sbatch environment.slurm
+  # (this may take a while)
+  source $BASE/ENV3/bin/activate
 ```
 
 An alternate way is to experiment with the setup on the login node in
@@ -283,14 +286,15 @@ what the batch script does internaly.
 It basically executes the following.
 
 ```
-b1> cd $EXEC_DIR
-b1> module load gcc/11.2.0 openmpi/4.1.4 python/3.11.1
-b1> python -m venv $BASE/ENV3
-(this may take a while to finish due to rivanna's slow file system)
-b1> source $BASE/ENV3/bin/activate
-pip install pip -U
-pip install -r $EXEC_DIR/requirements.txt
-cms help
+b1>
+  cd $EXEC_DIR
+  module load gcc/11.2.0 openmpi/4.1.4 python/3.11.1
+  python -m venv $BASE/ENV3
+  # (this may take a while to finish due to rivanna's slow file system)
+  source $BASE/ENV3/bin/activate
+  pip install pip -U
+  pip install -r $EXEC_DIR/requirements.txt
+  cms help
 ```
 
 
@@ -302,8 +306,9 @@ haproxy, and the code to be executed. This is done with
 
 
 ```
-b1> cd $EXEC_DIR
-b1> make images
+b1>
+  cd $EXEC_DIR
+  make images
 ```
 
 
@@ -313,10 +318,11 @@ To run some of the test jobs to run a model and see if things work you
 can use the commands
 
 ```
-b1> cd $EXEC_DIR
-b1> sbatch train-small.slurm
-b1> sbatch train-medium.slurm
-b1> sbatch train-large.slurm
+b1>
+  cd $EXEC_DIR
+  sbatch train-small.slurm
+  sbatch train-medium.slurm
+  sbatch train-large.slurm
 ```
 
 ### Run benchmark with cloudmesh experiment executor
@@ -343,9 +349,10 @@ To run many different jobs that are created based on config.in.slurm
 You can use the following
 
 ```
-b1> cd $EXEC_DIR
-b1> make project-gpu
-b1> sh jobs-project-gpu.sh
+b1>
+  cd $EXEC_DIR
+  make project-gpu
+  sh jobs-project-gpu.sh
 ```
 
 The results will be stored in a projects directory.
@@ -367,7 +374,7 @@ Now we can analyse the data with
 
 ```
 local>
-	open ./analysis/analysis-simple.ipynb
+  open ./analysis/analysis-simple.ipynb
 ```
 
 graphs are also saved in `./analysis/out`
@@ -394,23 +401,27 @@ mode to develop batch scripts.
 First, obtain an interactive job with
 
 ```
-rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00
+rivanna>
+  ijob -c 1 -A bii_dsc_community -p standard --time=01:00:00
 ```
 
 To specify a particular GPU please use. 
 
 ```
-export GPUS=1
-v100 rivanna> ijob -c 1 -A bii_dsc_community --partition=bii-gpu --gres=gpu:v100:$GPUS --time=01:00:00
-a100 rivanna> ijob -c 1 -A bii_dsc_community --partition=bii-gpu --gres=gpu:a100:$GPUS --time=01:00:00
+rivanna>
+  export GPUS=1
+  v100 rivanna> ijob -c 1 -A bii_dsc_community --partition=bii-gpu --gres=gpu:v100:$GPUS --time=01:00:00
+  # (or)
+  a100 rivanna> ijob -c 1 -A bii_dsc_community --partition=bii-gpu --gres=gpu:a100:$GPUS --time=01:00:00
 ```
 
 
 ```
-node> cd $PROJECT/models
-node> python train.py small_lstm
-node> python train.py medium_tcnn
-node> python train.py large_cnn
+node>
+  cd $PROJECT/models
+  python train.py small_lstm
+  python train.py medium_tcnn
+  python train.py large_cnn
 ```
 
 For this application there is no separate data
@@ -423,13 +434,15 @@ For this application there is no separate data
 ----------------------------------------------------------------------
 
 ```
-rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=1-00:00:00 --partition=bii-gpu --gres=gpu
-node> singularity shell --nv --home `pwd` serving_latest-gpu.sif
-singularity> nvidia-smi #to see if you can use gpus (on node)
-singularity> cd benchmark
-singularity> tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
-singularity> cat log //to check its working
-singularity> lsof -i :8500 // to make sure it an accept incoming directions
+rivanna> 
+  ijob -c 1 -A bii_dsc_community -p standard --time=1-00:00:00 --partition=bii-gpu --gres=gpu
+node> 
+  singularity shell --nv --home `pwd` serving_latest-gpu.sif
+  singularity> nvidia-smi #to see if you can use gpus (on node)
+  singularity> cd benchmark
+  singularity> tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
+  singularity> cat log //to check its working
+  singularity> lsof -i :8500 // to make sure it an accept incoming directions
 ```
 
 Edit
@@ -443,29 +456,33 @@ python tfs_grpc_client.py -m [model, e.g. small_lstm] -b [batch size, e.g. 32] -
 simpler way
 
 ```
-rivanna> ijob -c 1 -A bii_dsc_community -p standard --time=1-00:00:00 --partition=bii-gpu --gres=gpu
-conda activate osmi
-node> cd /project/bii_dsc_community/$USER/osmi/osmi-bench/benchmark
-node> singularity run --nv --home `pwd` ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
-node> python tfs_grpc_client.py -m large_tcnn -b 128 -n 100 localhost:8500
+rivanna> 
+  ijob -c 1 -A bii_dsc_community -p standard --time=1-00:00:00 --partition=bii-gpu --gres=gpu
+  conda activate osmi
+node> 
+  cd /project/bii_dsc_community/$USER/osmi/osmi-bench/benchmark
+  singularity run --nv --home `pwd` ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --rest_api_port=0 --model_config_file=models.conf >& log &
+  python tfs_grpc_client.py -m large_tcnn -b 128 -n 100 localhost:8500
 ```
 
 run with slurm script
 
 ```
-rivanna> cd /project/bii_dsc_community/$USER/osmi/osmi-bench/benchmark
-rivanna> sbatch test_script.slurm
+rivanna> 
+  cd /project/bii_dsc_community/$USER/osmi/osmi-bench/benchmark
+  sbatch test_script.slurm
 ```
 
 Multiple GPU parallelization - incomplete
 
 ```
-node> singularity exec --bind `pwd`:/home --pwd /home     ../haproxy_latest.sif haproxy -d -f haproxy-grpc.cfg >& haproxy.log &
-node> cat haproxy.log
-node> CUDA_VISIBLE_DEVICES=0 singularity run --home `pwd` --nv ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --model_config_file=models.conf >& tfs0.log &
-node> cat tfs0.log
-node> CUDA_VISIBLE_DEVICES=1 singularity run --home `pwd` --nv ../serving_latest-gpu.sif tensorflow_model_server --port=8501 --model_config_file=models.conf >& tfs1.log &
-node> cat tf
+node> 
+  singularity exec --bind `pwd`:/home --pwd /home     ../haproxy_latest.sif haproxy -d -f haproxy-grpc.cfg >& haproxy.log &
+  cat haproxy.log
+  CUDA_VISIBLE_DEVICES=0 singularity run --home `pwd` --nv ../serving_latest-gpu.sif tensorflow_model_server --port=8500 --model_config_file=models.conf >& tfs0.log &
+  cat tfs0.log
+  CUDA_VISIBLE_DEVICES=1 singularity run --home `pwd` --nv ../serving_latest-gpu.sif tensorflow_model_server --port=8501 --model_config_file=models.conf >& tfs1.log &
+  cat tf
 ```
 
 do this for all gpus with different ports
