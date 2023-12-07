@@ -322,6 +322,24 @@ b1> sbatch train-large.slurm
 
 ### Run benchmark with cloudmesh experiment executor
 
+Set parameters in config.in.slurm
+
+```
+experiment:
+  # different gpus require different directives
+  directive: "a100,v100"
+  # batch size
+  batch: "1,2,4,8,16,32,64,128"
+  # number of gpus
+  ngpus: "1,2,3,4"
+  # number of concurrent clients
+  concurrency: "1,2,4,8,16"
+  # models
+  model: "small_lstm,medium_cnn,large_tcnn"
+  # number of repetitions of each experiment
+  repeat: "1,2,3,4"
+```
+
 To run many different jobs that are created based on config.in.slurm
 You can use the following
 
@@ -341,7 +359,9 @@ computer and use a jupyter notebook.
 ```
 local>
   cd ~/github/osmi/target/rivanna
-  rsync rivanna:$EXEC_DIR/project ./project
+  du -h rivanna:$EXEC_DIR/project-gpu
+  // figure out if you have enough space for this project on the local machine
+  rsync rivanna:$EXEC_DIR/project-gpu ./project-gpu
 ```
 
 Now we can analyse the data with 

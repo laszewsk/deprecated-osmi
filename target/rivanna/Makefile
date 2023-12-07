@@ -20,22 +20,18 @@ requirements:
 # PROJECT MANAGEMENT
 # #####################################################################
 
-project-gpu: clean project-gpu.json generate-gpu
-
-project-cpu: clean project-cpu.json generate-cpu
+project: clean project.json generate
 
 #setup:
 #	python setup_env_and_yaml.py
 #	source ~/ENV3/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/rivanna/requirements.txt
 
-generate-gpu: jobs-project-gpu.sh 
-
-generate-cpu: jobs-project-cpu.sh
+generate: jobs-project.sh
 
 run: submit
 
 submit:
-	-sh jobs-project-gpu.sh
+	-sh jobs-project.sh
 
 localscratch: localscratch.json
 
@@ -55,23 +51,9 @@ simple:
                --source_dir=. \
                --verbose
 
-
-%-cpu.json: slurm-cpu.in.yaml
+project.json: config.in.yaml
 	cms ee generate \
-	           --source=${NAME}-cpu.in.slurm \
-	           --config=$< \
-	           --name=$(basename $@) \
-	           --noos \
-	           --os=USER,HOME \
-		       --nocm \
-	           --output_dir=./$(basename $@) \
-               --source_dir=. \
-		       --verbose \
-			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
-
-%-gpu.json: slurm-gpu.in.yaml
-	cms ee generate \
-	           --source=${NAME}-gpu.in.slurm \
+	           --source=${NAME}.in.slurm \
 	           --config=$< \
 	           --name=$(basename $@) \
 	           --noos \
@@ -98,7 +80,7 @@ status:
 	watch squeue --format=\"%.18i %.9P %.50j %.8u %.8T %.10M %.9l %.6D %R\" --me
 
 clean:
-	@-rm -rf project-gpu project-cpu project*.json jobs-project*.sh
+	@-rm -rf project project.json jobs-project.sh
 	@-rm -rf '__pycache__'
 	@-rm -rf *~
 
@@ -106,8 +88,7 @@ clean:
 PROJECT_USER=/scratch/tma5gv
 
 get-results:
-	-rsync -av --progress rivanna:${PROJECT_USER}/${NAME}/target/rivanna/project-gpu .
-	-rsync -av --progress rivanna:${PROJECT_USER}/${NAME}/target/rivanna/project-cpu .
+	-rsync -av --progress rivanna:${PROJECT_USER}/${NAME}/target/rivanna/project .
 
 # #####################################################################
 # SINGULARITY IMAGE MANAGEMENT
