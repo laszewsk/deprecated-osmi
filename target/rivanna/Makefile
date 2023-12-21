@@ -5,7 +5,7 @@ SHELL=/bin/bash
 #PROJECT_DIR=${USER_SCRATCH}/mlcommons/benchmarks/${NAME}
 #PROJECT_DATA=${USER_SCRATCH}/data
 
-.PHONY: image-singularity image-docker project
+.PHONY: image-apptainer image-docker project
 
 all: requirements data
 
@@ -91,62 +91,62 @@ get-results:
 	-rsync -av --progress rivanna:${PROJECT_USER}/${NAME}/target/rivanna/project .
 
 # #####################################################################
-# SINGULARITY IMAGE MANAGEMENT
+# APPTAINER IMAGE MANAGEMENT
 # #####################################################################
 
 clean-images:
-	@-rm -rf image-singularity/*.sif
+	@-rm -rf image-apptainer/*.sif
 
 images: image
 
 image: image-haproxy image-osmi image-tfs
 
-image-haproxy: # image-singularity/haproxy_latest.sif
-	-mkdir -p image-singularity
-	-cd image-singularity; time singularity pull docker://haproxy
+image-haproxy: # image-apptainer/haproxy_latest.sif
+	-mkdir -p image-apptainer
+	-cd image-apptainer; time apptainer pull docker://haproxy
 
 image-serving:
-	-mkdir -p image-singularity
-	-cd image-singularity; cms rivanna singularity build serving.def
+	-mkdir -p image-apptainer
+	-cd image-apptainer; apptainer build serving.sif serving.def
 
-image-tfs: # image-singularity/serving_latest-gpu.sif
-	-mkdir -p image-singularity
-	-cd image-singularity; time singularity pull docker://tensorflow/serving:latest-gpu
+image-tfs: # image-apptainer/serving_latest-gpu.sif
+	-mkdir -p image-apptainer
+	-cd image-apptainer; time apptainer pull docker://tensorflow/serving:latest-gpu
 
-image-osmi: # image-singularity/osmi.sif
-	-mkdir -p image-singularity
-	-cd image-singularity; cms rivanna singularity build ${NAME}.def
+image-osmi: # image-apptainer/osmi.sif
+	-mkdir -p image-apptainer
+	-cd image-apptainer; cms rivanna apptainer build ${NAME}.def
 
 shell:
-	singularity ${BIND} shell --nv ${IMAGE}
+	apptainer ${BIND} shell --nv ${IMAGE}
 
 shell-serving:
-	singularity ${BIND} shell --nv image-singularity/serving.sif
+	apptainer ${BIND} shell --nv image-apptainer/serving.sif
 
 # #####################################################################
 # THESE ARE NOT YET DONE AND JUST PLACEHOLDERS
 # #####################################################################
 
 # run-osmi:
-# 	# cd image-singularity; make run
+# 	# cd image-apptainer; make run
 
 
-run-singularity:
-	cd image-singularity; make run
+run-apptainer:
+	cd image-apptainer; make run
 
-shell-singularity:
-	cd image-singularity; make shell
+shell-apptainer:
+	cd image-apptainer; make shell
 
 run-localscratch:
-	cd image-singularity; make run-localscratch
+	cd image-apptainer; make run-localscratch
 
 shell-localscratch:
-	cd image-singularity; make shell-localscratch
+	cd image-apptainer; make shell-localscratch
 
 shell-rivanna:
-	cd image-singularity; make shell-rivanna
+	cd image-apptainer; make shell-rivanna
 
-run: run-singularity
+run: run-apptainer
 
 # #####################################################################
 # THESE COMMANDS ARE ONLY FOR GREGOR
