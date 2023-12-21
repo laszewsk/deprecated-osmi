@@ -72,7 +72,7 @@ PROGRESS "running" 3
 head /proc/meminfo
 
 module purge
-module load singularity gcc/11.2.0 openmpi/4.1.4 python/3.11.1
+module load apptainer gcc/11.2.0 openmpi/4.1.4 python/3.11.1
 
 source $USER_PROJECT/ENV3/bin/activate
 
