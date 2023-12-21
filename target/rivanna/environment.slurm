@@ -19,7 +19,7 @@ start_python_install=`date +%s`
 echo start_python_install $start_python_install
 
 module purge
-module load  gcc/11.2.0 openmpi/4.1.4 python/3.11.1
+module load gcc/11.4.0  openmpi/4.1.4 python/3.11.4
 if ! [ -d "$BASE/ENV3" ]; then
     time python -m venv $BASE/ENV3
 fi
@@ -27,10 +27,14 @@ source $BASE/ENV3/bin/activate
 
 time pip install pip -U
 time pip install -r $EXEC_DIR/requirements.txt
-cms help
 which python
+python --version
+cms help
 
 end_python_install_time=`date +%s`
 echo end_python_install_time $end_python_install_time
 time_python_install=$((end_python_install-start_python_install))
 echo time_python_install $time_python_install
+
+
+

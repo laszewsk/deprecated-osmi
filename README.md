@@ -29,15 +29,19 @@
     - [1.2 Get the code](#12-get-the-code)
     - [1.3 Running the small OSMI model benchmark](#13-running-the-small-osmi-model-benchmark)
     - [1.4 TODO: Install tensorflow serving in ubuntu](#14-todo-install-tensorflow-serving-in-ubuntu)
-- [(this may take a while)](#this-may-take-a-while)
-- [(this may take a while to finish due to rivanna's slow file system)](#this-may-take-a-while-to-finish-due-to-rivannas-slow-file-system)
-- [different gpus require different directives](#different-gpus-require-different-directives)
-- [batch size](#batch-size)
-- [number of gpus](#number-of-gpus)
-- [number of concurrent clients](#number-of-concurrent-clients)
-- [models](#models)
-- [number of repetitions of each experiment](#number-of-repetitions-of-each-experiment)
-- [(or)](#or)
+  - [2. Running on UVA Rivanna](#2-running-on-uva-rivanna)
+    - [2.1 Logging into Rivanna](#21-logging-into-rivanna)
+    - [2.2 Running OSMI Bench on rivanna](#22-running-osmi-bench-on-rivanna)
+    - [Set up a project directory and get the code](#set-up-a-project-directory-and-get-the-code)
+    - [Set up Python Environment](#set-up-python-environment)
+    - [Build Tensorflow Serving, Haproxy, and OSMI Images](#build-tensorflow-serving-haproxy-and-osmi-images)
+    - [Compile OSMI Models in Batch Jobs](#compile-osmi-models-in-batch-jobs)
+    - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor)
+    - [Graphing Results](#graphing-results)
+    - [Compile OSMI Models in Interactive Jobs (avpid using)](#compile-osmi-models-in-interactive-jobs-avpid-using)
+  - [1. Running OSMI Bench on a local Windows WSL](#1-running-osmi-bench-on-a-local-windows-wsl)
+    - [Create python virtual environment on WSL Ubuntu](#create-python-virtual-environment-on-wsl-ubuntu)
+    - [Get the code](#get-the-code)
   - [References](#references)
 
 ## 1. Running OSMI Bench on Ubuntu natively
@@ -100,7 +104,7 @@ This documentation is unclear and not tested:
 > sudo apt-get update && sudo apt-get install tensorflow-model-server
 > which tensorflow_model_server
 >make image
-```
+> ```
 
 
 ## 2. Running on UVA Rivanna
@@ -120,7 +124,7 @@ Best is to also install cloudmesh-rivanna and cloudmesh-vpn on your
 local machine, so that login and management of the machine is
 simplified
 
-```
+```bash
 local>
   python -m venv ~/ENV3
   pip install cloudmesh-rivanna
@@ -135,7 +139,7 @@ to one of biheads.
 In case you followed our documentation you will be able to say
 
 
-```
+```bash
 local>
   cms vpn activate
   ssh b1
@@ -146,7 +150,7 @@ laptop as we use this to sync later on the results created with the
 super computer.
 
 
-```
+```bash
 local>
   mkdir ~/github
   cd ~/github
@@ -157,7 +161,7 @@ local>
 To have the same environment variables to access the code on rivanna
 we introduce
 
-```
+```bash
 local>
   export USER_SCRATCH=/scratch/$USER
   export USER_LOCALSCRATCH=/localscratch/$USER
@@ -167,14 +171,12 @@ local>
   export EXEC_DIR=$PROJECT/target/rivanna
 ```
 
-This will come in handy when we rsync the results
-
-
+This will come in handy when we rsync the results.
 Now you are logged in on  frontend node to rivanna.
 
 
 
-### Running OSMI Bench on rivanna
+### 2.2 Running OSMI Bench on rivanna
 
 To run the OSMI benchmark, you will first need to generate the project
 directory with the code. We assume you are in the group
@@ -230,7 +232,7 @@ You now have the code in `$PROJECT`
 ### Set up Python Environment
 
 OSMI will run in batch mode this is also valid for setting up the
-environment for which we created abatch script.  This has the
+environment for which we created sbatch script.  This has the
 advantage that it installed via the worker nodes, which is typically
 faster, but also gurantees that the worker node itself is ued to
 install it to avoid software incompatibilities.
@@ -244,9 +246,9 @@ b1>
 ```
 
 An alternate way is to experiment with the setup on the login node in
-acse you like to explore other libraries. However  once you find other
+case you like to explore other libraries. However  once you find other
 improvements, you ought to include them in the batch script. Here is
-what the batch script does internaly.
+what the batch script does internally.
 
 [environment.slurm](https://github.com/laszewsk/osmi/blob/main/target/rivanna/environment.slurm)
 
@@ -255,12 +257,13 @@ It basically executes the following.
 ```
 b1>
   cd $EXEC_DIR
-  module load gcc/11.2.0 openmpi/4.1.4 python/3.11.1
-  python -m venv $BASE/ENV3
-  # (this may take a while to finish due to rivanna's slow file system)
+  module load gcc/11.4.0  openmpi/4.1.4 python/3.11.4
+  which python
+  python --version
+  python -m venv $BASE/ENV3 # takes about 5.2s
   source $BASE/ENV3/bin/activate
   pip install pip -U
-  pip install -r $EXEC_DIR/requirements.txt
+  time pip install -r $EXEC_DIR/requirements.txt # takes about 1m21s
   cms help
 ```
 
