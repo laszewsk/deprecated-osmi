@@ -1,25 +1,48 @@
 # mlcommons-osmi
 
-Authors: Nate Kimball, Gregor von Laszewski
+[![GitHub Repo](https://img.shields.io/badge/github-repo-green.svg)](https://github.com/laszewsk/osmi)
+[![GitHub issues](https://img.shields.io/github/issues/laszewsk/osmi.svg)](https://github.com/laszewsk/osmi/issues)
+[![Contributors](https://img.shields.io/github/contributors/laszewsk/osmi.svg)](https://github.com/laszewsk/osmi/graphs/contributors)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Linux](https://img.shields.io/badge/OS-Linux-orange.svg)](https://www.linux.org/)
+
+## Other Repos
+
+[![General badge](https://img.shields.io/badge/mlcommons-dev-<COLOR>.svg)](https://github.com/laszewsk/mlcommons)
+[![General badge](https://img.shields.io/badge/cloudmesh-ee-<COLOR>.svg)](https://github.com/cloudmesh/cloudmesh-ee)
+[![General badge](https://img.shields.io/badge/cloudmesh-common-<COLOR>.svg)](https://github.com/cloudmesh/cloudmesh-common)
+[![General badge](https://img.shields.io/badge/cloudmesh-cmd5-<COLOR>.svg)](https://github.com/cloudmesh/cloudmesh-cmd5)
+
+## Authors
+
+* Nate Kimball
+* Gregor von Laszewski, laszewski@gmail.com, [orcid: 0000-0001-9558-179X](https://orcid.org/0000-0001-9558-179X)
 
 ## Table of contents
 
-1. [Running OSMI Bench on a local Windows machine running WSL](#running-osmi-bench-on-a-local-windows-wsl)
-
-2. [Running OSMI Bench on a local machine running Ubuntu](#running-osmi-bench-on-ubuntu)
-   1. [Create python virtual environment](#create-python-virtual-environment-on-ubuntu)
-   2. [Get the code](#get-the-code)
-   3. [Running the small OSMI model benchmark](#running-the-small-osmi-model-benchmark)
-   4. [Install tensorflow serving in ubuntu](#install-tensorflow-serving-in-ubuntu)
-
-
-3. [Running OSMI Bench on Rivanna](#running-osmi-bench-on-rivanna)
-   1. [Get the code](#set-up-a-project-directory-and-get-the-code)
-   2. [Set up Python Environment](#set-up-python-environment)
-   3. [Get Tensorflow Serving](#pull-tensorflow-serving-image)
-   4. [Running the small OSMI model benchmark](#compile-osmi-models-in-interactive-jobs)
-   5. [Running test sweep](#run-test-sweep-via-batch-jobs)
-   6. [Graph Results](#graphing-results)
+- [mlcommons-osmi](#mlcommons-osmi)
+  - [Other Repos](#other-repos)
+  - [Authors](#authors)
+  - [Table of contents](#table-of-contents)
+  - [Running OSMI Bench on a local Windows WSL](#running-osmi-bench-on-a-local-windows-wsl)
+    - [Create python virtual environment on WSL Ubuntu](#create-python-virtual-environment-on-wsl-ubuntu)
+    - [Get the code](#get-the-code)
+  - [Running OSMI Bench on Ubuntu natively](#running-osmi-bench-on-ubuntu-natively)
+    - [Create python virtual environment on Ubuntu](#create-python-virtual-environment-on-ubuntu)
+    - [Get the code](#get-the-code-1)
+    - [Running the small OSMI model benchmark](#running-the-small-osmi-model-benchmark)
+    - [Install tensorflow serving in ubuntu](#install-tensorflow-serving-in-ubuntu)
+  - [Running on rivanna](#running-on-rivanna)
+    - [Logging into rivanna](#logging-into-rivanna)
+    - [Running OSMI Bench on rivanna](#running-osmi-bench-on-rivanna)
+    - [Set up a project directory and get the code](#set-up-a-project-directory-and-get-the-code)
+    - [Set up Python Environment](#set-up-python-environment)
+    - [Build Tensorflow Serving, Haproxy, and OSMI Images](#build-tensorflow-serving-haproxy-and-osmi-images)
+    - [Compile OSMI Models in Batch Jobs](#compile-osmi-models-in-batch-jobs)
+    - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor)
+    - [Graphing Results](#graphing-results)
+    - [Compile OSMI Models in Interactive Jobs (avpid using)](#compile-osmi-models-in-interactive-jobs-avpid-using)
+  - [References](#references)
 
 ## Running OSMI Bench on a local Windows WSL
 
@@ -66,34 +89,47 @@ wsl>
   cd .. 
 ```
 
-## Running OSMI Bench on Ubuntu
+## Running OSMI Bench on Ubuntu natively
 
 ### Create python virtual environment on Ubuntu
 
-TODO: Gregor
-```
-python -m venv ~/OSMI
-source ~/OSMI/bin/activate
-pip install pip -U
+Note:
+> * tensorflow, 3.10 is the latest supported version
+> * smartredis, python 3.10 is the latest supported version
+>
+> * Hence, we will use python3.10
+
+First create a venv with 
+```bash
+ubuntu> 
+  python3.10 -m venv ~/OSMI
+  source ~/OSMI/bin/activate
+  pip install pip -U
 ```
 
 ### Get the code
 
+We assume that you go to the directory where you want to install `osmi`. We assume you do not have a directory called osmi in it. Use simply `ls osmi` to check. Next we set up the osmi directory and clone it from github.
 To get the code we clone this github repository
-(https://github.com/laszewsk/osmi.git). Please execute:
+
+<https://github.com/laszewsk/osmi.git>
+
+Please execute:
 
 ```
-mkdir ~/osmi
-cd ~/osmi
-git clone https://github.com/laszewsk/osmi.git
-cd osmi
-pip install -r ~/osmi/osmi/machine/ubuntu/requirements-ubuntu.txt
+ubuntu>
+  mkdir ./osmi
+  export OSMI_HOME=$(realpath "./osmi")
+  export OSMI=$(OSMI_HOME)/
+  git clone https://github.com/laszewsk/osmi.git
+  cd osmi
+  pip install -r target/ubuntu/requirements-ubuntu.txt
 ```
 
 **Note:** the original version of grpcio 1.0.0 does not distribute
 valid wheels, hence we assume the library is out of date, but a new
 version with 1.15.1 is available that is distributed. Gregor
-strongly recoomnds to swithc to a supported version of grpcio.
+strongly recomends to switch to a supported version of grpcio.
 
 ### Running the small OSMI model benchmark
 
@@ -141,11 +177,11 @@ TODO: complete
 ### Logging into rivanna
 
 The easiest way to log into rivanna is to use ssh. However as we are
-creating singularity images, we need to use either bihead1 or bihead2
+creating singularity images, we need to currently use either bihead1 or bihead2
 
 Please follow the documentation at
 
-LINK MISSING
+<http://sciencefmhub.org/docs/tutorials/rivanna/singularity/>
 
 to set this up
 
