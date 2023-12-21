@@ -5,6 +5,11 @@ Bootstrap: docker
 From: ubuntu:latest
 
 %post
+    # Install python 
+    apt install software-properties-common
+    add-apt-repository ppa:deadsnakes/ppa
+    apt install python3.10
+    
     # Install dependencies
     apt-get update
     apt-get install -y haproxy curl
@@ -17,9 +22,8 @@ From: ubuntu:latest
     cd /models
     git clone https://github.com/tensorflow/serving
     cd serving
-    apt-get install -y python3-pip python3-dev
-    pip3 install tensorflow-serving-api
-
+    pip3 install tensorflow-serving-api    
+ 
 %runscript
     # Start HAProxy and TensorFlow Serving
     haproxy -f /path/to/haproxy.cfg -db &
