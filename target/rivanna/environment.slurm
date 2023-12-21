@@ -26,7 +26,7 @@ fi
 source $BASE/ENV3/bin/activate
 
 time pip install pip -U
-time pip install -r $EXEC_DIR/requirements.txt
+time pip install -r $EXEC_DIR/requirements-baremetal.txt
 which python
 python --version
 cms help
