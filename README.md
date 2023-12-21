@@ -24,74 +24,25 @@
   - [Other Repos](#other-repos)
   - [Authors](#authors)
   - [Table of contents](#table-of-contents)
-  - [Running OSMI Bench on a local Windows WSL](#running-osmi-bench-on-a-local-windows-wsl)
-    - [Create python virtual environment on WSL Ubuntu](#create-python-virtual-environment-on-wsl-ubuntu)
-    - [Get the code](#get-the-code)
-  - [Running OSMI Bench on Ubuntu natively](#running-osmi-bench-on-ubuntu-natively)
-    - [Create python virtual environment on Ubuntu](#create-python-virtual-environment-on-ubuntu)
-    - [Get the code](#get-the-code-1)
-    - [Running the small OSMI model benchmark](#running-the-small-osmi-model-benchmark)
-    - [Install tensorflow serving in ubuntu](#install-tensorflow-serving-in-ubuntu)
-  - [Running on rivanna](#running-on-rivanna)
-    - [Logging into rivanna](#logging-into-rivanna)
-    - [Running OSMI Bench on rivanna](#running-osmi-bench-on-rivanna)
-    - [Set up a project directory and get the code](#set-up-a-project-directory-and-get-the-code)
-    - [Set up Python Environment](#set-up-python-environment)
-    - [Build Tensorflow Serving, Haproxy, and OSMI Images](#build-tensorflow-serving-haproxy-and-osmi-images)
-    - [Compile OSMI Models in Batch Jobs](#compile-osmi-models-in-batch-jobs)
-    - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor)
-    - [Graphing Results](#graphing-results)
-    - [Compile OSMI Models in Interactive Jobs (avpid using)](#compile-osmi-models-in-interactive-jobs-avpid-using)
+  - [1. Running OSMI Bench on Ubuntu natively](#1-running-osmi-bench-on-ubuntu-natively)
+    - [1.1 Create python virtual environment on Ubuntu](#11-create-python-virtual-environment-on-ubuntu)
+    - [1.2 Get the code](#12-get-the-code)
+    - [1.3 Running the small OSMI model benchmark](#13-running-the-small-osmi-model-benchmark)
+    - [1.4 TODO: Install tensorflow serving in ubuntu](#14-todo-install-tensorflow-serving-in-ubuntu)
+- [(this may take a while)](#this-may-take-a-while)
+- [(this may take a while to finish due to rivanna's slow file system)](#this-may-take-a-while-to-finish-due-to-rivannas-slow-file-system)
+- [different gpus require different directives](#different-gpus-require-different-directives)
+- [batch size](#batch-size)
+- [number of gpus](#number-of-gpus)
+- [number of concurrent clients](#number-of-concurrent-clients)
+- [models](#models)
+- [number of repetitions of each experiment](#number-of-repetitions-of-each-experiment)
+- [(or)](#or)
   - [References](#references)
 
-## Running OSMI Bench on a local Windows WSL
+## 1. Running OSMI Bench on Ubuntu natively
 
-TODO: Nate
-
-1. create isolated new wsl environment
-2. use what we do in the ubuntu thing, but do separate documentation
-   er as the ubuntu native install may have other steps or issuse
-
-
-### Create python virtual environment on WSL Ubuntu
-
-```
-wsl> python3 -m venv /home/$USER/OSMI
-wsl> source /home/$USER/OSMI/bin/activate
-wsl> python -V
-wsl> pip install pip -U
-```
-
-### Get the code
-
-To get the [code](<https://code.ornl.gov/whb/osmi-bench>) we clone a
-gitlab instance that is hosted at Oakridge National Laboratory,
-please execute:
-
-```
-export PROJECT=/home/$USER/project/
-mkdir -p $PROJECT
-cd $PROJECT
-git clone https://github.com/laszewsk/osmi #git@github.com:laszewsk/osmi.git
-cd osmi/
-pip install -r $PROJECT/mlcommons-osmi/wsl/requirements.txt
-```
-
-
-```
-wsl>
-  cd $PROJECT/mlcommons-osmi/wsl
-  make image
-  cd models
-  time python train.py small_lstm (14.01s user 1.71s system 135% cpu 11.605 total)
-  time python train.py medium_cnn (109.20s user 6.84s system 407% cpu 28.481 total)
-  time python train.py large_tcnn
-  cd .. 
-```
-
-## Running OSMI Bench on Ubuntu natively
-
-### Create python virtual environment on Ubuntu
+### 1.1 Create python virtual environment on Ubuntu
 
 Note:
 > * tensorflow, 3.10 is the latest supported version
@@ -107,7 +58,7 @@ ubuntu>
   pip install pip -U
 ```
 
-### Get the code
+### 1.2 Get the code
 
 We assume that you go to the directory where you want to install `osmi`. We assume you do not have a directory called osmi in it. Use simply `ls osmi` to check. Next we set up the osmi directory and clone it from github.
 To get the code we clone this github repository
@@ -126,55 +77,35 @@ ubuntu>
   pip install -r target/ubuntu/requirements-ubuntu.txt
 ```
 
-**Note:** the original version of grpcio 1.0.0 does not distribute
-valid wheels, hence we assume the library is out of date, but a new
-version with 1.15.1 is available that is distributed. Gregor
-strongly recomends to switch to a supported version of grpcio.
-
-### Running the small OSMI model benchmark
+### 1.3 Running the small OSMI model benchmark
 
 ```
 cd models
-time python train.py small_lstm  # taks about 10s on an 5950X
-time python train.py medium_cnn  # taks less the 12s on an 5950X
-time python train.py large_tcnn  # takes less the 30s on an 5950X
+time python train.py small_lstm  # ~   6.6s on an 5950X with RTX3090
+time python train.py medium_cnn  # ~  35.6s on an 5950X with RTX3090
+time python train.py large_tcnn  # ~ 16m58s on an 5950X with RTX3090
 ```
 
-### Install tensorflow serving in ubuntu
+### 1.4 TODO: Install tensorflow serving in ubuntu
 
-Unclear. the documentation do this with singularity, I do have
-singularity on desktop, but can we use it natively and compare with
-singularity performance?
+This documentation is unclear and not tested:
 
-Nate will explore theoretically how to isntall tensorflow servving on
-ubuntu
+> Unclear. the documentation do this with singularity, I do have
+> singularity on desktop, but can we use it natively and compare with
+> singularity performance?
 
-compare if others have install instructions, these are old from 16.01
-but we want 21. ...
-
-```
-sudo pip install tensorflow-serving-api
-echo "deb [arch=amd64] http://storage.googleapis.com/tensorflow-serving-apt stable tensorflow-model-server tensorflow-model-server-universal" | sudo tee /etc/apt/sources.list.d/tensorflow-serving.list
-curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.release.pub.gpg | sudo apt-key add -
-sudo apt-get update && sudo apt-get install tensorflow-model-server
-which tensorflow_model_server
-make image
+> ```
+> echo "deb [arch=amd64] http://storage.googleapis.com/tensorflow-serving-apt stable tensorflow-model-server tensorflow-model-server-universal" | sudo tee /etc/apt/sources.list.d/tensorflow-serving.list
+> curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.release.pub.gpg | sudo apt-key add -
+> sudo apt-get update && sudo apt-get install tensorflow-model-server
+> which tensorflow_model_server
+>make image
 ```
 
-<!--
-### Running the program (obsolete)
 
-```
-cd ~/osmi/osmi/machine/ubuntu
-make run
-python metabench.py --config=make-yaml-file-for-ubuntu
-```
-TODO: complete
--->
+## 2. Running on UVA Rivanna
 
-## Running on rivanna
-
-### Logging into rivanna
+### 2.1 Logging into Rivanna
 
 The easiest way to log into rivanna is to use ssh. However as we are
 creating singularity images, we need to currently use either bihead1 or bihead2
@@ -196,7 +127,7 @@ local>
   pip install cloudmesh-vpn
 ```
 
-IN case you have set up the vpn client correctly you can now activate
+In case you have set up the vpn client correctly you can now activate
 it from the terminal including gitbash on windows. If this does not
 work, you can alternatively just use the cisco vpn gu client and ssh
 to one of biheads.
@@ -239,7 +170,7 @@ local>
 This will come in handy when we rsync the results
 
 
-Now you are looged in on  frontend node to rivanna.
+Now you are logged in on  frontend node to rivanna.
 
 
 
@@ -463,6 +394,52 @@ node>
 For this application there is no separate data
 
 
+
+## 1. Running OSMI Bench on a local Windows WSL
+
+TODO: Nate
+
+1. create isolated new wsl environment
+2. Use what we do in the ubuntu thing, but do separate documentation
+   er as the ubuntu native install may have other steps or issuse
+
+
+### Create python virtual environment on WSL Ubuntu
+
+```
+wsl> python3.10 -m venv /home/$USER/OSMI
+  source /home/$USER/OSMI/bin/activate
+  python -V
+  pip install pip -U
+```
+
+### Get the code
+
+To get the [code](<https://code.ornl.gov/whb/osmi-bench>) we clone a
+gitlab instance that is hosted at Oakridge National Laboratory,
+please execute:
+
+```
+wsl>
+  export PROJECT=/home/$USER/project/
+  mkdir -p $PROJECT
+  cd $PROJECT
+  git clone https://github.com/laszewsk/osmi #git@github.com:laszewsk/osmi.git
+  cd osmi/
+  pip install -r $PROJECT/mlcommons-osmi/wsl/requirements.txt
+```
+
+
+```
+wsl>
+  cd $PROJECT/mlcommons-osmi/wsl
+  make image
+  cd models
+  time python train.py small_lstm (14.01s user 1.71s system 135% cpu 11.605 total)
+  time python train.py medium_cnn (109.20s user 6.84s system 407% cpu 28.481 total)
+  time python train.py large_tcnn
+  cd .. 
+```
 
 <!--
 
