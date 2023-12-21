@@ -1,0 +1,44 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools >= 69",
+    "wheel >= 0.42",
+    "pip >= 23.2.1"
+]
+
+[project]
+name = "osmi"
+version = "5.0.19"
+description = "MLCommons OSMI Benchmark"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Gregor von Laszewski", email = "laszewski@gmail.com"}
+]
+maintainers = [
+  {name = "Gregor von Laszewski", email = "laszewski@gmail.com"}
+]
+keywords = ["helper library", "cloudmesh"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering",
+    "Topic :: System :: Distributed Computing",
+]
+
+[project.urls]
+Homepage = "https://github.com/laszewsk/osmi"
+Documentation = "https://github.com/laszewsk/osmi/blob/main/README.md"
+Repository = "https://github.com/laszewsk/osmi.git"
+Issues = "https://github.com/laszewsk/osmi/issues"
+Changelog = "https://github.com/laszewsk/osmi/blob/main/CHANGELOG.md"
+
+# [tool.setuptools.packages.find]
+# where = ["src/"]
+# include = ["cloudmesh.bar", "cloudmesh.bar.*"]
