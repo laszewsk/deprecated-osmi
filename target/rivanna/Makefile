@@ -91,7 +91,7 @@ get-results:
 	-rsync -av --progress rivanna:${PROJECT_USER}/${NAME}/target/rivanna/project .
 
 # #####################################################################
-# APPTAINER IMAGE MANAGEMENT
+# APPTAINER IMAGE BUILD
 # #####################################################################
 
 clean-images:
@@ -102,20 +102,21 @@ images: image
 image: image-haproxy image-osmi image-tfs
 
 image-haproxy: # image-apptainer/haproxy_latest.sif
-	-mkdir -p image-apptainer
 	-cd image-apptainer; time apptainer pull docker://haproxy
 
-image-serving:
-	-mkdir -p image-apptainer
-	-cd image-apptainer; apptainer build serving.sif serving.def
-
-image-tfs: # image-apptainer/serving_latest-gpu.sif
-	-mkdir -p image-apptainer
+image-serving: # image-apptainer/serving_latest-gpu.sif
 	-cd image-apptainer; time apptainer pull docker://tensorflow/serving:latest-gpu
 
+image-tfs: # image-apptainer/tfs.sif
+	-cd image-apptainer; time apptainer build tfs.sif tfs.def
+
 image-osmi: # image-apptainer/osmi.sif
-	-mkdir -p image-apptainer
-	-cd image-apptainer; cms rivanna apptainer build ${NAME}.def
+	-cd image-apptainer; apptainer build osmi.sif osmi.def
+
+
+# #####################################################################
+# APPTAINER IMAGE SHELL
+# #####################################################################
 
 shell:
 	apptainer ${BIND} shell --nv ${IMAGE}
