@@ -9,17 +9,17 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from cloudmesh.common.StopWatch import StopWatch
 
+
+StopWatch.start("total")
+
 parser = argparse.ArgumentParser()
 archs = [s.split('.')[0] for s in os.listdir('archs') if s[0:1] != '_']
-parser.add_argument('arch', type=str, choices=archs, help='Type of neural network architectures')
+parser.add_argument('arch',
+                    type=str,
+                    choices=archs,
+                    help='Type of neural network architectures')
 args = parser.parse_args()
 
-def start(msg):
-    StopWatch.start(f"train-py {msg} arch={args.arch}, input_shape={input_shape}, output_shape={output_shape}")
-    
-def stop(msg):
-    StopWatch.stop(f"train-py {msg} arch={args.arch}, input_shape={input_shape}, output_shape={output_shape}")
-    
 # parameters
 samples = 100 
 epochs = 5
@@ -38,29 +38,38 @@ elif args.arch == "large_tcnn":
 else:
     raise ValueError("Model not supported. Need to specify input and output shapes")
 
-start("create data")
+event = {
+    "input_shape": input_shape,
+    "output_shape": output_shape
+}
+StopWatch.event("configuration", event)
+
+
+StopWatch.start("create data")
 X = np.random.rand(samples, *input_shape)
 Y = np.random.rand(samples, *output_shape)
-stop("create data")
+StopWatch.stop("create data")
 
 # define model
-start("define model")
+StopWatch.start("define model")
 model = importlib.import_module('archs.' + args.arch).build_model(input_shape)
 model.summary()
-stop("define model")
+StopWatch.stop("define model")
 
 # compile model
-start("compile model")
+StopWatch.start("compile model")
 model.compile(loss='mae', optimizer='adam')
-stop("compile model")
+StopWatch.stop("compile model")
 
 # train model
-start("train model")
+StopWatch.start("train model")
 model.fit(X, Y, batch_size=batch_size, epochs=epochs)
-stop("train model")
+StopWatch.stop("train model")
 
-start("save model")
+StopWatch.start("save model")
 model.save(f"{args.arch}/1")
-stop("save model")
+StopWatch.stop("save model")
 
-StopWatch.benchmark()
+StopWatch.stop("total")
+
+StopWatch.benchmark(tag=args.arch)

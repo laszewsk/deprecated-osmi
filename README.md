@@ -45,6 +45,36 @@
     - [Get the code](#get-the-code)
   - [References](#references)
 
+## 1. Running OSMI Bench on macOS natively
+
+```bash
+macOS> 
+  python3.10 -m venv ~/OSMI
+  source ~/OSMI/bin/activate
+  pip install pip -U
+```
+
+```
+macOS>
+  mkdir ./osmi
+  export OSMI_HOME=$(realpath "./osmi")
+  export OSMI=$(OSMI_HOME)/
+  git clone https://github.com/laszewsk/osmi.git
+  cd osmi
+  pip install -r target/ubuntu/requirements-ubuntu.txt
+```
+
+
+```bash
+macOS>
+  cd models
+  time python train.py small_lstm  # ~   3.2s on an M1 Max  10 core 64GB
+  time python train.py medium_cnn  # ~  13.9s on an M1 Max 10 core 64GB
+  time python train.py large_tcnn  # ~ 298.0s on an M1 Max 10 core 64GB 
+                                   #   4m 58s
+```
+
+
 ## 1. Running OSMI Bench on Ubuntu natively
 
 ### 1.1 Create python virtual environment on Ubuntu
@@ -56,6 +86,7 @@ Note:
 > * Hence, we will use python3.10
 
 First create a venv with 
+
 ```bash
 ubuntu> 
   python3.10 -m venv ~/OSMI
@@ -84,11 +115,12 @@ ubuntu>
 
 ### 1.3 Running the small OSMI model benchmark
 
-```
-cd models
-time python train.py small_lstm  # ~   6.6s on an 5950X with RTX3090
-time python train.py medium_cnn  # ~  35.6s on an 5950X with RTX3090
-time python train.py large_tcnn  # ~ 16m58s on an 5950X with RTX3090
+```bash
+ubuntu>
+  cd models
+  time python train.py small_lstm  # ~   6.6s on an 5950X with RTX3090
+  time python train.py medium_cnn  # ~  35.6s on an 5950X with RTX3090
+  time python train.py large_tcnn  # ~ 16m58s on an 5950X with RTX3090
 ```
 
 ### 1.4 TODO: Install tensorflow serving in ubuntu
