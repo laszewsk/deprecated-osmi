@@ -43,13 +43,18 @@ benchmark:
   platform: rivanna
   
 experiment:
-  directive: "a100,v100,rtx2080"
+  # directive: "a100,v100,rtx2080"
+  directive: "a100"
   # 2,4,8 are not that interesting
-  batch: "1,2,4,8,16,32,64,128"
-  ngpus: "1,2,3,4"
+  #batch: "1,2,4,8,16,32,64,128"
+  batch: "1,2"  
+  #ngpus: "1,2,3,4"
+  ngpus: "1"
   # concurrency: "1,2,4,8,16"
   concurrency: "1"
   model: "small_lstm,medium_cnn,large_tcnn"
+  model: "small_lstm"
+  #repeat: "1,2"
   repeat: "1,2"
 
 # experiment:

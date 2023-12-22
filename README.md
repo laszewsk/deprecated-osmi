@@ -130,8 +130,8 @@ ubuntu>
 ```bash
 ubuntu>
   cd models
-  time python train.py small_lstm  # ~   6.6s on an 5950X with RTX3090
-  time python train.py medium_cnn  # ~  35.6s on an 5950X with RTX3090
+  time python train.py small_lstm  # ~   4.9s on an 5950X with RTX3090
+  time python train.py medium_cnn  # ~  34.0s on an 5950X with RTX3090
   time python train.py large_tcnn  # ~ 16m58s on an 5950X with RTX3090
 ```
 
