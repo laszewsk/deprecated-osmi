@@ -107,11 +107,17 @@ image-haproxy: # image-apptainer/haproxy_latest.sif
 image-serving: # image-apptainer/serving_latest-gpu.sif
 	-cd image-apptainer; time apptainer pull docker://tensorflow/serving:latest-gpu
 
-image-tfs: # image-apptainer/tfs.sif
-	-cd image-apptainer; time apptainer build tfs.sif tfs.def
 
 image-osmi: # image-apptainer/osmi.sif
 	-cd image-apptainer; apptainer build osmi.sif osmi.def
+
+# broken?
+image-tfs: # image-apptainer/tfs.sif
+	-cd image-apptainer; time apptainer build tfs.sif tfs.def
+
+# broken?
+image-combined: # image-apptainer/combined.sif
+	-cd image-apptainer; apptainer build combined.sif combined.def
 
 
 # #####################################################################

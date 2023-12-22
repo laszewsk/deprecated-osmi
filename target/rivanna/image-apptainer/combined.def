@@ -4,18 +4,19 @@
 Bootstrap: docker
 From: ubuntu:latest
 
-%post
-    # Install python 
-    apt install software-properties-common
-    add-apt-repository ppa:deadsnakes/ppa
-    apt install python3.10
-    
-    # Install dependencies
-    apt-get update
-    apt-get install -y haproxy curl
 
+%post    
+    # Install dependencies
+    apt-get update -y
+    apt-get install -y haproxy curl git
+
+    # Install python 
+    apt install python3 -y
+    apt install python3-pip -y
+    apt install python3-dev -y    
+    
     # Install cloudmesh-common
-    pip install cloudmesh-common
+    pip install cloudmesh-common==4.3.195
 
     # Install TensorFlow Serving
     mkdir -p /models

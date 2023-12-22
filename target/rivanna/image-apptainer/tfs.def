@@ -7,10 +7,10 @@ From: tensorflow/serving:latest
 %environment
     export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-%appinstall tfserving
+%appinstall serving_latest_gpu
     # pass
     
-%app tfserving
+%apprun serving_latest_gpu
     if [ -z "$PORT" ]; then
         echo "Please specify the PORT environment variable"
         exit 1
