@@ -6,8 +6,8 @@
 #SBATCH --account=bii_dsc_community
 #SBATCH --gres=gpu:a100:1
 #SBATCH --job-name=medium-train-osmi
-#SBATCH --output=train-osmi-%u-%j.out
-#SBATCH --error=train-osmi-%u-%j.err
+#SBATCH --output=train-medium-osmi-%u-%j.out
+#SBATCH --error=train-osmi-medium-%u-%j.err
 #SBATCH --reservation=bi_fox_dgx
 #SBATCH --constraint=a100_80gb
 
@@ -23,8 +23,7 @@ module load apptainer
 
 nvidia-smi
 
-source $BASE/ENV3/bin/activate
-
+# source $BASE/ENV3/bin/activate
 # cms gpu watch --gpu=0 --delay=0.5 --dense > $SLURM_JOBID.gpu.log &
 
 cd $BASE/osmi/models

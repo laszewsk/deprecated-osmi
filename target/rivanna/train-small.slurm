@@ -23,8 +23,7 @@ module load apptainer
 
 nvidia-smi
 
-source $BASE/ENV3/bin/activate
-
+# source $BASE/ENV3/bin/activate
 # cms gpu watch --gpu=0 --delay=0.5 --dense > $SLURM_JOBID.gpu.log &
 
 cd $BASE/osmi/models
