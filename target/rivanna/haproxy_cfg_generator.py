@@ -2,8 +2,8 @@
 HAProxy Config Generator
 
 Usage:
-  generate_config.py (-c <config> | --config=<config>) [-p <port>] [-g <ngpus>] [-s <server>] [-o <haproxy_cfg_file>]
-  generate_config.py (-h | --help)
+  haproxy_cfg_generate.py (-c <config> | --config=<config>) [-p <port>] [-g <ngpus>] [-s <server>] [-o <haproxy_cfg_file>]
+  haproxy_cfg_generate.py (-h | --help)
 
 Options:
   -h --help                              Show this screen.
@@ -18,27 +18,28 @@ from cloudmesh.common.util import banner
 from cloudmesh.common.FlatDict import FlatDict
 from docopt import docopt
 from port_generator import unique_base_port
+from textwrap import dedent
 
 def generate_haproxy_cfg(config):
   port = unique_base_port(config)
-  base = f'''
-global
-  tune.ssl.default-dh-param 1024
- 
-defaults
-  timeout connect 10000ms
-  timeout client 60000ms
-  timeout server 60000ms
- 
-frontend fe_https
-  mode tcp
-  bind *:{port:04d} npn spdy/2 alpn h2,http/1.1
-  default_backend be_grpc
+  base = dedent(f'''
+    global
+      tune.ssl.default-dh-param 1024
+    
+    defaults
+      timeout connect 10000ms
+      timeout client 60000ms
+      timeout server 60000ms
+    
+    frontend fe_https
+      mode tcp
+      bind *:{port:04d} npn spdy/2 alpn h2,http/1.1
+      default_backend be_grpc
 
-backend be_grpc
-  mode tcp
-  balance roundrobin
-  '''
+    backend be_grpc
+      mode tcp
+      balance roundrobin
+  ''').strip
   with open(config["data.haproxy_cfg_file"], 'w+') as f:
       f.write(base)
       for i in range(config["experiment.ngpus"]):
