@@ -1,42 +1,59 @@
-"""usage: python train.py {small_lstm|medium_cnn|large_tcnn}"""
+"""
+Usage:
+     train.py [--samples=SAMPLES] [--epochs=EPOCHS] [--batch_size=BATCH_SIZE] ARCH
+    
+This executs the training for OSMI.
+    
+Arguments:
+    ARCH   the model architecture. Allowed values small_lstm, medium_cnn, large_tcnn
+    
+Options:
+    --samples=SAMPLES           number of samples to generate
+    --epochs=EPOCHS             number of epochs to train
+    --batch_size=BATCH_SIZE     the batch size
+    
+Description:
+    TBD
+"""
 import argparse
 import importlib
 import numpy as np
 import os
 import tensorflow as tf
+import docopt
 
 from tensorflow import keras
 from tensorflow.keras import layers
 from cloudmesh.common.StopWatch import StopWatch
+from cloudmesh.common.util import banner
+from cloudmesh.common.debug import VERBOSE
 
 
 StopWatch.start("total")
 
-parser = argparse.ArgumentParser()
-archs = [s.split('.')[0] for s in os.listdir('archs') if s[0:1] != '_']
-parser.add_argument('arch',
-                    type=str,
-                    choices=archs,
-                    help='Type of neural network architectures')
-args = parser.parse_args()
+args = docopt.docopt(__doc__)
 
-# parameters
-samples = 100 
-epochs = 5
-batch_size = 32
+VERBOSE(args)
+
+# parameter mappings
+arch = args["ARCH"] or "small_lstm"
+samples = int(args["--samples"] or 100)
+epochs = int(args["--epochs"] or 5)
+batch_size = int(args["--batch_size"] or 32)
 
 # compute synthetic data for X and Y
-if args.arch == "small_lstm":
+if arch == "small_lstm":
     input_shape = (8, 48)
     output_shape = (2, 12)
-elif args.arch == "medium_cnn":
+elif arch == "medium_cnn":
     input_shape = (101, 82, 9)
     output_shape = (101, 82)
-elif args.arch == "large_tcnn":
+elif arch == "large_tcnn":
     input_shape = (3, 101, 82, 9)
     output_shape = (3, 101, 82, 1)
 else:
     raise ValueError("Model not supported. Need to specify input and output shapes")
+
 
 event = {
     "input_shape": input_shape,
@@ -44,6 +61,7 @@ event = {
 }
 StopWatch.event("configuration", event)
 
+StopWatch.start("core")
 
 StopWatch.start("create data")
 X = np.random.rand(samples, *input_shape)
@@ -52,7 +70,7 @@ StopWatch.stop("create data")
 
 # define model
 StopWatch.start("define model")
-model = importlib.import_module('archs.' + args.arch).build_model(input_shape)
+model = importlib.import_module('archs.' + arch).build_model(input_shape)
 model.summary()
 StopWatch.stop("define model")
 
@@ -66,10 +84,13 @@ StopWatch.start("train model")
 model.fit(X, Y, batch_size=batch_size, epochs=epochs)
 StopWatch.stop("train model")
 
+
 StopWatch.start("save model")
-model.save(f"{args.arch}/1")
+model.save(f"{arch}/1")
 StopWatch.stop("save model")
+
+StopWatch.stop("core")
 
 StopWatch.stop("total")
 
-StopWatch.benchmark(tag=args.arch)
+StopWatch.benchmark(tag=arch)

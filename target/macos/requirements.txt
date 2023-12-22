@@ -2,6 +2,7 @@
 grpcio
 numpy
 requests
+docopt
 #smartredis==0.3.1
 smartredis==0.5.0
 tensorflow
