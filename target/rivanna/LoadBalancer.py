@@ -15,15 +15,15 @@ Options:
   -s <image> --haproxy_sif=<image>  HAProxy apptainer image.
 """
 
-from cloudmesh.common.Shell import Shell
-import time
-from docopt import docopt
 import os
 import socket
+import time
+
 from cloudmesh.common.FlatDict import FlatDict
-from pprint import pprint
-from haproxy_cfg_generator import generate_haproxy_cfg
+from docopt import docopt
 from port_generator import unique_base_port
+
+from haproxy_cfg_generator import generate_haproxy_cfg
 
 APPTAINER = "apptainer exec --bind `pwd`:/home --pwd /home"
 
