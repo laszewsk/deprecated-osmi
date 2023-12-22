@@ -33,9 +33,7 @@ StopWatch.start("total")
 
 args = docopt.docopt(__doc__)
 
-VERBOSE(args)
-
-# parameter mappings
+# define hyperparameters
 arch = args["ARCH"] or "small_lstm"
 samples = int(args["--samples"] or 100)
 epochs = int(args["--epochs"] or 5)
