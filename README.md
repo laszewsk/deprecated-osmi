@@ -231,28 +231,27 @@ You now have the code in `$PROJECT`
 
 ### Set up Python Environment
 
-OSMI will run in batch mode this is also valid for setting up the
-environment for which we created sbatch script.  This has the
-advantage that it installed via the worker nodes, which is typically
-faster, but also gurantees that the worker node itself is ued to
-install it to avoid software incompatibilities.
+Note: This is no longer working
 
-```
-b1>
-  cd $EXEC_DIR
-  sbatch environment.slurm
-  # (this may take a while)
-  source $BASE/ENV3/bin/activate
-```
+> OSMI will run in batch mode this is also valid for setting up the
+> environment for which we created sbatch script.  This has the
+> advantage that it installed via the worker nodes, which is typically
+> faster, but also gurantees that the worker node itself is ued to
+> install it to avoid software incompatibilities.
+>
+> ```
+> b1>
+>  cd $EXEC_DIR
+>  sbatch environment.slurm
+>  # (this may take a while)
+>  source $BASE/ENV3/bin/activate
+> ```
+>
+> See: [environment.slurm](https://github.com/laszewsk/osmi/blob/main/target/rivanna/environment.slurm)
 
-An alternate way is to experiment with the setup on the login node in
-case you like to explore other libraries. However  once you find other
-improvements, you ought to include them in the batch script. Here is
-what the batch script does internally.
+Note: currently we recommend this way:
 
-[environment.slurm](https://github.com/laszewsk/osmi/blob/main/target/rivanna/environment.slurm)
-
-It basically executes the following.
+An alternate way is to run the following commands directly:
 
 ```
 b1>

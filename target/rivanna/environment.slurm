@@ -6,8 +6,8 @@
 #SBATCH --gres=gpu:v100:1
 #SBATCH --account=bii_dsc_community
 #SBATCH --job-name=python3-setup
-#SBATCH --output=%u-%j.out
-#SBATCH --error=%u-%j.err
+#SBATCH --output=environment-%u-%j.out
+#SBATCH --error=environment-%u-%j.err
 #SBATCH --mem-per-gpu=64G
 
 if [ -z "$BASE" ]; then
