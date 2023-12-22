@@ -32,10 +32,11 @@
   - [2. Running on UVA Rivanna](#2-running-on-uva-rivanna)
     - [2.1 Logging into Rivanna](#21-logging-into-rivanna)
     - [2.2 Running OSMI Bench on rivanna](#22-running-osmi-bench-on-rivanna)
-    - [Set up a project directory and get the code](#set-up-a-project-directory-and-get-the-code)
-    - [Set up Python Environment](#set-up-python-environment)
-    - [Build Tensorflow Serving, Haproxy, and OSMI Images](#build-tensorflow-serving-haproxy-and-osmi-images)
-    - [Compile OSMI Models in Batch Jobs](#compile-osmi-models-in-batch-jobs)
+    - [2.3 Set up a project directory and get the code](#23-set-up-a-project-directory-and-get-the-code)
+    - [2.4 Set up Python Environment](#24-set-up-python-environment)
+    - [2.5 Build Tensorflow Serving, Haproxy, and OSMI Images](#25-build-tensorflow-serving-haproxy-and-osmi-images)
+    - [2.6 Compile OSMI Models in Batch Jobs](#26-compile-osmi-models-in-batch-jobs)
+      - [GREGOR CAME TILL HERE](#gregor-came-till-here)
     - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor)
     - [Graphing Results](#graphing-results)
     - [Compile OSMI Models in Interactive Jobs (avpid using)](#compile-osmi-models-in-interactive-jobs-avpid-using)
@@ -194,7 +195,7 @@ As well as the slurm partitions `gpu` and `bii_gpu`
 
 We will set up OSMI in the /scratch/$USER directory.
 
-### Set up a project directory and get the code
+### 2.3 Set up a project directory and get the code
 
 <!-- To get the code we clone a gitlab instance that is hosted at -->
 <!-- Oakridge National Laboratory -->
@@ -229,7 +230,7 @@ b1>
 You now have the code in `$PROJECT`
 
 
-### Set up Python Environment
+### 2.4 Set up Python Environment
 
 Note: This is no longer working
 
@@ -268,7 +269,7 @@ b1>
 
 
 
-### Build Tensorflow Serving, Haproxy, and OSMI Images
+### 2.5 Build Tensorflow Serving, Haproxy, and OSMI Images
 
 We created convenient singularity images for tensorflow serving,
 haproxy, and the code to be executed. This is done with
@@ -281,7 +282,7 @@ b1>
 ```
 
 
-### Compile OSMI Models in Batch Jobs
+### 2.6 Compile OSMI Models in Batch Jobs
 
 To run some of the test jobs to run a model and see if things work you
 can use the commands
@@ -289,10 +290,13 @@ can use the commands
 ```
 b1>
   cd $EXEC_DIR
-  sbatch train-small.slurm
-  sbatch train-medium.slurm
-  sbatch train-large.slurm
+  sbatch train-small.slurm  #    26.8s on a100_80GB, bi_fox_dgx
+  sbatch train-medium.slurm #    33.5s on a100_80GB, bi_fox_dgx
+  sbatch train-large.slurm  # 1m  8.3s on a100_80GB, bi_fox_dgx
 ```
+
+
+#### GREGOR CAME TILL HERE 
 
 ### Run benchmark with cloudmesh experiment executor
 
