@@ -6,8 +6,8 @@
 #SBATCH --account=bii_dsc_community
 #SBATCH --gres=gpu:a100:1
 #SBATCH --job-name=small-train-osmi
-#SBATCH --output=train-osmi-%u-%j.out
-#SBATCH --error=train-osmi-%u-%j.err
+#SBATCH --output=small-train-osmi-%u-%j.out
+#SBATCH --error=small-train-osmi-%u-%j.err
 #SBATCH --reservation=bi_fox_dgx
 #SBATCH --constraint=a100_80gb
 
