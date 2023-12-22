@@ -21,6 +21,16 @@ from port_generator import unique_base_port
 from textwrap import dedent
 
 def generate_haproxy_cfg(config):
+  """
+  Generate HAProxy configuration file based on the provided config.
+
+  Args:
+    config (dict): Configuration parameters for generating the HAProxy configuration.
+
+  Returns:
+    None
+  """
+  
   port = unique_base_port(config)
   base = dedent(f'''
     global
@@ -35,15 +45,15 @@ def generate_haproxy_cfg(config):
       mode tcp
       bind *:{port:04d} npn spdy/2 alpn h2,http/1.1
       default_backend be_grpc
-
+  
     backend be_grpc
       mode tcp
       balance roundrobin
   ''').strip
   with open(config["data.haproxy_cfg_file"], 'w+') as f:
-      f.write(base)
-      for i in range(config["experiment.ngpus"]):
-          f.write(f"  server tfs{i} {config['constant.server']}:{port+1+i:04d}\n")
+    f.write(base)
+    for i in range(config["experiment.ngpus"]):
+      f.write(f"  server tfs{i} {config['constant.server']}:{port+1+i:04d}\n")
 
 if __name__ == "__main__":
   args = docopt(__doc__)
