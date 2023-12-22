@@ -11,7 +11,7 @@ Options:
   -p <port> --port=<port>             Base port for TF servers.
   -g <ngpus> --ngpus=<ngpus>          Number of GPUs.
   -o <output_dir> --output_dir=<output_dir>   Directory to store output logs.
-  -t <tfs_sif> --tfs_sif=<tfs_sif>    Tensorflow serving singularity image.
+  -t <tfs_sif> --tfs_sif=<tfs_sif>    Tensorflow serving apptainer image.
   --status=<status>                   Server status (for wait command).
   --timeout=<timeout>                 Timeout (for wait command).
   -h --help                           Show this screen.
@@ -27,7 +27,7 @@ from docopt import docopt
 from pprint import pprint
 from port_generator import unique_base_port
 
-SINGULARITY = "singularity exec --bind `pwd`:/home --pwd /home"
+APPTAINER = "apptainer exec --bind `pwd`:/home --pwd /home"
 
 class ModelServer:
 
@@ -50,7 +50,7 @@ class ModelServer:
         for i in range(self.ngpus):
             port = self.tfs_base_port + i
             command = f"time CUDA_VISIBLE_DEVICES={i} "\
-                      f"{SINGULARITY} {self.tfs_sif} "\
+                      f"{APPTAINER} {self.tfs_sif} "\
                       f"tensorflow_model_server --port={port:04d} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
                       f">& {self.output_dir}/v100-{port:04d}.log &"
             print(command)

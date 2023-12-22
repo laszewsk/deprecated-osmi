@@ -15,10 +15,10 @@ if [ -z "$EXEC_DIR" ]; then
     echo "EXEC_DIR is not set"
     exit 1
 fi
-export CONTAINER_DIR=$EXEC_DIR/image-singularity/
+export CONTAINER_DIR=$EXEC_DIR/image-apptainer/
 
 module purge
-module load singularity
+module load apptainer
 # module load tensorflow/2.10.0 gcc openmpi python
 
 nvidia-smi
@@ -30,4 +30,4 @@ source $BASE/ENV3/bin/activate
 cd $BASE/osmi/models
 
 MODEL=large_tcnn
-time singularity exec --nv $CONTAINER_DIR/osmi.sif python train.py $MODEL
+time apptainer exec --nv $CONTAINER_DIR/osmi.sif python train.py $MODEL

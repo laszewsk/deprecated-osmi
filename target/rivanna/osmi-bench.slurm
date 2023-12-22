@@ -51,7 +51,7 @@ progress 7
 progress 8
 
 module purge
-module load singularity
+module load apptainer
 # module load  gcc/9.2.0  cuda/11.0.228  openmpi/3.1.6 python/3.8.8
 # source $RUN_DIR/ENV3/bin/activate
 progress 10
@@ -68,7 +68,7 @@ echo "# ======= SERVER START"
 start_wait_for_server=`date +%s`
 echo start_wait_for_server $start_wait_for_server
 
-singularity exec --nv --bind /localscratch:/localscratch $EXEC_DIR/$NAME.sif \
+apptainer exec --nv --bind /localscratch:/localscratch $EXEC_DIR/$NAME.sif \
     python ModelServer.py --port_tf_server_base=$PORT_TF_SERVER_BASE --num_gpus=$NUM_GPUS_PER_NODE --output_dir=$OUTPUT_DIR --repeat_no=$REPEAT
 
 
@@ -82,7 +82,7 @@ progress 60
 
 echo "launching load balancer on all nodes"
 
-singularity exec --nv --bind /localscratch:/localscratch $EXEC_DIR/$NAME.sif \
+apptainer exec --nv --bind /localscratch:/localscratch $EXEC_DIR/$NAME.sif \
     python LoadBalancer.py --port_ha_proxy_base=$HAPROXY_SERVER_BASE --output_dir=$OUTPUT_DIR --exec_dir=$EXEC_DIR --config_file=$CFG_FILE --repeat_no=$REPEAT
 
 echo "# ======= SERVER UP"

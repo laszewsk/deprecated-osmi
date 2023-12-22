@@ -21,9 +21,9 @@ parser.add_argument("-o", "--output_dir", type=str, help="directory to store out
 parser.add_argument("-c", "--config", type=str, help="model config file")
 parser.add_argument("-t", "--tfs_base_port", type=int, help="base port for TF servers")
 parser.add_argument("-g", "--ngpus", type=int, help="number of GPUs")
-parser.add_argument("--osmi_sif", type=str, help="osmi singularity image")
-parser.add_argument("--haproxy_sif", type=str, help="haproxy singularity image")
-parser.add_argument("--tfs_sif", type=str, help="tensorflow serving singularity image")
+parser.add_argument("--osmi_sif", type=str, help="osmi apptainer image")
+parser.add_argument("--haproxy_sif", type=str, help="haproxy apptainer image")
+parser.add_argument("--tfs_sif", type=str, help="tensorflow serving apptainer image")
 
 # ap.add_argument("-m", "--model_conf_base_name", type=str, required=False, help="model config file base name")
 args = parser.parse_args()

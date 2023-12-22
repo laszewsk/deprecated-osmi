@@ -12,7 +12,7 @@ Options:
   -c <config> --config=<config>     Model config file.
   -p <port> --haproxy_port=<port>   Port for haproxy server.
   -o <output> --output_dir=<output> Directory to store output logs.
-  -s <image> --haproxy_sif=<image>  HAProxy singularity image.
+  -s <image> --haproxy_sif=<image>  HAProxy apptainer image.
 """
 
 from cloudmesh.common.Shell import Shell
@@ -25,7 +25,7 @@ from pprint import pprint
 from haproxy_cfg_generator import generate_haproxy_cfg
 from port_generator import unique_base_port
 
-SINGULARITY = "singularity exec --bind `pwd`:/home --pwd /home"
+APPTAINER = "apptainer exec --bind `pwd`:/home --pwd /home"
 
 class HAProxyLoadBalancer:
 
@@ -37,7 +37,7 @@ class HAProxyLoadBalancer:
         self.haproxy_sif = config["data.haproxy_sif"]
 
     def start(self):
-        command = f"time {SINGULARITY} {self.haproxy_sif} " \
+        command = f"time {APPTAINER} {self.haproxy_sif} " \
                   f"haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}/haproxy.log &"
         print(command)
         r = os.system(command)
