@@ -1,0 +1,3 @@
+docopt
+tensorflow
+cloudmesh-common==4.4.1

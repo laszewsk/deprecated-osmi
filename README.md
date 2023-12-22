@@ -47,12 +47,21 @@
 
 ## 1. Running OSMI Bench on macOS natively
 
+### 1.1 INstall and run training
+
+To install and run training on macOS we donduct three steps
+
+First, we install a version of python that is compatible with tensorflow 
+and smartredis
+
 ```bash
 macOS> 
   python3.10 -m venv ~/OSMI
   source ~/OSMI/bin/activate
   pip install pip -U
 ```
+
+Second, We check out the code in a OSMI_HOME directory
 
 ```
 macOS>
@@ -64,6 +73,8 @@ macOS>
   pip install -r target/ubuntu/requirements-ubuntu.txt
 ```
 
+Third, we run the experiments
+
 
 ```bash
 macOS>
@@ -73,6 +84,7 @@ macOS>
   time python train.py large_tcnn  # ~ 298.0s on an M1 Max 10 core 64GB 
                                    #   4m 58s
 ```
+
 
 
 ## 1. Running OSMI Bench on Ubuntu natively
