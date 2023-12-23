@@ -30,6 +30,19 @@ APPTAINER = "apptainer exec --bind `pwd`:/home --pwd /home"
 class HAProxyLoadBalancer:
 
     def __init__(self, config):
+        """
+        Initializes a LoadBalancer object.
+
+        Parameters:
+            config (dict): A dictionary containing configuration information.
+
+        Attributes:
+            port (int): The unique base port for the LoadBalancer.
+            output_dir (str): The output directory for the LoadBalancer.
+            haproxy_config_file (str): The path to the HAProxy configuration file.
+            haproxy_sif (str): The path to the HAProxy SIF file.
+        """
+
         self.port = unique_base_port(config)
         self.output_dir = config["data.output"]
         generate_haproxy_cfg(config)
@@ -37,6 +50,12 @@ class HAProxyLoadBalancer:
         self.haproxy_sif = config["data.haproxy_sif"]
 
     def start(self):
+        """
+        Starts the load balancer by executing the haproxy command.
+
+        Returns:
+            int: The return code of the executed command.
+        """
         command = f"time {APPTAINER} {self.haproxy_sif} " \
                   f"haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}/haproxy.log &"
         print(command)
@@ -44,23 +63,49 @@ class HAProxyLoadBalancer:
         print(r)
 
     def shutdown(self):
+        """
+        Not implemented. Shuts down the load balancer.
+        """
         raise NotImplementedError
 
     def status(self, port):
+        """
+        Check the status of a port on the local machine.
+
+        Parameters:
+            port (int): The port number to check.
+
+        Returns:
+            bool: True if the port is open, False otherwise.
+        """
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         return sock.connect_ex(('127.0.0.1', port)) == 0
 
     def wait_for_server(self):
-        start = time.time()
-        while not self.status(self.port):
-            if time.time() - start > 45:
-                raise ValueError("Load balancer not properly started")
-            time.sleep(0.5)
-            print(".", end="")
-        print()
+            """
+            Waits for the server to start by continuously checking its status.
+            
+            Raises:
+                ValueError: If the load balancer is not properly started within 45 seconds.
+            """
+            start = time.time()
+            while not self.status(self.port):
+                if time.time() - start > 45:
+                    raise ValueError("Load balancer not properly started")
+                time.sleep(0.5)
+                print(".", end="")
+            print()
 
 
 def main():
+    """
+    Entry point of the LoadBalancer program.
+    
+    This function parses command line arguments, loads the configuration file,
+    maps the command line arguments to the corresponding configuration keys,
+    and starts or waits for the load balancer based on the provided arguments.
+    """
+    
     args = docopt(__doc__)
 
     config_file = args["--config"] or "config.yaml"

@@ -20,24 +20,23 @@ requirements:
 # PROJECT MANAGEMENT
 # #####################################################################
 
-project: clean project.json generate
+project: clean project_json generate
 
 #setup:
 #	python setup_env_and_yaml.py
 #	source ~/ENV3/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/rivanna/requirements.txt
 
-generate: jobs-project.sh
+generate: project-jobs.sh
 
 run: submit
 
 submit:
-	-sh jobs-project.sh
+	-sh project-jobs.sh
 
-localscratch: localscratch.json
+localscratch: localscratch_json
 
 
-jobs-%.sh: %.json
-	cms ee generate submit --name=$<  > $@
+
 
 simple:
 	cms ee generate \
@@ -50,19 +49,68 @@ simple:
 	           --output_dir=./$(basename $@) \
                --source_dir=. \
                --verbose
+	
+# project.json: config.in.yaml
+# 	cms ee generate \
+# 	           --source=osmi.in.slurm \
+# 	           --config=config.in.yaml \
+# 	           --name=project \
+# 	           --noos \
+# 	           --os=USER,HOME \
+# 		       --nocm \
+# 	           --output_dir=./project \
+#                --source_dir=. \
+# 		       --verbose \
+# 			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
+# 	cms ee list
 
-project.json: config.in.yaml
+# project-jobs.sh: project.json
+# 	cms ee generate submit --name=project  > project-jobs.sh
+
+project_sh: project.json
 	cms ee generate \
-	           --source=${NAME}.in.slurm \
-	           --config=$< \
-	           --name=$(basename $@) \
+	           --source=osmi.in.sh \
+	           --config=config.in.yaml \
+	           --name=project \
 	           --noos \
 	           --os=USER,HOME \
 		       --nocm \
-	           --output_dir=./$(basename $@) \
+	           --output_dir=./project \
                --source_dir=. \
 		       --verbose \
 			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
+	cms ee generate submit --name=project --job_type=sh > project-jobs-sh.sh
+	cms ee list
+	
+project_slurm: project.json
+	cms ee generate \
+	           --source=osmi.in.slurm \
+	           --config=config.in.yaml \
+	           --name=project \
+	           --noos \
+	           --os=USER,HOME \
+		       --nocm \
+	           --output_dir=./project \
+               --source_dir=. \
+		       --verbose \
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
+	cms ee generate submit --name=project --job_type=sbatch > project-jobs-slurm.sh
+	cms ee list
+
+project_lsf: project.json
+	cms ee generate \
+	           --source=osmi.in.lsf \
+	           --config=config.in.yaml \
+	           --name=project \
+	           --noos \
+	           --os=USER,HOME \
+		       --nocm \
+	           --output_dir=./project \
+               --source_dir=. \
+		       --verbose \
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
+	cms ee generate submit --name=project --job_type=lsf > project-jobs-lsf.sh
+	cms ee list
 
 kill: stop
 

@@ -20,6 +20,18 @@ import requests
 from docopt import docopt
 
 class TFModelServerManager:
+    """
+    A class for managing TensorFlow Model Server.
+
+    Args:
+        server_url (str): The URL of the TensorFlow Model Server.
+        port (int): The port number on which the server will run.
+        model_name (str): The name of the model.
+        model_path (str): The path to the model directory.
+        gpus (list, optional): A list of GPU fractions to be used by the server. Defaults to None.
+        log_file (str, optional): The path to the log file. Defaults to "server_log.txt".
+    """
+
     def __init__(self, server_url, port, model_name, model_path, gpus=None, log_file="server_log.txt"):
         self.server_url = server_url
         self.port = port
@@ -31,6 +43,9 @@ class TFModelServerManager:
         self.server_process = None
 
     def start_tf_model_server(self):
+        """
+        Starts the TensorFlow Model Server.
+        """
         cmd = [
             "tensorflow_model_server",
             "--port=" + str(self.port),
@@ -46,6 +61,12 @@ class TFModelServerManager:
         print("TensorFlow Model Server started on port", self.port)
 
     def check_server_availability(self):
+        """
+        Checks the availability of the TensorFlow Model Server.
+
+        Returns:
+            bool: True if the server is available, False otherwise.
+        """
         try:
             response = requests.get(self.server_check_url)
             if response.status_code == 200:
@@ -55,6 +76,9 @@ class TFModelServerManager:
         return False
 
     def wait_for_server(self):
+        """
+        Waits for the TensorFlow Model Server to become available.
+        """
         attempt = 0
         while attempt < self.max_attempts:
             if self.check_server_availability():
@@ -68,6 +92,13 @@ class TFModelServerManager:
             print("Timed out waiting for TensorFlow Model Server to become available.")
 
 def main():
+    """
+    Entry point of the program.
+    
+    Parses command line arguments, initializes the TFModelServerManager,
+    starts the TF model server, and waits for the server to be ready.
+    """
+
     arguments = docopt(__doc__)
 
     server_url = arguments['--server_url']

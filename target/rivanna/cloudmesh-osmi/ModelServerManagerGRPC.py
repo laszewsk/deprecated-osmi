@@ -22,7 +22,21 @@ import tf_server_pb2
 import tf_server_pb2_grpc
 
 class ModelServiceServicer(tf_server_pb2_grpc.ModelServiceServicer):
+    """
+    A gRPC service servicer for managing the TensorFlow model server.
+    """
+
     def StartServer(self, request, context):
+        """
+        Starts the TensorFlow model server with the provided configuration.
+
+        Args:
+            request: The gRPC request containing the server configuration.
+            context: The gRPC context.
+
+        Returns:
+            A gRPC response indicating the success or failure of starting the server.
+        """
         manager = TFModelServerManager(request.server_url, request.port, request.gpus, request.log_file)
         manager.start_tf_model_server()
         manager.wait_for_server()
@@ -30,6 +44,16 @@ class ModelServiceServicer(tf_server_pb2_grpc.ModelServiceServicer):
         return tf_server_pb2.ServerResponse(success=True, message="Server started successfully")
 
 class TFModelServerManager:
+    """
+    A class for managing TensorFlow Model Server.
+
+    Args:
+        server_url (str): The URL of the server.
+        port (int): The port number for the server.
+        gpus (list, optional): A list of GPU fractions to be used by the server. Defaults to None.
+        log_file (str, optional): The path to the log file. Defaults to "server_log.txt".
+    """
+
     def __init__(self, server_url, port, gpus=None, log_file="server_log.txt"):
         self.server_url = server_url
         self.port = port
@@ -40,6 +64,9 @@ class TFModelServerManager:
         self.server_process = None
 
     def start_tf_model_server(self):
+        """
+        Starts the TensorFlow Model Server.
+        """
         cmd = [
             "tensorflow_model_server",
             "--port=" + str(self.port),
@@ -55,6 +82,12 @@ class TFModelServerManager:
         print("TensorFlow Model Server started on port", self.port)
 
     def check_server_availability(self):
+        """
+        Checks the availability of the TensorFlow Model Server.
+
+        Returns:
+            bool: True if the server is available, False otherwise.
+        """
         try:
             response = requests.get(self.server_check_url)
             if response.status_code == 200:
@@ -64,6 +97,9 @@ class TFModelServerManager:
         return False
 
     def wait_for_server(self):
+        """
+        Waits for the TensorFlow Model Server to become available.
+        """
         attempt = 0
         while attempt < self.max_attempts:
             if self.check_server_availability():
@@ -77,6 +113,13 @@ class TFModelServerManager:
             print("Timed out waiting for TensorFlow Model Server to become available.")
 
 def main():
+    """
+    This is the main function that starts the TFModelServerManager and 
+    waits for the server to start.
+    It takes command line arguments using docopt and initializes the 
+    TFModelServerManager with the provided arguments.
+    """
+
     arguments = docopt(__doc__)
 
     server_url = arguments['--server_url']

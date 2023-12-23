@@ -18,10 +18,29 @@ import time
 from docopt import docopt
 
 class HAProxyManager:
+    """
+    A class to manage HAProxy.
+
+    Attributes:
+        haproxy_executable (str): The path to the HAProxy executable.
+
+    Methods:
+        start(config_file): Start HAProxy with the specified configuration file.
+        stop(): Stop HAProxy.
+        status(): Check the status of HAProxy.
+        wait_for_start(config_file, timeout, interval): Wait for HAProxy to start within the specified timeout.
+    """
+
     def __init__(self, haproxy_executable="/usr/sbin/haproxy"):
         self.haproxy_executable = haproxy_executable
 
     def start(self, config_file):
+        """
+        Start HAProxy with the specified configuration file.
+
+        Args:
+            config_file (str): The path to the HAProxy configuration file.
+        """
         try:
             subprocess.run([self.haproxy_executable, "-f", config_file, "-D"], check=True)
             print("HAProxy started.")
@@ -29,6 +48,9 @@ class HAProxyManager:
             print("Error starting HAProxy.")
 
     def stop(self):
+        """
+        Stop HAProxy.
+        """
         try:
             subprocess.run([self.haproxy_executable, "-D", "-sf", " $(pgrep haproxy)"], shell=True, check=True)
             print("HAProxy stopped.")
@@ -36,6 +58,12 @@ class HAProxyManager:
             print("Error stopping HAProxy.")
 
     def status(self):
+        """
+        Check the status of HAProxy.
+
+        Returns:
+            bool: True if HAProxy is running and the configuration is valid, False otherwise.
+        """
         try:
             output = subprocess.run([self.haproxy_executable, "-c"], capture_output=True, text=True)
             if output.returncode == 0:
@@ -49,6 +77,14 @@ class HAProxyManager:
             return False
 
     def wait_for_start(self, config_file, timeout=60, interval=5):
+        """
+        Wait for HAProxy to start within the specified timeout.
+
+        Args:
+            config_file (str): The path to the HAProxy configuration file.
+            timeout (int): The maximum time to wait for HAProxy to start, in seconds. Default is 60 seconds.
+            interval (int): The interval between status checks, in seconds. Default is 5 seconds.
+        """
         start_time = time.time()
         while time.time() - start_time < timeout:
             if self.status():

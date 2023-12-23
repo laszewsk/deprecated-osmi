@@ -32,6 +32,14 @@ APPTAINER = "apptainer exec --bind `pwd`:/home --pwd /home"
 class ModelServer:
 
     def __init__(self, config, config_filename=None):
+        """
+        Initializes the ModelServer object.
+
+        Parameters:
+        - config (dict): Configuration dictionary containing various parameters.
+        - config_filename (str): Optional filename of the configuration file.
+
+        """
         self.tfs_base_port = unique_base_port(config) + 1
         self.ngpus = config["experiment.ngpus"]
         self.output_dir = config["data.output"]
@@ -41,44 +49,91 @@ class ModelServer:
         self.model_conf_file = self.convert_conf_to_json(config_filename)
 
     def convert_conf_to_json(self, config_filename):
+        """
+        Converts a YAML configuration file to JSON format.
+
+        Parameters:
+            config_filename (str): The path to the YAML configuration file.
+
+        Returns:
+            str: The name of the converted JSON file.
+        """
         converter = YamlToJsonConverter(config_filename, "models")
         converter.convert()
         return converter.get_name()
 
     def start(self):
-        StopWatch.event("ModelServer: start")
-        for i in range(self.ngpus):
-            port = self.tfs_base_port + i
-            command = f"time CUDA_VISIBLE_DEVICES={i} "\
-                      f"{APPTAINER} {self.tfs_sif} "\
-                      f"tensorflow_model_server --port={port:04d} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
-                      f">& {self.output_dir}/v100-{port:04d}.log &"
-            print(command)
-            r = os.system(command)
-            print(r)
+            """
+            Starts the ModelServer by executing the TensorFlow Serving command for each GPU.
+            """
+            
+            StopWatch.event("ModelServer: start")
+            for i in range(self.ngpus):
+                port = self.tfs_base_port + i
+                command = f"time CUDA_VISIBLE_DEVICES={i} "\
+                          f"{APPTAINER} {self.tfs_sif} "\
+                          f"tensorflow_model_server --port={port:04d} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
+                          f">& {self.output_dir}/v100-{port:04d}.log &"
+                print(command)
+                r = os.system(command)
+                print(r)
     
     def shutdown(self):
+        """
+        Not implemented. Shuts down the model server.
+        """
         raise NotImplementedError
 
     def status(self, port):
+        """
+        Check the status of the ModelServer.
+
+        Parameters:
+            port (int): The port number to check the status on.
+
+        Returns:
+            bool: True if the ModelServer is running on the specified port, False otherwise.
+        """
         StopWatch.event("ModelServer: status")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         return sock.connect_ex(('127.0.0.1', port)) == 0
 
-    def wait_for_server(self):
+    def wait_for_server(sel, wait_time=0.5):
+        """
+        Waits for the model server to start up.
+
+        This method continuously checks the status of the model server until the server is up.
+        If the server does not start within the specified timeout, a ValueError is raised.
+
+        Args:
+            wait_time (float): The time interval between each status check (default is 0.5 seconds)
+
+        Raises:
+            ValueError: If the model server does not start within the specified timeout
+
+        Returns:
+            None
+        """
         StopWatch.event("ModelServer: wait for server")
         start = time.time()
         while not all([self.status(p + self.tfs_base_port) for p in range(self.ngpus)]):
             if time.time() - start > self.timeout:
                 print("Server not properly started")
                 raise ValueError("Model server not properly started")
-            time.sleep(0.5)
+            time.sleep(wait_time)
             print(".", end="")
         StopWatch.event("ModelServer: server up")
         print()
 
 
 def main():
+    """
+    Entry point of the ModelServer program.
+    
+    Parses command line arguments, loads configuration, and starts the 
+    ModelServer based on the provided arguments.
+    """
+
     args = docopt(__doc__)
     pprint(args)
     config_filename = args["--config"] or "config.yaml"

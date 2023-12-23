@@ -6,6 +6,19 @@ import os
 
 
 class YamlToJsonConverter:
+    """
+    Converts a YAML configuration file to a JSON file.
+
+    Args:
+        config_file (str): The path to the YAML configuration file.
+        base_name (str, optional): The base name for the JSON file. Defaults to "models".
+
+    Attributes:
+        config_file (str): The path to the YAML configuration file.
+        json_file (str): The path to the generated JSON file.
+        config (FlatDict): The loaded and expanded configuration from the YAML file.
+        model_config_list (dict): The extracted 'model_config_list' section from the configuration.
+    """
 
     def __init__(self, config_file, base_name="models"):
         self.config_file = config_file

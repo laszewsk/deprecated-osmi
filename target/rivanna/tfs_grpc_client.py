@@ -38,7 +38,7 @@ def stop(msg):
                    f"num_requests={args.n}, outfile={args.outfile}, redux={args.redux}")
 
 
-start("Total")
+start("total")
 hostport = args.server
 print(hostport)
 
@@ -106,7 +106,7 @@ print(f"throughput: {throughput}")
 print(f"latency: {avg_inference_latency}")
 
 StopWatch.event("client result", {"latency": avg_inference_latency, "throughput": throughput})
-stop("Total")
+stop("total")
 StopWatch.benchmark()
 
 # write_header = True if not os.path.exists(args.outfile) else False
