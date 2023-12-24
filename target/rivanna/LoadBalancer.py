@@ -2,17 +2,28 @@
 LoadBalancer
 
 Usage:
-  LoadBalancer.py start_and_wait [-c <config> | --config=<config>] [-p <port> | --haproxy_port=<port>] [-o <output> | --output_dir=<output>] [-s <image> | --haproxy_sif=<image>] [--timeout=<timeout>] [--tfs_base_port=<port>] [--ngpus=<ngpus>] [--haproxy_cfg_file=<haproxy_cfg_file>] [--server=<server>]
-  LoadBalancer.py start [-c <config> | --config=<config>] [-p <port> | --haproxy_port=<port>] [-o <output> | --output_dir=<output>] [-s <image> | --haproxy_sif=<image>]
-  LoadBalancer.py wait [-c <config> | --config=<config>]
+  LoadBalancer.py start_and_wait  [--config=CONFIG]
+                                  [--haproxy_port=PORT]
+                                  [--output_dir=OUTPUT]
+                                  [--haproxy_sif=IMAGE]
+                                  [--timeout=TIMEOUT]
+                                  [--tfs_base_port=BASE_PORT]
+                                  [--ngpus=NGPUS]
+                                  [--haproxy_cfg_file=HAPROXY_CFG_FILE]
+                                  [--server=<server>]
+  LoadBalancer.py start  [--config=CONFIG]
+                         [--haproxy_port=PORT]
+                         [--output_dir=OUTPUT]
+                         [--haproxy_sif=IMAGE]
+  LoadBalancer.py wait [--config=CONFIG]
   LoadBalancer.py (-h | --help)
 
 Options:
-  -h --help                         Show this screen.
-  -c <config> --config=<config>     Model config file.
-  -p <port> --haproxy_port=<port>   Port for haproxy server.
-  -o <output> --output_dir=<output> Directory to store output logs.
-  -s <image> --haproxy_sif=<image>  HAProxy apptainer image.
+  -h --help             Show this screen.
+  --config=CONFIG       Model config file.
+  --haproxy_port=PORT   Port for haproxy server.
+  --output_dir=OUTPUT   Directory to store output logs.
+  --haproxy_sif=IMAGE   HAProxy apptainer image.
 """
 
 import os

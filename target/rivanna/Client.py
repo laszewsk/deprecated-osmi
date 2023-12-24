@@ -2,20 +2,29 @@
 Client
 
 Usage:
-  Client.py run -c <config> | --config=<config> [-s <server>] [-p <port>] [-b <batch>] [-m <model>] [-n <nrequests>] [-o <osmi_sif>] [-a <algorithm>] [--concurrency <concurrency>] [--output_dir=<output_dir>]
+  Client.py run --config=CONFIG
+                [--server=SERVER]
+                [--port=PORT]
+                [--batch=BATCH]
+                [--model=MODEL]
+                [--nrequests=REQUESTS]
+                [--osmi_sif=OSMI_SIF]
+                [--algorithm=ALGORITHM]
+                [--concurrency=CONCURRENCY]
+                [--output_dir=OUTPUT_DIR]
   Client.py (-h | --help)
 
 Options:
-  -h --help                             Show this screen.
-  -c <config> --config=<config>         Model config file.
-  -s <server> --server=<server>         Server IP, e.g. 10.1.1.37.
-  -p <port> --port=<port>               Server port, e.g. 8443.
-  -b <batch> --batch=<batch>            Batch size.
-  -m <model> --model=<model>            Model name, e.g. small_lstm].
-  -n <nrequests> --nrequests=<nrequests> Number of requests.
-  -o <osmi_sif> --osmi_sif=<osmi_sif>   OSMI singularity image.
-  -a <algorithm> --algorithm=<algorithm> Client program.
-  --output_dir=<output_dir>             Output directory.
+  -h --help                Manaual page.
+  --config=CONFIG          Model config file [default: config.yaml].
+  --server=SERVER          Server IP, e.g. 10.1.1.37.
+  --port=PORT              Server port, e.g. 8443.
+  --batch=BATCH            Batch size.
+  --model=MODEL            Model name, e.g. small_lstm].
+  --nrequests=REQUESTS     Number of requests.
+  --osmi_sif=OSMI_SIF      OSMI singularity image.
+  --algorithm=ALGORITHM    Client program.
+  --output_dir=OUTPUT_DIR  Output directory.
 """
 
 from cloudmesh.common.Shell import Shell

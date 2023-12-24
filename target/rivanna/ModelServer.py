@@ -1,20 +1,29 @@
 """
 Usage:
-  ModelServer.py start_and_wait [-c <config>] [-p <port>] [-g <ngpus>] [-o <output_dir>] [-t <tfs_sif>]
-  ModelServer.py start [-c <config>] [-p <port>] [-g <ngpus>] [-o <output_dir>] [-t <tfs_sif>]
-  ModelServer.py wait [-c <config>] [--timeout=<timeout>]
-  ModelServer.py status [-p <port>]
+  ModelServer.py start_and_wait [--config=CONFIG]
+                                [--port=PORT]
+                                [-ngpus=<NGPUS]
+                                [--output_dir=OUTPUT_DIR]
+                                [--tfs_sif=TFS_SIF]
+  ModelServer.py start [--config=CONFIG]
+                       [--port=PORT]
+                       [-ngpus=<NGPUS]
+                       [--output_dir=OUTPUT_DIR]
+                       [--tfs_sif=TFS_SIF]
+  ModelServer.py wait [---config=CONFIG]
+                      [--timeout=TIMEOUT]
+  ModelServer.py status [--port=PORT]
   ModelServer.py (-h | --help)
 
 Options:
-  -c <config> --config=<config>       Config file [default: config.yaml].
-  -p <port> --port=<port>             Base port for TF servers.
-  -g <ngpus> --ngpus=<ngpus>          Number of GPUs.
-  -o <output_dir> --output_dir=<output_dir>   Directory to store output logs.
-  -t <tfs_sif> --tfs_sif=<tfs_sif>    Tensorflow serving apptainer image.
-  --status=<status>                   Server status (for wait command).
-  --timeout=<timeout>                 Timeout (for wait command).
-  -h --help                           Show this screen.
+    --config=CONFIG          Config file [default: config.yaml].
+    --port=PORT              Base port for TF servers.
+    --ngpus=<NGPUS           Number of GPUs.
+    --output_dir=OUTPUT_DIR  Directory to store output logs.
+    --tfs_sif=TFS_SIF        Tensorflow serving apptainer image.
+    --status=STATUS          Server status (for wait command).
+    --timeout=TIMEOUT        Timeout (for wait command).
+    -h --help                Show this screen.
 """
 
 from cloudmesh.common.FlatDict import FlatDict

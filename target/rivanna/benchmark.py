@@ -1,6 +1,17 @@
-import argparse
+"""
+Usage:
+  benchmark.py [--batch=BATCH_SIZE] --model=MODEL_NAME [--num_requests=NUM_REQUESTS] [--verbose]
+
+Options:
+  --batch=BATCH_SIZE           Batch size [default: 1]
+  --model=MODEL_NAME           Model name (required)
+  --num_requests=NUM_REQUESTS  Number of requests [default: 128]
+  --verbose                    Verbose output
+"""
+
 import time
 from pprint import pprint
+from docopt import docopt
 
 import numpy as np
 from smi import SMI
@@ -22,14 +33,14 @@ for key in ["concurrency", "batch", "nrequests", "ngpus", "ports"]:
 
 banner("Overwrite config from arguments")
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-b', '--batch', type=int, default=1, help='batch size')
-parser.add_argument('-m', '--model', required=True, default='medium_cnn', type=str)
-parser.add_argument('-n', '--num_requests', default=128, type=int, help='number of requests')
-parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
-args = parser.parse_args()
+
+args = docopt(__doc__)
+
+args_without_dash = {key[2:]: value for key, value in args.items() if key.startswith("--")}
 
 pprint(dict(config))
+
+args = FlatDict(args)
 
 banner("Overwrite config from arguments")
 
@@ -44,7 +55,7 @@ def stop(msg):
 
 # gRPC
 start("retrieve model")
-inference = SMI(model=args.model, hostport='localhost:8500').grpc(args.batch)
+inference = SMI(model=args.model, hostport='localhost:8500').grpc(int(args.batch))
 stop("retrieve model")
 
 # HTTP
@@ -54,7 +65,7 @@ stop("retrieve model")
 # inference = SMI(model=args.model).embedded(model_base_path="/ccs/home/whbrewer/surbench/models")
 
 start("define model params")
-meta = models(args.batch)[args.model]
+meta = models(int(args.batch))[args.model]
 input_shape = meta['input_shape']
 output_name = meta['output_name']
 output_shape = meta['output_shape']
@@ -64,7 +75,7 @@ dtype_method = dtype_map[dtype_name]
 stop("define model params")
 
 times = []
-for _ in tqdm(range(args.num_requests)):
+for _ in tqdm(range(int(args.num_requests))):
     start("create data")
     data = np.array(np.random.random(input_shape))
     stop("create data")
@@ -79,7 +90,7 @@ for _ in tqdm(range(args.num_requests)):
     times.append(tok - tik)
 
 elapsed = sum(times)
-average = elapsed / args.num_requests
+average = elapsed / int(args.num_requests)
 print(f"elapsed: {elapsed:.4f}s, avg: {average:.4f}s")
 StopWatch.event("benchmark result", str({"elapsed": elapsed, "average": average}))
 StopWatch.benchmark()

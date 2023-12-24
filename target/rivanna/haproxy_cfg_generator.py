@@ -2,16 +2,20 @@
 HAProxy Config Generator
 
 Usage:
-  haproxy_cfg_generate.py (-c <config> | --config=<config>) [-p <port>] [-g <ngpus>] [-s <server>] [-o <haproxy_cfg_file>]
+  haproxy_cfg_generate.py --config=CONFIG
+                         [--port=PORT]
+                         [--ngpus=NGPUS]
+                         [--server=SERVER]
+                         [--haproxy_cfg_file=HAPROXY_CFG_FILE]
   haproxy_cfg_generate.py (-h | --help)
 
 Options:
-  -h --help                              Show this screen.
-  -c <config> --config=<config>          Config file.
-  -p <port> --port=<port>                Base port for TF servers.
-  -g <ngpus> --ngpus=<ngpus>             Number of GPUs.
-  -s <server> --server=<server>          Server IP.
-  -o <haproxy_cfg_file> --haproxy_cfg_file=<haproxy_cfg_file>  Name of file to store haproxy config file.
+  -h --help                            Show this screen.
+  --config=CONFIG                      Config file.
+  --port=<port>                        Base port for TF servers.
+  --ngpus=NGPUS                        Number of GPUs.
+  --server=SERVER                      Server IP.
+  --haproxy_cfg_file=HAPROXY_CFG_FILE  Name of file to store haproxy config file.
 """
 
 from cloudmesh.common.util import banner

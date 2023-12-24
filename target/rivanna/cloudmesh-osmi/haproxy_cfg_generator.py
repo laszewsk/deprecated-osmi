@@ -1,48 +1,4 @@
 import yaml
-
-class YAMLToHAProxyConverter:
-    def __init__(self, yaml_file_path, output_file_path):
-        self.yaml_file_path = yaml_file_path
-        self.output_file_path = output_file_path
-
-    def convert(self):
-        with open(self.yaml_file_path, 'r') as yaml_file:
-            yaml_data = yaml.safe_load(yaml_file)
-
-        cfg_lines = self._generate_cfg_lines(yaml_data)
-
-        with open(self.output_file_path, 'w') as output_file:
-            output_file.write('\n'.join(cfg_lines))
-
-    def _generate_cfg_lines(self, yaml_data):
-        cfg_lines = []
-
-        for section_name, section_data in yaml_data.items():
-            cfg_lines.append(section_name + ':')
-
-            if isinstance(section_data, dict):
-                for key, value in section_data.items():
-                    if isinstance(value, list):
-                        cfg_lines.append(f"  {key}:")
-                        for item in value:
-                            cfg_lines.append(f"    - {item}")
-                    else:
-                        cfg_lines.append(f"  {key}: {value}")
-            elif isinstance(section_data, list):
-                for item in section_data:
-                    cfg_lines.append(f"  - {item}")
-
-            cfg_lines.append('')
-
-        return cfg_lines
-
-# Example usage
-yaml_to_haproxy_converter = YAMLToHAProxyConverter('input.yaml', 'haproxy.cfg')
-yaml_to_haproxy_converter.convert()
-
-#####
-
-import yaml
 from docopt import docopt
 
 class YAMLToHAProxyConverter:
@@ -80,7 +36,7 @@ if __name__ == "__main__":
     YAML to HAProxy Converter
     
     Usage:
-      yaml_to_haproxy.py <input_yaml> <output_cfg>
+      yaml_to_haproxy.py INPUT_YAML OUTPUT_CFG
       yaml_to_haproxy.py -h | --help
       
     Options:
@@ -89,8 +45,8 @@ if __name__ == "__main__":
     
     arguments = docopt(usage)
     
-    input_yaml = arguments['<input_yaml>']
-    output_cfg = arguments['<output_cfg>']
+    input_yaml = arguments['INPUT_YAML']
+    output_cfg = arguments['OUTPUT_CFG']
     
     converter = YAMLToHAProxyConverter(input_yaml, output_cfg)
     converter.convert()
@@ -122,3 +78,4 @@ if __name__ == "__main__":
 
       frontend http_front:
         bind: *
+    """

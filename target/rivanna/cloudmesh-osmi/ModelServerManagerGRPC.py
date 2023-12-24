@@ -1,15 +1,15 @@
 """TensorFlow Model Server Manager with gRPC.
 
 Usage:
-  ModelServerManagerGRPC.py [--server_url=<url>] [--port=<port>] [--gpus=<gpu_fractions>] [--log_file=<log_path>]
+  ModelServerManagerGRPC.py [--server_url=URL] [--port=PORT] [--gpus=GPU_FRACTIONS] [--log_file=LOG_PATH]
   ModelServerManagerGRPC.py (-h | --help)
 
 Options:
-  --server_url=<url>      TensorFlow Model Server URL [default: http://localhost:8501].
-  --port=<port>           Port number for the gRPC server [default: 50051].
-  --gpus=<gpu_fractions>  GPU fractions separated by commas [default: 0.0].
-  --log_file=<log_path>   Path to the log file [default: server_log.txt].
-  -h --help               Show this help message and exit.
+  --server_url=URL      TensorFlow Model Server URL [default: http://localhost:8501].
+  --port=PORT           Port number for the gRPC server [default: 50051].
+  --gpus=GPU_FRACTIONS  GPU fractions separated by commas [default: 0.0].
+  --log_file=LOG_PATH   Path to the log file [default: server_log.txt].
+  -h --help             Show this help message and exit.
 """
 
 import grpc

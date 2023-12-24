@@ -1,17 +1,17 @@
 """TensorFlow Model Server Manager with HTTP.
 
 Usage:
-  ModelServerManagerHTTP.py [--server_url=<url>] [--port=<port>] [--model_name=<name>] [--model_path=<path>] [--gpus=<gpu_fractions>] [--log_file=<log_path>]
+  ModelServerManagerHTTP.py [--server_url=URL] [--port=PORT] [--model_name=NAME] [--model_path=PATH] [--gpus=GPU_FRACTIONS] [--log_file=LOG_PATH]
   ModelServerManagerHTTP.py (-h | --help)
 
 Options:
-  --server_url=<url>      TensorFlow Model Server URL [default: http://localhost:8501/v1/models].
-  --port=<port>           Port number for the HTTP server [default: 50051].
-  --model_name=<name>     Model name [default: my_model].
-  --model_path=<path>     Path to the model directory [default: /path/to/your/model].
-  --gpus=<gpu_fractions>  GPU fractions separated by commas [default: 0.0].
-  --log_file=<log_path>   Path to the log file [default: server_log.txt].
-  -h --help               Show this help message and exit.
+  --server_url=URL      TensorFlow Model Server URL [default: http://localhost:8501/v1/models].
+  --port=PORT           Port number for the HTTP server [default: 50051].
+  --model_name=NAME     Model name [default: my_model].
+  --model_path=PATH     Path to the model directory [default: /path/to/your/model].
+  --gpus=GPU_FRACTIONS  GPU fractions separated by commas [default: 0.0].
+  --log_file=LOG_PATH   Path to the log file [default: server_log.txt].
+  -h --help             Show this help message and exit.
 """
 
 import subprocess

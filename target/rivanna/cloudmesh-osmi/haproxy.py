@@ -2,15 +2,15 @@
 Manage HAProxy operations.
 
 Usage:
-    haproxy_manager.py start <config_file>
+    haproxy_manager.py start CONFIG_FILE
     haproxy_manager.py stop
     haproxy_manager.py status
-    haproxy_manager.py wait <config_file> [--timeout=<timeout>] [--interval=<interval>]
+    haproxy_manager.py wait CONFIG_FILE [--timeout=TIMEOUT] [--interval=INTERVAL]
 
 Options:
-    <config_file>    Path to HAProxy configuration file.
-    --timeout=<timeout>   Maximum time to wait for HAProxy to start [default: 60].
-    --interval=<interval> Time interval between status checks [default: 5].
+    CONFIG_FILE         Path to HAProxy configuration file.
+    --timeout=TIMEOUT   Maximum time to wait for HAProxy to start [default: 60].
+    --interval=INTERVAL Time interval between status checks [default: 5].
 """
 
 import subprocess
@@ -99,12 +99,12 @@ if __name__ == "__main__":
     haproxy_manager = HAProxyManager()
 
     if arguments["start"]:
-        haproxy_manager.start(arguments["<config_file>"])
+        haproxy_manager.start(arguments["CONFIG_FILE"])
     elif arguments["stop"]:
         haproxy_manager.stop()
     elif arguments["status"]:
         haproxy_manager.status()
     elif arguments["wait"]:
-        haproxy_manager.wait_for_start(arguments["<config_file>"],
+        haproxy_manager.wait_for_start(arguments["CONFIG_FILE"],
                                        timeout=int(arguments["--timeout"]),
                                        interval=int(arguments["--interval"]))
