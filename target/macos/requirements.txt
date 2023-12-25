@@ -7,5 +7,7 @@ docopt
 smartredis==0.5.0
 tensorflow
 tensorflow-serving-api
-cloudmesh-common==4.4.1
+#cloudmesh-common==4.4.1
+#cloudmesh-common
+cloudmesh-ee
 tqdm

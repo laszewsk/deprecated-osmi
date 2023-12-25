@@ -70,7 +70,7 @@ macOS>
   export OSMI=$(OSMI_HOME)/
   git clone https://github.com/laszewsk/osmi.git
   cd osmi
-  pip install -r target/ubuntu/requirements-ubuntu.txt
+  pip install -r target/macos/requirements.txt
 ```
 
 Third, we run the experiments

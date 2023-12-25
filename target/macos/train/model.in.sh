@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+
+PROJECT_DIR=../../../../..
+MODELS_DIR=$PROJECT_DIR/models
+
+RESULT_DIR=`pwd`
+
+
+# PYTHON_DIR=~OSMI
+# source $PYTHON_DIR/bin/activate
+
+echo "PROJECT_ID: {identifier}"
+echo "MODELS_DIR: $MODELS_DIR"
+echo "MODEL: {experiment.model}"
+
+cd $MODELS_DIR
+time python train.py {experiment.model} > $RESULT_DIR/log.txt 2>&1
+
