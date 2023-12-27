@@ -25,33 +25,33 @@ requirements:
 # PROJECT MANAGEMENT
 # #####################################################################
 
-project: clean project_slurm generate
+project: project_slurm generate
 
 #setup:
 #	python setup_env_and_yaml.py
 #	source ~/ENV3/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/rivanna/requirements.txt
 
-generate: project-jobs-sh.sh
+generate: project-jobs-slurm.sh
 
 run: submit
 
 submit:
-	-sh project-jobs-sh.sh
+	-sh project-jobs-slurm.sh
 
 project_slurm:
 	cms ee generate \
-	           --source=model.in.slurm \
-	           --config=config.in.yaml \
-	           --name=project \
-	           --noos \
-	           --os=USER,HOME \
-		   --nocm \
-	           --output_dir=./project \
-                   --source_dir=. \
+	        --source=model.in.slurm \
+	        --config=config.in.yaml \
+	        --name=project \
+	        --noos \
+	        --os=USER,HOME \
+		   	--nocm \
+	        --output_dir=./project \
+            --source_dir=. \
 		   --verbose 
 			   # \
 			   # --copycode="models.py"
-	cms ee generate submit --name=project --job_type=sh > project-jobs-sh.sh
+	cms ee generate submit --name=project --job_type=slurm > project-jobs-slurm.sh
 	cms ee list
 
 

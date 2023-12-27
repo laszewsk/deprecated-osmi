@@ -13,15 +13,22 @@
 PROJECT_DIR=../../../../..
 MODELS_DIR=$PROJECT_DIR/models
 
+export USER_SCRATCH=/scratch/$USER
+# export USER_LOCALSCRATCH=/localscratch/$USER
+# export BASE=$USER_SCRATCH
+# export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
+# export PROJECT=$BASE/osmi
+# export EXEC_DIR=$PROJECT/target/rivanna
+
+
 RESULT_DIR=`pwd`
 
 module purge
-module load apptainer gcc/11.2.0 openmpi/4.1.4 python/3.11.1
-
+module load gcc/11.4.0  openmpi/4.1.4 python/3.11.4
 #
 # change this to OSMI venv as documented
 #
-source $USER_PROJECT/ENV3/bin/activate
+source $USER_SCRATCH/ENV3/bin/activate
 
 # PYTHON_DIR=~OSMI
 # source $PYTHON_DIR/bin/activate
