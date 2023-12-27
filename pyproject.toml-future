@@ -40,5 +40,5 @@ Issues = "https://github.com/laszewsk/osmi/issues"
 Changelog = "https://github.com/laszewsk/osmi/blob/main/CHANGELOG.md"
 
 # [tool.setuptools.packages.find]
-# where = ["src/"]
+# where = ["src"]
 # include = ["cloudmesh.bar", "cloudmesh.bar.*"]
