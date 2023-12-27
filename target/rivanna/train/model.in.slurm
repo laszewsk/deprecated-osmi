@@ -15,6 +15,13 @@ MODELS_DIR=$PROJECT_DIR/models
 
 RESULT_DIR=`pwd`
 
+module purge
+module load apptainer gcc/11.2.0 openmpi/4.1.4 python/3.11.1
+
+#
+# change this to OSMI venv as documented
+#
+source $USER_PROJECT/ENV3/bin/activate
 
 # PYTHON_DIR=~OSMI
 # source $PYTHON_DIR/bin/activate

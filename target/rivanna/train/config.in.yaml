@@ -33,7 +33,6 @@ submission:
   platform: rivanna
   accelerators_per_node: 1
 
-
 experiment:
   model: "small_lstm,medium_cnn,large_tcnn"
   directive: "a100"
@@ -51,7 +50,7 @@ other:
   cpu_num: 1
   mem: "64GB"
 
-identifier: "{experiment.directive}_{experiment.model}{experiment.repeat}"
+identifier: "{experiment.directive}_{experiment.model}-{experiment.repeat}"
 
 system:
   host: "rivanna"
