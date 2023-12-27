@@ -8,7 +8,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=64GB
 #SBATCH --cpus-per-task=1
-#SBATCH --time=10:00
+#SBATCH --time={ee.time}
 
 PROGRESS() {
     echo "# ###############################################"
@@ -18,8 +18,10 @@ PROGRESS() {
 
 PROGRESS "running" "configure" 1
 
-PROJECT_DIR=../../../../..
-MODELS_DIR=$PROJECT_DIR/models
+#PROJECT_DIR=../../../../..
+#MODELS_DIR=$PROJECT_DIR/models
+
+MODELS_DIR=./models
 
 export USER_SCRATCH=/scratch/$USER
 # export USER_LOCALSCRATCH=/localscratch/$USER

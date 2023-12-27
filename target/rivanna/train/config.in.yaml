@@ -18,7 +18,7 @@
 name: osmi-training
 
 ee:
-  time: "10:00:00"
+  time: "30:00"
 
 submission:
   benchmark: {name}
@@ -34,13 +34,13 @@ submission:
   accelerators_per_node: 1
 
 experiment:
+  # model: "small_lstm"
+  # directive: "v100"
+  # repeat: "1"
   model: "small_lstm,medium_cnn,large_tcnn"
-  #model: "small_lstm"
-  directive: "a100,v100"
-  #directive: "v100"
-  #directive: "a100,a100-dgx,v100"
-  #repeat: "1"
+  directive: "a100,a100-dgx,v100"
   repeat: "1,2,3,4,5,6,7,8,9,10"
+  
 
 other:
   #epoch: "1"

@@ -48,9 +48,8 @@ project_slurm:
 		   	--nocm \
 	        --output_dir=./project \
             --source_dir=. \
-		   --verbose 
-			   # \
-			   # --copycode="models.py"
+		    --verbose \
+			--copycode="../../../models"
 	cms ee generate submit --name=project --job_type=slurm > project-jobs-slurm.sh
 	cms ee list
 
