@@ -25,7 +25,7 @@ requirements:
 # PROJECT MANAGEMENT
 # #####################################################################
 
-project: clean project_sh generate
+project: clean project_slurm generate
 
 #setup:
 #	python setup_env_and_yaml.py
@@ -37,23 +37,23 @@ run: submit
 
 submit:
 	-sh project-jobs-sh.sh
-	
-project_sh:
+
+project_slurm:
 	cms ee generate \
-	           --source=model.in.sh \
+	           --source=model.in.slurm \
 	           --config=config.in.yaml \
 	           --name=project \
 	           --noos \
 	           --os=USER,HOME \
-		       --nocm \
+		   --nocm \
 	           --output_dir=./project \
-               --source_dir=. \
-		       --verbose 
+                   --source_dir=. \
+		   --verbose 
 			   # \
 			   # --copycode="models.py"
 	cms ee generate submit --name=project --job_type=sh > project-jobs-sh.sh
 	cms ee list
-	
+
 
 kill: stop
 
