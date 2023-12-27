@@ -10,6 +10,14 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --time=10:00
 
+PROGRESS() {
+    echo "# ###############################################"
+    echo "# cloudmesh status=$1 progress=$2 msg=$3 pid=$$"
+    echo "# ###############################################"
+}
+
+PROGRESS "running" "configure" 1
+
 PROJECT_DIR=../../../../..
 MODELS_DIR=$PROJECT_DIR/models
 
@@ -38,6 +46,10 @@ echo "MODELS_DIR: $MODELS_DIR"
 echo "MODEL: {experiment.model}"
 echo "REPEAT: {experiment.repeat}"
 
+PROGRESS "running" "training" 2
+
 cd $MODELS_DIR
-time python train.py {experiment.model} > $RESULT_DIR/log.txt 2>&1
+time python train.py {experiment.model}
+
+PROGRESS "completed" "done" 100
 
