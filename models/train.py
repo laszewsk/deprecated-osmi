@@ -27,7 +27,7 @@ from tensorflow.keras import layers
 from cloudmesh.common.StopWatch import StopWatch
 from cloudmesh.common.util import banner
 from cloudmesh.common.debug import VERBOSE
-
+import tensorflow as tf
 
 StopWatch.start("total")
 
@@ -58,6 +58,12 @@ event = {
     "output_shape": output_shape
 }
 StopWatch.event("configuration", event)
+
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+StopWatch.event("tensorflow", {"version": tf.__version__})
+StopWatch.event("gpus", {"gpus": len(physical_devices)})
+
+
 
 StopWatch.start("core")
 
