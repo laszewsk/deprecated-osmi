@@ -1,3 +1,4 @@
 docopt
 tensorflow
+tensorflow-metal
 cloudmesh-common==4.4.1
