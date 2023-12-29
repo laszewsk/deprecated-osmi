@@ -3,15 +3,13 @@
 
 PROJECT_DIR=../../../../..
 
-
-#MODELS_DIR=$PROJECT_DIR/models
 MODELS_DIR=./models
 
 
 RESULT_DIR=`pwd`
 
 
-# PYTHON_DIR=~OSMI
+# PYTHON_DIR=~/OSMI
 # source $PYTHON_DIR/bin/activate
 echo "============================================================"
 echo "PROJECT_ID: {identifier}"

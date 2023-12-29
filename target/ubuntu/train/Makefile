@@ -2,17 +2,21 @@ NAME=osmi
 
 SHELL=/bin/bash
 
-OS_TYPE=macos
+OS_TYPE=ubuntu
 OS_DIR=..
 PROJECT_DIR=../..
 
 .PHONY: image-apptainer image-docker project
 
 benchmark:
+	-make clean
 	-make project
 	-make run  
 
 all: requirements data
+
+test: clean project_sh generate submit
+	cat project/*/*.out
 
 # #####################################################################
 # REQUIREMENTS
@@ -25,7 +29,7 @@ requirements:
 # PROJECT MANAGEMENT
 # #####################################################################
 
-project: clean project_sh generate
+project: project_sh generate
 
 #setup:
 #	python setup_env_and_yaml.py
@@ -48,9 +52,8 @@ project_sh:
 		       --nocm \
 	           --output_dir=./project \
                --source_dir=. \
-		       --verbose 
-			   # \
-			   # --copycode="models.py"
+		       --verbose \
+			   --copycode="../../../models"
 	cms ee generate submit --name=project --job_type=sh > project-jobs-sh.sh
 	cms ee list
 	
@@ -85,66 +88,18 @@ get-results:
 # APPTAINER IMAGE BUILD
 # #####################################################################
 
-clean-images:
-	@-rm -rf image-apptainer/*.sif
-
-images: image
-
-image: image-haproxy image-osmi image-tfs
-
-image-haproxy: # image-apptainer/haproxy_latest.sif
-	-cd image-apptainer; time apptainer pull docker://haproxy
-
-image-serving: # image-apptainer/serving_latest-gpu.sif
-	-cd image-apptainer; time apptainer pull docker://tensorflow/serving:latest-gpu
+WORKDIR := $(shell pwd)
 
 
-image-osmi: # image-apptainer/osmi.sif
-	-cd image-apptainer; apptainer build osmi.sif osmi.def
-
-# broken?
-image-tfs: # image-apptainer/tfs.sif
-	-cd image-apptainer; time apptainer build tfs.sif tfs.def
-
-# broken?
-image-combined: # image-apptainer/combined.sif
-	-cd image-apptainer; apptainer build combined.sif combined.def
+docker-image:
+	cd ../image-docker/train; docker build -t "osmi_train:latest" .
 
 
-# #####################################################################
-# APPTAINER IMAGE SHELL
-# #####################################################################
 
-shell:
-	apptainer ${BIND} shell --nv ${IMAGE}
+image-osmi: docker image
 
-shell-serving:
-	apptainer ${BIND} shell --nv image-apptainer/serving.sif
-
-# #####################################################################
-# THESE ARE NOT YET DONE AND JUST PLACEHOLDERS
-# #####################################################################
-
-# run-osmi:
-# 	# cd image-apptainer; make run
-
-
-run-apptainer:
-	cd image-apptainer; make run
-
-shell-apptainer:
-	cd image-apptainer; make shell
-
-run-localscratch:
-	cd image-apptainer; make run-localscratch
-
-shell-localscratch:
-	cd image-apptainer; make shell-localscratch
-
-shell-rivanna:
-	cd image-apptainer; make shell-rivanna
-
-run: run-apptainer
+docker-shell:
+	docker run -it --gpus=all --mount type=bind,source=${WORKDIR}/project,target=/workspace/project osmi_train bash
 
 # #####################################################################
 # THESE COMMANDS ARE ONLY FOR GREGOR

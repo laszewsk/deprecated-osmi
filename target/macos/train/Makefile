@@ -25,7 +25,7 @@ requirements:
 # PROJECT MANAGEMENT
 # #####################################################################
 
-project: clean project_sh generate
+project: project_sh generate
 
 #setup:
 #	python setup_env_and_yaml.py
