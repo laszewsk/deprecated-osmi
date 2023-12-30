@@ -851,13 +851,17 @@ summit>
 5. Initial notes to be deleted, Nate:
    <https://docs.google.com/document/d/1luDAAatx6ZD_9-gM5HZZLcvglLuk_OqswzAS2n_5rNA>
 
-6. Gregor von Laszewski, J.P. Fleischer, Cloudmesh VPN, <https://github.com/cloudmesh/cloudmesh-vpn>
+6. Gregor von Laszewski, J.P. Fleischer, Cloudmesh VPN, 
+   <https://github.com/cloudmesh/cloudmesh-vpn>
 
-7. Gregor von Laszewski, Cloudmesh Rivanna, <https://github.com/cloudmesh/cloudmesh-rivanna>
+7. Gregor von Laszewski, Cloudmesh Rivanna, 
+   <https://github.com/cloudmesh/cloudmesh-rivanna>
 
-8. Gregor von Laszewski, Cloudmesh Common, <https://github.com/cloudmesh/cloudmesh-common>
+8. Gregor von Laszewski, Cloudmesh Common, 
+   <https://github.com/cloudmesh/cloudmesh-common>
 
-9. Gregor von Laszewski, Cloudmesh Experiment Executor, <https://github.com/cloudmesh/cloudmesh-ee>
+9. Gregor von Laszewski, Cloudmesh Experiment Executor, 
+   <https://github.com/cloudmesh/cloudmesh-ee>
 
 10.  Gregor von Laszewski, J.P. Fleischer, Geoffrey C. Fox, Juri Papay,
     Sam Jackson, Jeyan Thiyagalingam (2023).  Templated Hybrid
@@ -871,4 +875,4 @@ summit>
     enhancing MLCommons efforts while leveraging insights from
     educational MLCommons earthquake benchmarks efforts. Frontiers in
     High Performance Computing.
-	<https://doi.org/10.3389/fhpcp.2023.1233877>
+	  <https://doi.org/10.3389/fhpcp.2023.1233877>
