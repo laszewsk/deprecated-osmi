@@ -47,7 +47,9 @@
     - [3.2 Running OSMI Bench on maltlab](#32-running-osmi-bench-on-maltlab)
     - [3.3 Set up a project directory and get the code](#33-set-up-a-project-directory-and-get-the-code)
     - [3.4 Running the small OSMI model benchmark](#34-running-the-small-osmi-model-benchmark)
-    - [3.5 TODO: Install tensorflow serving in ubuntu](#35-todo-install-tensorflow-serving-in-ubuntu)
+    - [3.5 Build Tensorflow Serving, Haproxy, and OSMI Images](#35-build-tensorflow-serving-haproxy-and-osmi-images)
+    - [3.6 Compile OSMI Models in Batch Jobs](#36-compile-osmi-models-in-batch-jobs)
+    - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor-1)
   - [1. Running OSMI Bench on a local Windows WSL](#1-running-osmi-bench-on-a-local-windows-wsl)
     - [Create python virtual environment on WSL Ubuntu](#create-python-virtual-environment-on-wsl-ubuntu)
     - [Get the code](#get-the-code)
@@ -576,28 +578,84 @@ You now have the code in `$PROJECT`
 ### 3.4 Running the small OSMI model benchmark
 
 ```bash
-ubuntu>
+maltlab>
   cd models
   time python train.py small_lstm  # ~   4.9s on an 5950X with RTX3090
   time python train.py medium_cnn  # ~  34.0s on an 5950X with RTX3090
   time python train.py large_tcnn  # ~ 16m58s on an 5950X with RTX3090
 ```
 
-### 3.5 TODO: Install tensorflow serving in ubuntu
+Now we consider using slurm and batch ee execution
 
-This documentation is unclear and not tested:
 
-> Unclear. the documentation do this with singularity, I do have
-> singularity on desktop, but can we use it natively and compare with
-> singularity performance?
+```bash
+maltlab>
+  cd $EXEC_DIR
+  
+  python3.11 -m venv $BASE/ENV3 # takes about 5.2s
+  source $BASE/ENV3/bin/activate
+  pip install pip -U
+  time pip install -r $EXEC_DIR/requirements.txt # takes about 1m21s
+  cms help
+```
 
-> ```
-> echo "deb [arch=amd64] http://storage.googleapis.com/tensorflow-serving-apt stable tensorflow-model-server tensorflow-model-server-universal" | sudo tee /etc/apt/sources.list.d/tensorflow-serving.list
-> curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.release.pub.gpg | sudo apt-key add -
-> sudo apt-get update && sudo apt-get install tensorflow-model-server
-> which tensorflow_model_server
->make image
-> ```
+### 3.5 Build Tensorflow Serving, Haproxy, and OSMI Images
+
+We created convenient singularity images for tensorflow serving,
+haproxy, and the code to be executed. This is done with
+
+
+```
+maltlab>
+  cd $EXEC_DIR
+  make images
+```
+
+
+### 3.6 Compile OSMI Models in Batch Jobs
+
+To run some of the test jobs to run a model and see if things work you
+can use the commands
+
+```
+maltlab>
+  cd $EXEC_DIR
+  sbatch train-small.slurm  #    26.8s on a100_80GB, bi_fox_dgx
+  sbatch train-medium.slurm #    33.5s on a100_80GB, bi_fox_dgx
+  sbatch train-large.slurm  # 1m  8.3s on a100_80GB, bi_fox_dgx
+```
+
+### Run benchmark with cloudmesh experiment executor
+
+Set parameters in config.in.yaml
+
+```
+experiment:
+  # different gpus require different directives
+  directive: "a100,v100"
+  # batch size
+  batch: "1,2,4,8,16,32,64,128"
+  # number of gpus
+  ngpus: "1,2,3,4"
+  # number of concurrent clients
+  concurrency: "1,2,4,8,16"
+  # models
+  model: "small_lstm,medium_cnn,large_tcnn"
+  # number of repetitions of each experiment
+  repeat: "1,2,3,4"
+```
+
+To run many different jobs that are created based on config.in.slurm
+You can use the following
+
+```
+maltlab>
+  cd $EXEC_DIR
+  make project
+  sh project-jobs.sh
+```
+
+The results will be stored in a projects directory.
 
 <!-- end jp -->
 
