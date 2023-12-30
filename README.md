@@ -24,6 +24,8 @@
   - [Other Repos](#other-repos)
   - [Authors](#authors)
   - [Table of contents](#table-of-contents)
+  - [1. Running OSMI Bench on macOS natively](#1-running-osmi-bench-on-macos-natively)
+    - [1.1 Install and run training](#11-install-and-run-training)
   - [1. Running OSMI Bench on Ubuntu natively](#1-running-osmi-bench-on-ubuntu-natively)
     - [1.1 Create python virtual environment on Ubuntu](#11-create-python-virtual-environment-on-ubuntu)
     - [1.2 Get the code](#12-get-the-code)
@@ -40,16 +42,25 @@
     - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor)
     - [Graphing Results](#graphing-results)
     - [Compile OSMI Models in Interactive Jobs (avpid using)](#compile-osmi-models-in-interactive-jobs-avpid-using)
+  - [3. Running on UFL MALTLab](#3-running-on-ufl-maltlab)
+    - [3.1 Logging into MALTLab](#31-logging-into-maltlab)
+    - [3.2 Running OSMI Bench on maltlab](#32-running-osmi-bench-on-maltlab)
+    - [3.3 Set up a project directory and get the code](#33-set-up-a-project-directory-and-get-the-code)
+    - [3.4 Running the small OSMI model benchmark](#34-running-the-small-osmi-model-benchmark)
+    - [3.5 Build Tensorflow Serving, Haproxy, and OSMI Images](#35-build-tensorflow-serving-haproxy-and-osmi-images)
+    - [3.6 Compile OSMI Models in Batch Jobs](#36-compile-osmi-models-in-batch-jobs)
+    - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor-1)
   - [1. Running OSMI Bench on a local Windows WSL](#1-running-osmi-bench-on-a-local-windows-wsl)
     - [Create python virtual environment on WSL Ubuntu](#create-python-virtual-environment-on-wsl-ubuntu)
     - [Get the code](#get-the-code)
+  - [Summit Instructions](#summit-instructions)
   - [References](#references)
 
 ## 1. Running OSMI Bench on macOS natively
 
-### 1.1 INstall and run training
+### 1.1 Install and run training
 
-To install and run training on macOS we donduct three steps
+To install and run training on macOS we conduct three steps
 
 First, we install a version of python that is compatible with tensorflow 
 and smartredis
@@ -67,7 +78,7 @@ Second, We check out the code in a OSMI_HOME directory
 macOS>
   mkdir ./osmi
   export OSMI_HOME=$(realpath "./osmi")
-  export OSMI=$(OSMI_HOME)/
+  export OSMI=$OSMI_HOME
   git clone https://github.com/laszewsk/osmi.git
   cd osmi
   pip install -r target/macos/requirements.txt
@@ -79,8 +90,8 @@ Third, we run the experiments
 ```bash
 macOS>
   cd models
-  time python train.py small_lstm  # ~   3.2s on an M1 Max  10 core 64GB
-  time python train.py medium_cnn  # ~  13.9s on an M1 Max 10 core 64GB
+  time python train.py small_lstm  # ~   3.2s on an M1 Max  10 core 64GB and 8.7s on an i5 1135g7
+  time python train.py medium_cnn  # ~  13.9s on an M1 Max 10 core 64GB and 20.27s on an i5 1135g7
   time python train.py large_tcnn  # ~ 298.0s on an M1 Max 10 core 64GB 
                                    #   4m 58s
 ```
@@ -443,6 +454,210 @@ node>
 
 For this application there is no separate data
 
+
+## 3. Running on UFL MALTLab
+
+### 3.1 Logging into MALTLab
+
+The easiest way to log into maltlab is to use ssh.
+
+Best is to also install cloudmesh-vpn on your
+local machine, so that login and management of the machine is
+simplified
+
+```bash
+local>
+  python -m venv ~/ENV3
+
+  # windows
+  source ~/ENV3/Scripts/activate
+  # other os
+  source ~/ENV3/bin/activate
+
+  pip install cloudmesh-vpn
+```
+
+In case you have set up the vpn client correctly you can now activate
+it from the terminal including gitbash on windows. If this does not
+work, you can alternatively just use the cisco vpn gu client and ssh
+to one of biheads.
+
+In case you followed our documentation you will be able to say
+
+
+```bash
+local>
+  cms vpn connect --service=ufl
+  # you need to set up maltlab.cise.ufl.edu in your ~/.ssh/config.
+  ssh maltlab
+```
+
+Furthermore we assume that you have the code also checked out on your
+laptop as we use this to sync later on the results created with the
+super computer.
+
+
+```bash
+local>
+  mkdir ~/github
+  cd ~/github
+  git clone https://github.com/laszewsk/osmi.git
+  cd osmi
+```
+
+To have the same environment variables to access the code on maltlab
+we introduce
+
+```bash
+local>
+  # you probably have a different username :)
+  export USER=jpf
+
+  export USER_SCRATCH=/mnt/hdd/$USER/scratch
+  # export USER_LOCALSCRATCH=/localscratch/$USER
+  export BASE=$USER_SCRATCH
+  export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
+  export PROJECT=$BASE/osmi
+  export EXEC_DIR=$PROJECT/target/maltlab
+```
+
+This will come in handy when we rsync the results.
+Now you are logged in on maltlab.
+
+
+### 3.2 Running OSMI Bench on maltlab
+
+To run the OSMI benchmark, you will first need to generate the project
+directory with the code.
+
+
+<!-- This allows you access to the directory
+```/project/bii_dsc_community```-->
+
+
+We will set up OSMI in the /home/$USER/scratch directory.
+
+### 3.3 Set up a project directory and get the code
+
+<!-- To get the code we clone a gitlab instance that is hosted at -->
+<!-- Oakridge National Laboratory -->
+<!-- (<https://code.ornl.gov/whb/osmi-bench>). -->
+
+
+First you need to create the directory. The following steps simplify
+it and make the instalation uniform.
+
+
+<!--
+b1>
+  export USER_PROJECT=/project/bii_dsc_community/$USER
+  export BASE=$USER_PROJECT
+-->
+
+```bash
+maltlab>
+  # you probably have a different username :)
+  export USER=jpf
+
+  export USER_SCRATCH=/mnt/hdd/$USER/scratch
+  # export USER_LOCALSCRATCH=/localscratch/$USER
+  export BASE=$USER_SCRATCH
+  export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
+  export PROJECT=$BASE/osmi
+  export EXEC_DIR=$PROJECT/target/maltlab
+
+  mkdir -p $BASE
+  cd $BASE
+  git clone https://github.com/laszewsk/osmi.git
+  cd osmi
+  git checkout training
+```
+
+You now have the code in `$PROJECT`
+
+### 3.4 Running the small OSMI model benchmark
+
+```bash
+maltlab>
+  cd models
+  time python train.py small_lstm  # ~   4.9s on an 5950X with RTX3090
+  time python train.py medium_cnn  # ~  34.0s on an 5950X with RTX3090
+  time python train.py large_tcnn  # ~ 16m58s on an 5950X with RTX3090
+```
+
+Now we consider using slurm and batch ee execution
+
+
+```bash
+maltlab>
+  cd $EXEC_DIR
+  
+  python3.11 -m venv $BASE/ENV3 # takes about 5.2s
+  source $BASE/ENV3/bin/activate
+  pip install pip -U
+  time pip install -r $EXEC_DIR/requirements.txt # takes about 1m21s
+  cms help
+```
+
+### 3.5 Build Tensorflow Serving, Haproxy, and OSMI Images
+
+We created convenient singularity images for tensorflow serving,
+haproxy, and the code to be executed. This is done with
+
+
+```
+maltlab>
+  cd $EXEC_DIR
+  make images
+```
+
+
+### 3.6 Compile OSMI Models in Batch Jobs
+
+To run some of the test jobs to run a model and see if things work you
+can use the commands
+
+```
+maltlab>
+  cd $EXEC_DIR
+  sbatch train-small.slurm  #    26.8s on a100_80GB, bi_fox_dgx
+  sbatch train-medium.slurm #    33.5s on a100_80GB, bi_fox_dgx
+  sbatch train-large.slurm  # 1m  8.3s on a100_80GB, bi_fox_dgx
+```
+
+### Run benchmark with cloudmesh experiment executor
+
+Set parameters in config.in.yaml
+
+```
+experiment:
+  # different gpus require different directives
+  directive: "a100,v100"
+  # batch size
+  batch: "1,2,4,8,16,32,64,128"
+  # number of gpus
+  ngpus: "1,2,3,4"
+  # number of concurrent clients
+  concurrency: "1,2,4,8,16"
+  # models
+  model: "small_lstm,medium_cnn,large_tcnn"
+  # number of repetitions of each experiment
+  repeat: "1,2,3,4"
+```
+
+To run many different jobs that are created based on config.in.slurm
+You can use the following
+
+```
+maltlab>
+  cd $EXEC_DIR
+  make project
+  sh project-jobs.sh
+```
+
+The results will be stored in a projects directory.
+
+<!-- end jp -->
 
 
 ## 1. Running OSMI Bench on a local Windows WSL
