@@ -14,8 +14,6 @@
 
 # slurm.sbatch
 # #SBATCH --gres=gpu:a100:1
-# #SBATCH --partition=gpu
-# #SBATCH --account=bii_dsc_community
 # #SBATCH --mem-per-gpu={ee.mem_per_gpu}
 
 

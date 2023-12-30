@@ -50,22 +50,22 @@ simple:
                --source_dir=. \
                --verbose
 	
-# project.json: config.in.yaml
-# 	cms ee generate \
-# 	           --source=osmi.in.slurm \
-# 	           --config=config.in.yaml \
-# 	           --name=project \
-# 	           --noos \
-# 	           --os=USER,HOME \
-# 		       --nocm \
-# 	           --output_dir=./project \
-#                --source_dir=. \
-# 		       --verbose \
-# 			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
-# 	cms ee list
+project_json: config.in.yaml
+	cms ee generate \
+	           --source=osmi.in.slurm \
+	           --config=config.in.yaml \
+	           --name=project \
+	           --noos \
+	           --os=USER,HOME \
+		       --nocm \
+	           --output_dir=./project \
+               --source_dir=. \
+		       --verbose \
+			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
+	cms ee list
 
-# project-jobs.sh: project.json
-# 	cms ee generate submit --name=project  > project-jobs.sh
+project-jobs.sh: project.json
+	cms ee generate submit --name=project  > project-jobs.sh
 
 project_sh: project.json
 	cms ee generate \
@@ -125,7 +125,7 @@ inspect:
 watch: status
 
 status:
-	watch squeue --format=\"%.18i %.9P %.50j %.8u %.8T %.10M %.9l %.6D %R\" --me
+	watch squeue --format=\"%.18i %.9P %.50j %.8u %.8T %.10M %.9l %.6D %R\"
 
 clean:
 	@-rm -rf project project.json jobs-project.sh
@@ -150,18 +150,26 @@ images: image
 image: image-haproxy image-osmi image-tfs
 
 image-haproxy: # image-apptainer/haproxy_latest.sif
-	-cd image-apptainer; time apptainer pull docker://haproxy
+	-cd image-apptainer; \
+		export APPTAINER_CACHEDIR=$(realpath $(CURDIR)/../../../)/cache ; \
+		export APPTAINER_TMPDIR=$(realpath $(CURDIR)/../../../)/tmp ; \
+		time apptainer pull docker://haproxy
 
 image-serving: # image-apptainer/serving_latest-gpu.sif
 	-cd image-apptainer; time apptainer pull docker://tensorflow/serving:latest-gpu
 
-
 image-osmi: # image-apptainer/osmi.sif
-	-cd image-apptainer; apptainer build osmi.sif osmi.def
+	-cd image-apptainer; \
+		export APPTAINER_CACHEDIR=$(realpath $(CURDIR)/../../../)/cache ; \
+		export APPTAINER_TMPDIR=$(realpath $(CURDIR)/../../../)/tmp ; \
+		apptainer build osmi.sif osmi.def
 
 # broken?
 image-tfs: # image-apptainer/tfs.sif
-	-cd image-apptainer; time apptainer build tfs.sif tfs.def
+	-cd image-apptainer; \
+		export APPTAINER_CACHEDIR=$(realpath $(CURDIR)/../../../)/cache ; \
+		export APPTAINER_TMPDIR=$(realpath $(CURDIR)/../../../)/tmp ; \
+		time apptainer build tfs.sif tfs.def
 
 # broken?
 image-combined: # image-apptainer/combined.sif
@@ -212,4 +220,32 @@ push:
 	ssh -tt maltlab "cd /scratch/thf2bn/mlcommons/benchmarks/${NAME}; ssh-add; git pull"
 
 
+
+docker-run: build
+	docker run -d \
+		--name osmi \
+		-v "$(realpath $(CURDIR)/../../../):/scratch" \
+		--gpus all \
+		osmi tail -f /dev/null
+
+build:
+	docker build -t osmi .
+
+docker-shell:
+	docker exec -it `docker ps -aqf ancestor=osmi | head -n 1` /bin/bash
+
+down:
+	@CONTAINERS=$$(docker ps -q -f ancestor=osmi); \
+	if [ -n "$$CONTAINERS" ]; then \
+		for container in $$CONTAINERS; do \
+			echo "Stopping container: $$container"; \
+			docker stop $$container; \
+			echo "Removing container: $$container"; \
+			docker rm $$container; \
+		done; \
+	else \
+		echo "No containers to stop or remove."; \
+	fi
+	# docker stop `docker ps -aqf ancestor=osmi | head -n 1`
+	# docker rm `docker ps -aqf ancestor=osmi | head -n 1`
 

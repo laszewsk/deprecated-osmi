@@ -2,14 +2,10 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --time=00:30:00
-#SBATCH --partition=bii-gpu
-#SBATCH --account=bii_dsc_community
-#SBATCH --gres=gpu:a100:1
+#SBATCH --gres=gpu:rtx_titan:1
 #SBATCH --job-name=small-train-osmi
 #SBATCH --output=small-train-osmi-%u-%j.out
 #SBATCH --error=small-train-osmi-%u-%j.err
-#SBATCH --reservation=bi_fox_dgx
-#SBATCH --constraint=a100_80gb
 
 if [ -z "$EXEC_DIR" ]; then
     echo "EXEC_DIR is not set"
