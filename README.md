@@ -838,34 +838,35 @@ summit>
    <https://ieeexplore.ieee.org/document/9652868> TODO: please ask
    wess what the free pdf link is all gov organizations have one. for
    example as ornl is coauther it must be on their site somewhere.
-   
 
-2. Using Rivanna for GPU ussage, Gregor von Laszewski, JP. Fleischer
+2. Wes Brewer, OSMI-bench, <https://code.ornl.gov/whb/osmi-bench>
+
+3. Using Rivanna for GPU ussage, Gregor von Laszewski, JP. Fleischer
    <https://github.com/cybertraining-dsc/reu2022/blob/main/project/hpc/rivanna-introduction.md>
 
-3. Setting up a Windows computer for research, Gregor von Laszewski,
+4. Setting up a Windows computer for research, Gregor von Laszewski,
    J.P Fleischer
    <https://github.com/cybertraining-dsc/reu2022/blob/main/project/windows-configuration.md>
    
-4. Initial notes to be deleted, Nate:
+5. Initial notes to be deleted, Nate:
    <https://docs.google.com/document/d/1luDAAatx6ZD_9-gM5HZZLcvglLuk_OqswzAS2n_5rNA>
 
-5. Gregor von Laszewski, J.P. Fleischer, Cloudmesh VPN, <https://github.com/cloudmesh/cloudmesh-vpn>
+6. Gregor von Laszewski, J.P. Fleischer, Cloudmesh VPN, <https://github.com/cloudmesh/cloudmesh-vpn>
 
-6. Gregor von Laszewski, Cloudmesh Rivanna, <https://github.com/cloudmesh/cloudmesh-rivanna>
+7. Gregor von Laszewski, Cloudmesh Rivanna, <https://github.com/cloudmesh/cloudmesh-rivanna>
 
-7. Gregor von Laszewski, Cloudmesh Common, <https://github.com/cloudmesh/cloudmesh-common>
+8. Gregor von Laszewski, Cloudmesh Common, <https://github.com/cloudmesh/cloudmesh-common>
 
-8. Gregor von Laszewski, Cloudmesh Experiment Executor, <https://github.com/cloudmesh/cloudmesh-ee>
+9. Gregor von Laszewski, Cloudmesh Experiment Executor, <https://github.com/cloudmesh/cloudmesh-ee>
 
-9.  Gregor von Laszewski, J.P. Fleischer, Geoffrey C. Fox, Juri Papay,
+10.  Gregor von Laszewski, J.P. Fleischer, Geoffrey C. Fox, Juri Papay,
     Sam Jackson, Jeyan Thiyagalingam (2023).  Templated Hybrid
     Reusable Computational Analytics Workflow Management with
     Cloudmesh, Applied to the Deep Learning MLCommons Cloudmask
     Application. eScience'23.
     <https://github.com/cyberaide/paper-cloudmesh-cc-ieee-5-pages/raw/main/vonLaszewski-cloudmesh-cc.pdf>, 2023.
 
-10. Gregor von Laszewski, J.P. Fleischer, R. Knuuti, G.C. Fox,
+11. Gregor von Laszewski, J.P. Fleischer, R. Knuuti, G.C. Fox,
     J. Kolessar, T.S. Butler, J. Fox (2023). Opportunities for
     enhancing MLCommons efforts while leveraging insights from
     educational MLCommons earthquake benchmarks efforts. Frontiers in
