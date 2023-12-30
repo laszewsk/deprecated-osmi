@@ -1,0 +1,17 @@
+Bootstrap: docker
+From: ubuntu:latest
+
+%post
+    apt-get update
+    apt-get install -y haproxy python3-pip
+    pip3 install docopt
+
+%runscript
+    python3 ./cloudmesh-osmi/haproxy_manager.py start /etc/haproxy/haproxy.cfg
+    python3 ./cloudmesh-osmi/haproxy_manager.py wait /etc/haproxy/haproxy.cfg
+
+%appenv myapp
+    export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+%environment
+    export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"

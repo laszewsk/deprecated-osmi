@@ -1,0 +1,29 @@
+config:
+    server: "localhost"
+    gpu: "V100-SXM2-32GB"
+    batch: [1,2,4,8,16,32,64,128,256,512,1024] #[16, 64, 128]
+    nrequests: [1024] #[25,50,100]
+    ngpus: [2] # [1,2,4,6]
+    concurrency: [1,2,4] # [1,2,4,6]
+    ports: [8500]
+    model: ["small_lstm"] # ["small_lstm","medium_cnn","large_tcnn"]
+# config:
+#     server: "localhost"
+#     gpu: "V100-SXM2-32GB"
+#     batch: [1,2,4,8,16,32,64,128,256,512,1024]
+#     nrequests: [1,2,4,8,16,32,64,128,256,512,1024]
+#     ngpus: [1,2,4,6,8,10,12,14]
+#     concurrency: [1,2,4,6,8,10,12,14]
+#     ports: [8500]
+#     model: ["small_lstm","medium_cnn","large_tcnn"]
+
+submission:
+    benchmark: osmi
+    submitter: Gregor von Laszewski
+    email: laszewski@gmail.com
+    org: University of Virginia
+    division: closed
+    version: mlcommons-osmi-v1.0
+    github_commit_version: TBD #write a program for
+    status: completed
+    platform: rivanna
