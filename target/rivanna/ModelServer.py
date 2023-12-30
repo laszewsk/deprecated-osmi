@@ -2,12 +2,12 @@
 Usage:
   ModelServer.py start_and_wait [--config=CONFIG]
                                 [--port=PORT]
-                                [-ngpus=<NGPUS]
+                                [--ngpus=<NGPUS]
                                 [--output_dir=OUTPUT_DIR]
                                 [--tfs_sif=TFS_SIF]
   ModelServer.py start [--config=CONFIG]
                        [--port=PORT]
-                       [-ngpus=<NGPUS]
+                       [--ngpus=<NGPUS]
                        [--output_dir=OUTPUT_DIR]
                        [--tfs_sif=TFS_SIF]
   ModelServer.py wait [---config=CONFIG]
@@ -107,7 +107,7 @@ class ModelServer:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         return sock.connect_ex(('127.0.0.1', port)) == 0
 
-    def wait_for_server(sel, wait_time=0.5):
+    def wait_for_server(self, wait_time=0.5):
         """
         Waits for the model server to start up.
 

@@ -162,14 +162,14 @@ image-osmi: # image-apptainer/osmi.sif
 	-cd image-apptainer; \
 		export APPTAINER_CACHEDIR=$(realpath $(CURDIR)/../../../)/cache ; \
 		export APPTAINER_TMPDIR=$(realpath $(CURDIR)/../../../)/tmp ; \
-		apptainer build osmi.sif osmi.def
+		apptainer build --force osmi.sif osmi.def
 
 # broken?
 image-tfs: # image-apptainer/tfs.sif
 	-cd image-apptainer; \
 		export APPTAINER_CACHEDIR=$(realpath $(CURDIR)/../../../)/cache ; \
 		export APPTAINER_TMPDIR=$(realpath $(CURDIR)/../../../)/tmp ; \
-		time apptainer build tfs.sif tfs.def
+		time apptainer build --force tfs.sif tfs.def
 
 # broken?
 image-combined: # image-apptainer/combined.sif
@@ -219,7 +219,7 @@ push:
 	-git push
 	ssh -tt maltlab "cd /scratch/thf2bn/mlcommons/benchmarks/${NAME}; ssh-add; git pull"
 
-
+# jp
 
 docker-run: build
 	docker run -d \

@@ -21,7 +21,8 @@ Options:
 from cloudmesh.common.util import banner
 from cloudmesh.common.FlatDict import FlatDict
 from docopt import docopt
-from port_generator import unique_base_port
+# from port_generator import unique_base_port
+from cloudmesh.common.network import PortGenerator
 from textwrap import dedent
 
 def generate_haproxy_cfg(config):
@@ -35,7 +36,8 @@ def generate_haproxy_cfg(config):
     None
   """
   
-  port = unique_base_port(config)
+  p = PortGenerator(config['constant.haproxy_port'])
+  port = p.get_port()
   base = dedent(f'''
     global
       tune.ssl.default-dh-param 1024
@@ -53,7 +55,7 @@ def generate_haproxy_cfg(config):
     backend be_grpc
       mode tcp
       balance roundrobin
-  ''').strip
+  ''').strip()
   with open(config["data.haproxy_cfg_file"], 'w+') as f:
     f.write(base)
     for i in range(config["experiment.ngpus"]):

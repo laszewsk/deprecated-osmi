@@ -52,7 +52,7 @@ experiment:
   ngpus: "1"
   # concurrency: "1,2,4,8,16"
   concurrency: "1"
-  model: "small_lstm,medium_cnn,large_tcnn"
+  # model: "small_lstm,medium_cnn,large_tcnn"
   model: "small_lstm"
   #repeat: "1,2"
   repeat: "1,2"
@@ -85,15 +85,15 @@ constant:
   timeout: 45
 
 project:
-  user: "/scratch/{os.USER}"
+  user: "/mnt/hdd/{os.USER}/scratch"
   dir: "{project.user}/osmi"
 
 # this is a bug we should be able to use project.dir, it does not show properly in the slurm script
 data:
   output: "./outputs"
-  sif_dir: "{project.dir}/target/rivanna/image-singularity"
+  sif_dir: "{project.dir}/target/maltlab/image-apptainer"
   haproxy_sif: "{data.sif_dir}/haproxy_latest.sif"
-  tfs_sif: "{data.sif_dir}/serving_latest-gpu.sif"
+  tfs_sif: "{data.sif_dir}/tfs.sif"
   osmi_sif: "{data.sif_dir}/osmi.sif"
   haproxy_cfg_file: haproxy-grpc.cfg
 

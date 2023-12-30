@@ -2,14 +2,10 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --time=01:00:00
-#SBATCH --partition=bii-gpu
-#SBATCH --account=bii_dsc_community
-#SBATCH --gres=gpu:a100:1
+#SBATCH --gres=gpu:rtx_titan:1
 #SBATCH --job-name=medium-train-osmi
 #SBATCH --output=train-medium-osmi-%u-%j.out
 #SBATCH --error=train-osmi-medium-%u-%j.err
-#SBATCH --reservation=bi_fox_dgx
-#SBATCH --constraint=a100_80gb
 
 if [ -z "$EXEC_DIR" ]; then
     echo "EXEC_DIR is not set"
@@ -17,8 +13,8 @@ if [ -z "$EXEC_DIR" ]; then
 fi
 export CONTAINER_DIR=$EXEC_DIR/image-apptainer/
 
-module purge
-module load apptainer
+# module purge
+# module load apptainer
 # module load tensorflow/2.10.0 gcc openmpi python
 
 nvidia-smi
