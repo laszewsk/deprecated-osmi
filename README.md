@@ -37,7 +37,8 @@
     - [2.3 Set up a project directory and get the code](#23-set-up-a-project-directory-and-get-the-code)
     - [2.4 Set up Python Environment](#24-set-up-python-environment)
     - [2.5 Build Tensorflow Serving, Haproxy, and OSMI Images](#25-build-tensorflow-serving-haproxy-and-osmi-images)
-    - [2.6 Compile OSMI Models in Batch Jobs](#26-compile-osmi-models-in-batch-jobs)
+    - [2.6 Compile OSMI Models in Batch Jobs and create a single run](#26-compile-osmi-models-in-batch-jobs-and-create-a-single-run)
+    - [2.7 Compile OSMI Models in Batch Jobs and create a multiple runs](#27-compile-osmi-models-in-batch-jobs-and-create-a-multiple-runs)
       - [GREGOR CAME TILL HERE](#gregor-came-till-here)
     - [Test Run to see if it works](#test-run-to-see-if-it-works)
     - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor)
@@ -227,7 +228,7 @@ local>
   export BASE=$USER_SCRATCH
   export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
   export PROJECT=$BASE/osmi
-  export EXEC_DIR=$PROJECT/target/rivanna
+  export OSMI_TARGET=$PROJECT/target/rivanna
 ```
 
 This will come in handy when we rsync the results.
@@ -251,60 +252,32 @@ it and make the instalation uniform.
 
 ```bash
 b1>
-  export USER_SCRATCH=/scratch/$USER
-  export USER_LOCALSCRATCH=/localscratch/$USER
-  export BASE=$USER_SCRATCH
-  export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
-  export PROJECT=$BASE/osmi
-  export EXEC_DIR=$PROJECT/target/rivanna
-
-  mkdir -p $BASE
-  cd $BASE
+  cd /scratch/$USER
   git clone https://github.com/laszewsk/osmi.git
   cd osmi
   # next line is temporary and once merged we will use main 
   git checkout training 
+  cd target/rivanna
+  source env.sh
 ```
 
-You now have the code in `$PROJECT`
+You now have therepo in 
 
+* `$OSMI_PROJECT` 
+
+and the specific rivanna code in 
+
+* `$OSMI_TARGET` 
+ 
 
 ### 2.4 Set up Python Environment
 
-<!-- Note: This is no longer working -->
-
-<!-- > OSMI will run in batch mode this is also valid for setting up the
-> environment for which we created sbatch script.  This has the
-> advantage that it installed via the worker nodes, which is typically
-> faster, but also gurantees that the worker node itself is ued to
-> install it to avoid software incompatibilities.
->
-> ```
-> b1>
->  cd $EXEC_DIR
->  sbatch environment.slurm
->  # (this may take a while)
->  source $BASE/ENV3/bin/activate
-> ```
->
-> See: [environment.slurm](https://github.com/laszewsk/osmi/blob/main/target/rivanna/environment.slurm)
-
-Note: currently we recommend this way:
-
-An alternate way is to run the following commands directly: -->
-
-Now we set up a python envioonment with all necessary software. 
+Now we set up a python environment with all necessary software. 
 
 ```bash
 b1>
-  cd $EXEC_DIR
-  module load gcc/11.4.0  openmpi/4.1.4 python/3.11.4
-  source $BASE/OSMI/bin/activate
-  which python
-  python --version
-  time python -m venv $BASE/OSMI # takes about 5.6s
-  pip install pip -U
-  time pip install -r $EXEC_DIR/requirements.txt # takes about 2m57s
+  cd $OSMI_TARGET
+  time pip install -r requirements.txt # takes about 1m13s
   cms help
 ```
 
@@ -318,24 +291,38 @@ haproxy, and the code to be executed. This is done with
 
 ```
 b1>
-  cd $EXEC_DIR
+  cd $OSMI_TARGET
   module load apptainer
   time make images      # 4m56s 
 ```
 
 
-### 2.6 Compile OSMI Models in Batch Jobs
+### 2.6 Compile OSMI Models in Batch Jobs and create a single run
 
 To run some of the test jobs to run a model and see if things work you
 can use the commands
 
 ```
 b1>
-  cd $EXEC_DIR
+  cd $OSMI_TARGET
+  rm *.err *.out # in case you like to remove previous runs
   sbatch train-small.slurm  #    10.0s on A100-SXM4-80GB, a100_80GB, bi_fox_dgx
   sbatch train-medium.slurm #    16.5s on A100-SXM4-80GB, a100_80GB, bi_fox_dgx
   sbatch train-large.slurm  #    51.1s on A100-SXM4-80GB, a100_80GB, bi_fox_dgx
 ```
+
+### 2.7 Compile OSMI Models in Batch Jobs and create a multiple runs
+
+```
+b1>
+  make clean-models 
+  cd train
+  make project
+  sh project-jobs-slurm.sh
+```
+
+The results will be in the project dir and its subdirectories.
+
 
 
 #### GREGOR CAME TILL HERE 
@@ -355,12 +342,14 @@ experiment:
   repeat: "1,2"
 ```
 
-Now run 
+You can do thi ssimply by copying a sample file and running it 
+
 
 ```
 b1>
-  cd $EXEC_DIR
-  make project-gpu
+  cd $OSMI_TARGET
+  cp config.in.yaml-small config.in.yaml 
+  make project_slurm
   sh jobs-project-gpu.sh
 ```
 
@@ -389,7 +378,7 @@ You can use the following
 
 ```
 b1>
-  cd $EXEC_DIR
+  cd $OSMI_TARGET
   make project-gpu
   sh jobs-project-gpu.sh
 ```
@@ -404,9 +393,9 @@ computer and use a jupyter notebook.
 ```
 local>
   cd ~/github/osmi/target/rivanna
-  du -h rivanna:$EXEC_DIR/project-gpu
+  du -h rivanna:$OSMI_TARGET/project-gpu
   // figure out if you have enough space for this project on the local machine
-  rsync rivanna:$EXEC_DIR/project-gpu ./project-gpu
+  rsync rivanna:$OSMI_TARGET/project-gpu ./project-gpu
 ```
 
 Now we can analyse the data with 
@@ -524,7 +513,7 @@ local>
   export BASE=$USER_SCRATCH
   export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
   export PROJECT=$BASE/osmi
-  export EXEC_DIR=$PROJECT/target/maltlab
+  export OSMI_TARGET=$PROJECT/target/maltlab
 ```
 
 This will come in handy when we rsync the results.
@@ -550,7 +539,7 @@ maltlab>
   export BASE=$USER_SCRATCH
   export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
   export PROJECT=$BASE/osmi
-  export EXEC_DIR=$PROJECT/target/maltlab
+  export OSMI_TARGET=$PROJECT/target/maltlab
 
   mkdir -p $BASE
   cd $BASE
@@ -572,13 +561,13 @@ Now we set up a python envioonment with all necessary software.
 
 ```bash
 maltlab>
-  cd $EXEC_DIR
+  cd $OSMI_TARGET
   time python3.11 -m venv $BASE/OSMI # takes about 5.2s
   source $BASE/OSMI/bin/activate
   which python
   python --version
   pip install pip -U
-  time pip install -r $EXEC_DIR/requirements.txt # takes about 1m21s
+  time pip install -r $OSMI_TARGET/requirements.txt # takes about 1m21s
   cms help
 ```
 
@@ -593,7 +582,7 @@ haproxy, and the code to be executed. This is done with
 
 ```
 maltlab>
-  cd $EXEC_DIR
+  cd $OSMI_TARGET
   time make images
 ```
 
@@ -614,7 +603,7 @@ It is mandatory to run some tests to generate the models for batch use.
 
 ```
 maltlab>
-  cd $EXEC_DIR
+  cd $OSMI_TARGET
   sbatch train-small.slurm  # 1m 14.9s on maltlab's RTX TITAN
   sbatch train-medium.slurm # 1m 22.1s on maltlab's RTX TITAN
   sbatch train-large.slurm  # 2m 27.3s on maltlab's RTX TITAN
@@ -645,7 +634,7 @@ You can use the following
 
 ```
 maltlab>
-  cd $EXEC_DIR
+  cd $OSMI_TARGET
   make project
   sh project-jobs.sh
 ```

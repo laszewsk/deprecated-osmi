@@ -22,40 +22,21 @@ nvidia-smi
 
 PROGRESS "running" "configure" 2
 
-#PROJECT_DIR=../../../../..
-#MODELS_DIR=$PROJECT_DIR/models
-
 MODELS_DIR=./models
 
 export USER_SCRATCH=/scratch/$USER
-# export USER_LOCALSCRATCH=/localscratch/$USER
-# export BASE=$USER_SCRATCH
-# export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
-# export PROJECT=$BASE/osmi
-# export EXEC_DIR=$PROJECT/target/rivanna
 
 
 RESULT_DIR=`pwd`
 
-if [ -z "$EXEC_DIR" ]; then
-    echo "EXEC_DIR is not set"
+if [ -z "$OSMI_TARGET" ]; then
+    echo "OSMI_TARGET is not set"
     exit 1
 fi
-export CONTAINER_DIR=$EXEC_DIR/image-apptainer/
+export CONTAINER_DIR=$OSMI_TARGET/images/
 
 module purge
 module load apptainer
-
-#module purge
-#module load gcc/11.4.0  openmpi/4.1.4 python/3.11.4
-#module load apptainer/1.2.2 tensorflow/2.13.0
-#
-# change this to OSMI venv as documented
-#
-#source $USER_SCRATCH/ENV3/bin/activate
-
-# PYTHON_DIR=~OSMI
-# source $PYTHON_DIR/bin/activate
 
 MODEL={experiment.model}
 CONTAINER=$CONTAINER_DIR/osmi.sif
@@ -72,9 +53,7 @@ cd $MODELS_DIR
 
 time apptainer exec --nv $CONTAINER python train.py $MODEL
 
-# apptainer run --nv $CONTAINER_DIR/osmi.sif python train.py {experiment.model}
-
-# time python train.py {experiment.model}
-
 PROGRESS "completed" "done" 100
 
+#tr -cd '\11\12\15\40-\176' < $OUTPUT > tmp-output
+#mv tmp-output $OUTPUT

@@ -106,7 +106,7 @@ simple:
 # 	cms ee generate submit --name=project --job_type=sh > project-jobs-sh.sh
 # 	cms ee list
 	
-project_slurm: project.json
+project_slurm: 
 	cms ee generate \
 	           --source=osmi.in.slurm \
 	           --config=config.in.yaml \
@@ -121,7 +121,7 @@ project_slurm: project.json
 	cms ee generate submit --name=project --job_type=sbatch > project-jobs-slurm.sh
 	cms ee list
 
-project_lsf: project.json
+project_lsf:
 	cms ee generate \
 	           --source=osmi.in.lsf \
 	           --config=config.in.yaml \
@@ -162,6 +162,14 @@ PROJECT_USER=/scratch/tma5gv
 get-results:
 	-rsync -av --progress ${MACHINE}:${PROJECT_USER}/${NAME}/target/${MACHINE}/project .
 
+
+# #####################################################################
+# CLEAN MODELS
+# #####################################################################
+
+clean-models:
+	cd ../../models; make clean
+	
 # #####################################################################
 # APPTAINER IMAGE BUILD
 # #####################################################################
@@ -211,9 +219,6 @@ shell-serving:
 
 run-apptainer:
 	cd images; make run
-
-shell-apptainer:
-	cd images; make shell
 
 run-localscratch:
 	cd images; make run-localscratch
