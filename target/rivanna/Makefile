@@ -171,20 +171,16 @@ clean-images:
 
 images: image
 
-image: image-haproxy image-osmi image-tfs
-
-
-# export APPTAINER_CACHEDIR=$(realpath $(CURDIR)/../../../)/cache ; \
-# export APPTAINER_TMPDIR=$(realpath $(CURDIR)/../../../)/tmp ; \
+image: image-osmi image-tfs image-haproxy 
 
 image-haproxy: # images /haproxy_latest.sif
-	-cd images; time apptainer pull docker://haproxy
+	-cd images; apptainer pull docker://haproxy
 
 image-serving: # images/serving_latest-gpu.sif
-	-cd images; time apptainer pull docker://tensorflow/serving:latest-gpu
+	-cd images; apptainer pull docker://tensorflow/serving:latest-gpu
 
 image-osmi: # images/osmi.sif
-	-cd images; apptainer build --force osmi.sif osmi.def
+	-cd images; time apptainer build --force osmi.sif osmi.def
 
 # broken?
 image-tfs: # images/tfs.sif
@@ -192,7 +188,7 @@ image-tfs: # images/tfs.sif
 
 # broken?
 image-combined: # images/combined.sif
-	-cd images; apptainer build --force combined.sif combined.def
+	-cd images; time apptainer build --force combined.sif combined.def
 
 
 # #####################################################################
@@ -225,7 +221,7 @@ run-localscratch:
 shell-localscratch:
 	cd images; make shell-localscratch
 
-shell:
+shell-apptainer:
 	cd images; make shell
 
 run: run-apptainer

@@ -319,7 +319,7 @@ haproxy, and the code to be executed. This is done with
 b1>
   cd $EXEC_DIR
   module load apptainer
-  time make images      # 3m18s 
+  time make images      # 4m56s 
 ```
 
 
@@ -331,9 +331,9 @@ can use the commands
 ```
 b1>
   cd $EXEC_DIR
-  sbatch train-small.slurm  #    26.8s on a100_80GB, bi_fox_dgx
-  sbatch train-medium.slurm #    33.5s on a100_80GB, bi_fox_dgx
-  sbatch train-large.slurm  # 1m  8.3s on a100_80GB, bi_fox_dgx
+  sbatch train-small.slurm  #    10.0s on A100-SXM4-80GB, a100_80GB, bi_fox_dgx
+  sbatch train-medium.slurm #    16.5s on A100-SXM4-80GB, a100_80GB, bi_fox_dgx
+  sbatch train-large.slurm  #    51.1s on A100-SXM4-80GB, a100_80GB, bi_fox_dgx
 ```
 
 
