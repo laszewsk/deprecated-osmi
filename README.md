@@ -50,6 +50,7 @@
     - [3.5 Build Tensorflow Serving, Haproxy, and OSMI Images](#35-build-tensorflow-serving-haproxy-and-osmi-images)
     - [3.6 Compile OSMI Models in Batch Jobs](#36-compile-osmi-models-in-batch-jobs)
     - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor-1)
+      - [Quick redo](#quick-redo)
   - [1. Running OSMI Bench on a local Windows WSL](#1-running-osmi-bench-on-a-local-windows-wsl)
     - [Create python virtual environment on WSL Ubuntu](#create-python-virtual-environment-on-wsl-ubuntu)
     - [Get the code](#get-the-code)
@@ -597,6 +598,9 @@ maltlab>
   pip install pip -U
   time pip install -r $EXEC_DIR/requirements.txt # takes about 1m21s
   cms help
+  # you may need to pip uninstall cloudmesh-common -y
+  # and then run the time pip install command again
+  # because we use the git committed common not the pypi
 ```
 
 ### 3.5 Build Tensorflow Serving, Haproxy, and OSMI Images
@@ -614,15 +618,14 @@ maltlab>
 
 ### 3.6 Compile OSMI Models in Batch Jobs
 
-To run some of the test jobs to run a model and see if things work you
-can use the commands
+It is mandatory to run some tests to generate the models for batch use.
 
 ```
 maltlab>
   cd $EXEC_DIR
-  sbatch train-small.slurm  #    26.8s on a100_80GB, bi_fox_dgx
-  sbatch train-medium.slurm #    33.5s on a100_80GB, bi_fox_dgx
-  sbatch train-large.slurm  # 1m  8.3s on a100_80GB, bi_fox_dgx
+  sbatch train-small.slurm  # 1m 14.9s on maltlab's RTX TITAN
+  sbatch train-medium.slurm # 1m 22.1s on maltlab's RTX TITAN
+  sbatch train-large.slurm  # 2m 27.3s on maltlab's RTX TITAN
 ```
 
 ### Run benchmark with cloudmesh experiment executor
@@ -656,6 +659,10 @@ maltlab>
 ```
 
 The results will be stored in a projects directory.
+
+#### Quick redo
+
+If this becomes tiring and you would like a quick way to end all SLURM jobs and remake the batch slurm script and run it for debugging purposes, just use `make omega`
 
 <!-- end jp -->
 
