@@ -43,7 +43,7 @@ benchmark:
   platform: rivanna
 
 experiment:
-  directive: "a100"
+  directive: "a100-dgx"
   batch: "1,2"  
   ngpus: "1"
   concurrency: "1"

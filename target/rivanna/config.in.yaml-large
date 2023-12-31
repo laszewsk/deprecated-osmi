@@ -64,7 +64,7 @@ experiment:
 #   repeat: "1"
 
 # experiment:
-#   directive: "a100,v100,rtx2080" #nate
+#   directive: "a100-dgx,a100,v100,rtx2080" #nate
 #   batch: "2"
 #   ngpus: "1"
 #   concurrency: "1"

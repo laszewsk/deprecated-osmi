@@ -44,18 +44,16 @@ requirements:
 # PROJECT MANAGEMENT
 # #####################################################################
 
-project: clean project_json generate
+project: clean project_slurm
 
 #setup:
 #	python setup_env_and_yaml.py
 #	source ~/OSMI/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/${MACHINE}/requirements.txt
 
-generate: project-jobs.sh
-
 run: submit
 
 submit:
-	-sh project-jobs.sh
+	-sh project-jobs-slurm.sh
 
 localscratch: localscratch_json
 
@@ -105,6 +103,14 @@ simple:
 # 			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
 # 	cms ee generate submit --name=project --job_type=sh > project-jobs-sh.sh
 # 	cms ee list
+
+small:
+	rm -rf project
+	cd ${OSMI_TARGET} ; \
+	cp config.in.yaml-small config.in.yaml; \
+	make project_slurm 
+
+#sh jobs-project-gpu.sh
 	
 project_slurm: 
 	cms ee generate \
