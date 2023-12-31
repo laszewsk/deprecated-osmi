@@ -34,6 +34,7 @@ from cloudmesh.common.FlatDict import FlatDict
 from cloudmesh.common.Shell import Shell
 from docopt import docopt
 from port_generator import unique_base_port
+from cloudmesh.common.util import banner
 # from cloudmesh.common.network import PortGenerator
 
 from haproxy_cfg_generator import generate_haproxy_cfg
@@ -76,7 +77,7 @@ class HAProxyLoadBalancer:
         print(command)
         r = Shell.run(command)
         print(r)
-        print('that was the shell.run ^')
+        banner('Shell.run completed')
 
     def shutdown(self):
         """

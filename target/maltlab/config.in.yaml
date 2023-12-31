@@ -91,7 +91,7 @@ project:
 # this is a bug we should be able to use project.dir, it does not show properly in the slurm script
 data:
   output: "./outputs"
-  sif_dir: "{project.dir}/target/maltlab/image-apptainer"
+  sif_dir: "{project.dir}/target/maltlab/images"
   haproxy_sif: "{data.sif_dir}/haproxy_latest.sif"
   tfs_sif: "{data.sif_dir}/tfs.sif"
   osmi_sif: "{data.sif_dir}/osmi.sif"

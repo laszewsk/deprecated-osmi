@@ -235,40 +235,19 @@ Now you are logged in on  frontend node to rivanna.
 
 ### 2.2 Running OSMI Bench on rivanna
 
+We assume you are in the LINUX group
+`bii_dsc_community`, 
+
 To run the OSMI benchmark, you will first need to generate the project
-directory with the code. We assume you are in the group
-`bii_dsc_community`, and
-
-SOME OTHERS MISSING COPY FROM OUR DOCUMENTATION
-
-so you can create singularity images on rivanna.
-
-
-<!-- This allows you access to the directory
-```/project/bii_dsc_community```-->
-
-As well as the slurm partitions `gpu` and `bii_gpu`
-
-We will set up OSMI in the /scratch/$USER directory.
+directory with the code. 
 
 ### 2.3 Set up a project directory and get the code
-
-<!-- To get the code we clone a gitlab instance that is hosted at -->
-<!-- Oakridge National Laboratory -->
-<!-- (<https://code.ornl.gov/whb/osmi-bench>). -->
 
 
 First you need to create the directory. The following steps simplify
 it and make the instalation uniform.
 
-
-<!--
-b1>
-  export USER_PROJECT=/project/bii_dsc_community/$USER
-  export BASE=$USER_PROJECT
--->
-
-```
+```bash
 b1>
   export USER_SCRATCH=/scratch/$USER
   export USER_LOCALSCRATCH=/localscratch/$USER
@@ -281,6 +260,8 @@ b1>
   cd $BASE
   git clone https://github.com/laszewsk/osmi.git
   cd osmi
+  # next line is temporary and once merged we will use main 
+  git checkout training 
 ```
 
 You now have the code in `$PROJECT`
@@ -316,8 +297,8 @@ b1>
   module load gcc/11.4.0  openmpi/4.1.4 python/3.11.4
   which python
   python --version
-  python -m venv $BASE/ENV3 # takes about 5.2s
-  source $BASE/ENV3/bin/activate
+  python -m venv $BASE/OSMI # takes about 5.2s
+  source $BASE/OSMI/bin/activate
   pip install pip -U
   time pip install -r $EXEC_DIR/requirements.txt # takes about 1m21s
   cms help
@@ -468,13 +449,12 @@ simplified
 
 ```bash
 local>
-  python -m venv ~/ENV3
+  python -m venv ~/OSMI
 
   # windows
-  source ~/ENV3/Scripts/activate
-  # other os
-  source ~/ENV3/bin/activate
-
+  # source ~/OSMI/Scripts/activate
+  source ~/OSMI/bin/activate
+  pip install pip -U
   pip install cloudmesh-vpn
 ```
 
@@ -511,11 +491,7 @@ we introduce
 
 ```bash
 local>
-  # you probably have a different username :)
-  export USER=jpf
-
   export USER_SCRATCH=/mnt/hdd/$USER/scratch
-  # export USER_LOCALSCRATCH=/localscratch/$USER
   export BASE=$USER_SCRATCH
   export CLOUDMESH_CONFIG_DIR=$BASE/.cloudmesh
   export PROJECT=$BASE/osmi
@@ -532,34 +508,14 @@ To run the OSMI benchmark, you will first need to generate the project
 directory with the code.
 
 
-<!-- This allows you access to the directory
-```/project/bii_dsc_community```-->
-
-
-We will set up OSMI in the /home/$USER/scratch directory.
-
 ### 3.3 Set up a project directory and get the code
-
-<!-- To get the code we clone a gitlab instance that is hosted at -->
-<!-- Oakridge National Laboratory -->
-<!-- (<https://code.ornl.gov/whb/osmi-bench>). -->
-
 
 First you need to create the directory. The following steps simplify
 it and make the instalation uniform.
 
 
-<!--
-b1>
-  export USER_PROJECT=/project/bii_dsc_community/$USER
-  export BASE=$USER_PROJECT
--->
-
 ```bash
 maltlab>
-  # you probably have a different username :)
-  export USER=jpf
-
   export USER_SCRATCH=/mnt/hdd/$USER/scratch
   # export USER_LOCALSCRATCH=/localscratch/$USER
   export BASE=$USER_SCRATCH
@@ -571,6 +527,8 @@ maltlab>
   cd $BASE
   git clone https://github.com/laszewsk/osmi.git
   cd osmi
+  # next line is temporary and once merged we will use main 
+
   git checkout training
 ```
 

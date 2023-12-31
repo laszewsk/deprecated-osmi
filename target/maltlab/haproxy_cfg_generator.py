@@ -39,7 +39,7 @@ def generate_haproxy_cfg(config):
   # p = PortGenerator(config['constant.haproxy_port'])
   # port = p.get_port()
   port = unique_base_port(config)
-  print('so what port did you come up with', port, 'oh ok')
+  print(f'Port number: {port}')
   base = dedent(f'''
     global
       tune.ssl.default-dh-param 1024

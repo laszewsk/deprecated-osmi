@@ -74,7 +74,7 @@ head /proc/meminfo
 module purge
 module load apptainer gcc/11.2.0 openmpi/4.1.4 python/3.11.1
 
-source $USER_PROJECT/ENV3/bin/activate
+source $USER_PROJECT/OSMI/bin/activate
 
 for gpu in $(seq 0 {experiment.ngpus}); do
     cms gpu watch --gpu=$gpu --delay=0.5 --dense > $OUTPUT_DIR/gpu-0.log &

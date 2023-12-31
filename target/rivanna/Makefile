@@ -4,17 +4,41 @@ SHELL=/bin/bash
 #USER_SCRATCH=/scratch/${USER}
 #PROJECT_DIR=${USER_SCRATCH}/mlcommons/benchmarks/${NAME}
 #PROJECT_DATA=${USER_SCRATCH}/data
+MACHINE=rivanna
 
-.PHONY: image-apptainer image-docker project
+.PHONY: images image-docker project
 
 all: requirements data
+
+# #####################################################################
+# PROCESS MAAGEMENT
+# #####################################################################
+
+process_killer:
+	-pkill nvidia-smi
+	-pkill cms
+	-pkill haproxy
+
+everything: stop process_killer clean project run
+	@echo #####################################################################
+	@echo "Cool runner is DONE."
+	@echo #####################################################################
+
+#TODO
+hap:
+	# apptainer exec --bind `pwd`:/home --pwd /home ${USER_SCRATCH}/osmi/target/maltlab/images/haproxy_latest.sif haproxy -d -f haproxy-grpc.cfg > ./outputs/haproxy.log 2>&1 &
+	# apptainer shell
+	apptainer shell ${USER_SCRATCH}/osmi/target/maltlab/images/haproxy_latest.sif
+
+
+# thats it
 
 # #####################################################################
 # REQUIREMENTS
 # #####################################################################
 
 requirements:
-	time pip install -r ${PROJECT_DIR}/experiments/rivanna/requirements.txt
+	time pip install -r ${PROJECT_DIR}/experiments/${MACHINE}/requirements.txt
 
 # #####################################################################
 # PROJECT MANAGEMENT
@@ -24,7 +48,7 @@ project: clean project_json generate
 
 #setup:
 #	python setup_env_and_yaml.py
-#	source ~/ENV3/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/rivanna/requirements.txt
+#	source ~/OSMI/bin/activate && pip install -r /scratch/${USER}/mlcommons/benchmarks/${NAME}/experiments/${MACHINE}/requirements.txt
 
 generate: project-jobs.sh
 
@@ -50,9 +74,26 @@ simple:
                --source_dir=. \
                --verbose
 	
-# project.json: config.in.yaml
+# project_json: config.in.yaml
 # 	cms ee generate \
 # 	           --source=osmi.in.slurm \
+# 	           --config=config.in.yaml \
+# 	           --name=project \
+# 	           --noos \
+# 	           --os=USER,HOME \
+# 		       --nocm \
+# 	           --output_dir=./project \
+#              --source_dir=. \
+# 		       --verbose \
+# 			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
+# 	cms ee list
+
+# project-jobs.sh: project.json
+# 	cms ee generate submit --name=project  > project-jobs.sh
+
+# project_sh: project.json
+# 	cms ee generate \
+# 	           --source=osmi.in.sh \
 # 	           --config=config.in.yaml \
 # 	           --name=project \
 # 	           --noos \
@@ -62,25 +103,8 @@ simple:
 #                --source_dir=. \
 # 		       --verbose \
 # 			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
+# 	cms ee generate submit --name=project --job_type=sh > project-jobs-sh.sh
 # 	cms ee list
-
-# project-jobs.sh: project.json
-# 	cms ee generate submit --name=project  > project-jobs.sh
-
-project_sh: project.json
-	cms ee generate \
-	           --source=osmi.in.sh \
-	           --config=config.in.yaml \
-	           --name=project \
-	           --noos \
-	           --os=USER,HOME \
-		       --nocm \
-	           --output_dir=./project \
-               --source_dir=. \
-		       --verbose \
-			   --copycode="benchmark.py,haproxy-grpc.cfg,tfs_grpc_client.py,models.py,smi.py,LoadBalancer.py,ModelServer.py,yaml_to_conf.py,Client.py,osmi-bench.py,haproxy_cfg_generator.py,port_generator.py"
-	cms ee generate submit --name=project --job_type=sh > project-jobs-sh.sh
-	cms ee list
 	
 project_slurm: project.json
 	cms ee generate \
@@ -115,7 +139,7 @@ project_lsf: project.json
 kill: stop
 
 stop:
-	for i in "$$(squeue --user $$USER | awk 'NR>1{print $$1}')"; do scancel $$i ; done
+	-for i in "$$(squeue --user $$USER | awk 'NR>1{print $$1}')"; do scancel $$i ; done
 
 inspect:
 	$(eval D=$(shell ls project/$(ls -1) | head -n 1))
@@ -125,7 +149,7 @@ inspect:
 watch: status
 
 status:
-	watch squeue --format=\"%.18i %.9P %.50j %.8u %.8T %.10M %.9l %.6D %R\" --me
+	watch squeue --format=\"%.18i %.9P %.50j %.8u %.8T %.10M %.9l %.6D %R\" -u ${USER}
 
 clean:
 	@-rm -rf project project.json jobs-project.sh
@@ -136,36 +160,39 @@ clean:
 PROJECT_USER=/scratch/tma5gv
 
 get-results:
-	-rsync -av --progress rivanna:${PROJECT_USER}/${NAME}/target/rivanna/project .
+	-rsync -av --progress ${MACHINE}:${PROJECT_USER}/${NAME}/target/${MACHINE}/project .
 
 # #####################################################################
 # APPTAINER IMAGE BUILD
 # #####################################################################
 
 clean-images:
-	@-rm -rf image-apptainer/*.sif
+	@-rm -rf images/*.sif
 
 images: image
 
 image: image-haproxy image-osmi image-tfs
 
-image-haproxy: # image-apptainer/haproxy_latest.sif
-	-cd image-apptainer; time apptainer pull docker://haproxy
 
-image-serving: # image-apptainer/serving_latest-gpu.sif
-	-cd image-apptainer; time apptainer pull docker://tensorflow/serving:latest-gpu
+# export APPTAINER_CACHEDIR=$(realpath $(CURDIR)/../../../)/cache ; \
+# export APPTAINER_TMPDIR=$(realpath $(CURDIR)/../../../)/tmp ; \
 
+image-haproxy: # images /haproxy_latest.sif
+	-cd images; time apptainer pull docker://haproxy
 
-image-osmi: # image-apptainer/osmi.sif
-	-cd image-apptainer; apptainer build osmi.sif osmi.def
+image-serving: # images/serving_latest-gpu.sif
+	-cd images; time apptainer pull docker://tensorflow/serving:latest-gpu
+
+image-osmi: # images/osmi.sif
+	-cd images; apptainer build --force osmi.sif osmi.def
 
 # broken?
-image-tfs: # image-apptainer/tfs.sif
-	-cd image-apptainer; time apptainer build tfs.sif tfs.def
+image-tfs: # images/tfs.sif
+	-cd images; time apptainer build --force tfs.sif tfs.def
 
 # broken?
-image-combined: # image-apptainer/combined.sif
-	-cd image-apptainer; apptainer build combined.sif combined.def
+image-combined: # images/combined.sif
+	-cd images; apptainer build --force combined.sif combined.def
 
 
 # #####################################################################
@@ -176,30 +203,30 @@ shell:
 	apptainer ${BIND} shell --nv ${IMAGE}
 
 shell-serving:
-	apptainer ${BIND} shell --nv image-apptainer/serving.sif
+	apptainer ${BIND} shell --nv images/serving.sif
 
 # #####################################################################
 # THESE ARE NOT YET DONE AND JUST PLACEHOLDERS
 # #####################################################################
 
 # run-osmi:
-# 	# cd image-apptainer; make run
+# 	# cd images; make run
 
 
 run-apptainer:
-	cd image-apptainer; make run
+	cd images; make run
 
 shell-apptainer:
-	cd image-apptainer; make shell
+	cd images; make shell
 
 run-localscratch:
-	cd image-apptainer; make run-localscratch
+	cd images; make run-localscratch
 
 shell-localscratch:
-	cd image-apptainer; make shell-localscratch
+	cd images; make shell-localscratch
 
-shell-rivanna:
-	cd image-apptainer; make shell-rivanna
+shell:
+	cd images; make shell
 
 run: run-apptainer
 
@@ -209,7 +236,37 @@ run: run-apptainer
 
 push:
 	-git push
-	ssh -tt rivanna "cd /scratch/thf2bn/mlcommons/benchmarks/${NAME}; ssh-add; git pull"
+	ssh -tt ${MACHINE} "cd /scratch/thf2bn/mlcommons/benchmarks/${NAME}; ssh-add; git pull"
 
+# #####################################################################
+# SOME DOCKER TESTING TARGETS. TODO CLEANUP
+# #####################################################################
 
+docker-run: build
+	docker run -d \
+		--name osmi \
+		-v "$(realpath $(CURDIR)/../../../):/scratch" \
+		--gpus all \
+		osmi tail -f /dev/null
+
+build:
+	docker build -t osmi .
+
+docker-shell:
+	docker exec -it `docker ps -aqf ancestor=osmi | head -n 1` /bin/bash
+
+down:
+	@CONTAINERS=$$(docker ps -q -f ancestor=osmi); \
+	if [ -n "$$CONTAINERS" ]; then \
+		for container in $$CONTAINERS; do \
+			echo "Stopping container: $$container"; \
+			docker stop $$container; \
+			echo "Removing container: $$container"; \
+			docker rm $$container; \
+		done; \
+	else \
+		echo "No containers to stop or remove."; \
+	fi
+	# docker stop `docker ps -aqf ancestor=osmi | head -n 1`
+	# docker rm `docker ps -aqf ancestor=osmi | head -n 1`
 

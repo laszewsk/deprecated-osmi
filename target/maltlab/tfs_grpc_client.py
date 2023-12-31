@@ -40,15 +40,15 @@ def stop(msg):
 
 start("total")
 hostport = args.server
-# if 'localhost' in hostport:
-    # hostport = hostport.replace('localhost', '127.0.0.1')
-# print('\n\n\nLETS SEE THE HOSTPORT!!!!!!!!!!!!!HAHAHAHAH')
+
+# FORCE SETTING THE PORT. THIS MAY BE A BUG AS hostport may not be properly set via argv
 hostport = 'localhost:8500'
 print(hostport)
 
 # Increase gRPC's default max limit of 4194304 (4MB)
 MAX_MESSAGE_LENGTH = 2147483647  # 2GB gRPC hard limit
 
+# add latency to start up grpc if we are too fast
 while True:
     try:
         # Add the 'grpc.enable_http_proxy' option
@@ -127,6 +127,7 @@ StopWatch.event("client result", {"latency": avg_inference_latency, "throughput"
 stop("total")
 StopWatch.benchmark()
 
+# TODO: write a results csv file, maybe put this also as stopwatch event
 write_header = True if not os.path.exists(args.outfile) else False
 
 with open(args.outfile, 'a+') as f:

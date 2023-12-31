@@ -31,8 +31,11 @@ import socket
 import time
 
 from cloudmesh.common.FlatDict import FlatDict
+from cloudmesh.common.Shell import Shell
 from docopt import docopt
 from port_generator import unique_base_port
+from cloudmesh.common.util import banner
+# from cloudmesh.common.network import PortGenerator
 
 from haproxy_cfg_generator import generate_haproxy_cfg
 
@@ -68,10 +71,11 @@ class HAProxyLoadBalancer:
             int: The return code of the executed command.
         """
         command = f"time {APPTAINER} {self.haproxy_sif} " \
-                  f"haproxy -d -f {self.haproxy_config_file} >& {self.output_dir}/haproxy.log &"
+                  f"haproxy -d -f {self.haproxy_config_file} > {self.output_dir}/haproxy.log 2>&1 &"
         print(command)
-        r = os.system(command)
+        r = Shell.run(command)
         print(r)
+        banner('Shell.run completed')
 
     def shutdown(self):
         """

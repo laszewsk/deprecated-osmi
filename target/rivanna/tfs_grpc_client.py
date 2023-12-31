@@ -40,12 +40,30 @@ def stop(msg):
 
 start("total")
 hostport = args.server
+
+# TODO: FORCE SETTING THE PORT. THIS MAY BE A BUG AS hostport may not be properly set via argv
+hostport = 'localhost:8500'
 print(hostport)
 
 # Increase gRPC's default max limit of 4194304 (4MB)
 MAX_MESSAGE_LENGTH = 2147483647  # 2GB gRPC hard limit
-channel = grpc.insecure_channel(hostport,
-                                options=[('grpc.max_receive_message_length', MAX_MESSAGE_LENGTH)])
+
+# add latency to start up grpc if we are too fast
+while True:
+    try:
+        # Add the 'grpc.enable_http_proxy' option
+        channel = grpc.insecure_channel(
+            hostport,
+            options=[
+                ('grpc.max_receive_message_length', MAX_MESSAGE_LENGTH),
+                ('grpc.enable_http_proxy', 0),
+            ]
+        )
+        break
+    except:
+        print('... too quick on the draw?')
+        time.sleep(2)
+
 stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
 
 # Model definitions
@@ -109,9 +127,10 @@ StopWatch.event("client result", {"latency": avg_inference_latency, "throughput"
 stop("total")
 StopWatch.benchmark()
 
-# write_header = True if not os.path.exists(args.outfile) else False
+# TODO: write a results csv file, maybe put this also as stopwatch event
+write_header = True if not os.path.exists(args.outfile) else False
 
-# with open(args.outfile, 'a+') as f:
-#     if write_header: f.write("# prg,batch size,elapse,avg_inf_latency,99% tail latency,throughput\n")
-#     f.write(f"tfs_grpc_client,{args.batch},{elapsed:.1f},{avg_inference_latency:.3f},"
-#     f"{np.percentile(times, 99):.3f},{1/avg_inference_latency:.1f}\n")
+with open(args.outfile, 'a+') as f:
+    if write_header: f.write("# prg,batch size,elapse,avg_inf_latency,99% tail latency,throughput\n")
+    f.write(f"tfs_grpc_client,{args.batch},{elapsed:.1f},{avg_inference_latency:.3f},"
+    f"{np.percentile(times, 99):.3f},{1/avg_inference_latency:.1f}\n")

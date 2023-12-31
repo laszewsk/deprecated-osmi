@@ -82,7 +82,10 @@ class OSMI:
         log_file = f"{self.output_dir}/log-{id}-{self.model}-{self.nrequests}-{self.batch}-{self.port:04d}.txt"
         cmd = f"time {SINGULARITY} {self.osmi_sif} "\
               f"python {self.algorithm} {self.server}:{self.port:04d} -m {self.model} -b {self.batch} -n {self.nrequests} --identifier {id} &> {log_file}"
+        
+        print(cmd)
         r = os.system(cmd)
+        print(r)
 
 if __name__ == "__main__":
     osmi = OSMI(config)

@@ -28,15 +28,19 @@ Options:
 
 from cloudmesh.common.FlatDict import FlatDict
 from cloudmesh.common.StopWatch import StopWatch
+from cloudmesh.common.Shell import Shell
 from yaml_to_conf import YamlToJsonConverter
-import os
+import subprocess
 import socket
 import time
 from docopt import docopt
 from pprint import pprint
 from port_generator import unique_base_port
+import os
+# from cloudmesh.common.network import PortGenerator
 
-APPTAINER = "apptainer exec --bind `pwd`:/home --pwd /home"
+
+# APPTAINER = []
 
 class ModelServer:
 
@@ -49,6 +53,8 @@ class ModelServer:
         - config_filename (str): Optional filename of the configuration file.
 
         """
+        # p = PortGenerator(config["constant.tfs_base_port"] - 1)
+        # self.tfs_base_port = p.get_port() + 1
         self.tfs_base_port = unique_base_port(config) + 1
         self.ngpus = config["experiment.ngpus"]
         self.output_dir = config["data.output"]
@@ -56,6 +62,9 @@ class ModelServer:
         self.tfs_sif = config["data.tfs_sif"]
         self.timeout = config["constant.timeout"]
         self.model_conf_file = self.convert_conf_to_json(config_filename)
+        self.MACHINE = "rivanna"
+
+
 
     def convert_conf_to_json(self, config_filename):
         """
@@ -77,15 +86,41 @@ class ModelServer:
             """
             
             StopWatch.event("ModelServer: start")
+            banner("LS")
+            result = subprocess.run('ls', shell=True, check=True, capture_output=True, text=True)
+            print(result.stdout)
+
+            banner("PWD")           
+            mypwd = subprocess.run('pwd', shell=True, check=True, capture_output=True, text=True)
+            mypwd = mypwd.stdout.strip()
+            print (mypwd)
+            
             for i in range(self.ngpus):
                 port = self.tfs_base_port + i
-                command = f"time CUDA_VISIBLE_DEVICES={i} "\
+                if self.MACHINE == "maltlab":
+                    command = [
+                            # "CUDA_VISIBLE_DEVICES=" + str(i),
+                            "apptainer", "exec", 
+                            f"--bind={mypwd}:/home", "--pwd=/home", 
+                            "--bind=/mnt/hdd/jpf:/mnt/hdd/jpf",
+                            self.tfs_sif,
+                            "tensorflow_model_server", 
+                            f"--port={port:04d}", "--rest_api_port=0",
+                            f"--model_config_file={self.model_conf_file}",
+                            
+                        ]
+                        #   f"tensorflow_model_server --port={port:04d} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
+                        #   f">& {self.output_dir}/v100-{port:04d}.log &\""
+                elif self.MACHINE == "rivanna":
+                    command = f"time CUDA_VISIBLE_DEVICES={i} "\
                           f"{APPTAINER} {self.tfs_sif} "\
                           f"tensorflow_model_server --port={port:04d} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
                           f">& {self.output_dir}/v100-{port:04d}.log &"
-                print(command)
-                r = os.system(command)
-                print(r)
+                # command = " ".join(command)
+                print(" ".join(command))
+                r = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                
+                print('subprocess start above')
     
     def shutdown(self):
         """
@@ -162,6 +197,7 @@ def main():
 
     for arg_key, config_key in arg_to_config_mapping.items():
         arg_value = args[arg_key]
+        banner(f"arg_key: {arg_key}, config_key: {config_key}, arg_value: {arg_value}")
         if arg_value:
             config[config_key] = arg_value
 
