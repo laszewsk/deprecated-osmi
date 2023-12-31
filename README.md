@@ -39,6 +39,7 @@
     - [2.5 Build Tensorflow Serving, Haproxy, and OSMI Images](#25-build-tensorflow-serving-haproxy-and-osmi-images)
     - [2.6 Compile OSMI Models in Batch Jobs](#26-compile-osmi-models-in-batch-jobs)
       - [GREGOR CAME TILL HERE](#gregor-came-till-here)
+    - [Test Run to see if it works](#test-run-to-see-if-it-works)
     - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor)
     - [Graphing Results](#graphing-results)
     - [Compile OSMI Models in Interactive Jobs (avpid using)](#compile-osmi-models-in-interactive-jobs-avpid-using)
@@ -338,6 +339,30 @@ b1>
 
 
 #### GREGOR CAME TILL HERE 
+
+### Test Run to see if it works
+
+
+please cahnge in the config.in.yaml file the experiment: values to 
+
+```yaml
+experiment:
+  directive: "a100"
+  batch: "1,2"  
+  ngpus: "1"
+  concurrency: "1"
+  model: "small_lstm"
+  repeat: "1,2"
+```
+
+Now run 
+
+```
+b1>
+  cd $EXEC_DIR
+  make project-gpu
+  sh jobs-project-gpu.sh
+```
 
 ### Run benchmark with cloudmesh experiment executor
 
