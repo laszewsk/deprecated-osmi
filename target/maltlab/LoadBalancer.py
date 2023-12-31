@@ -33,8 +33,8 @@ import time
 from cloudmesh.common.FlatDict import FlatDict
 from cloudmesh.common.Shell import Shell
 from docopt import docopt
-# from port_generator import unique_base_port
-from cloudmesh.common.network import PortGenerator
+from port_generator import unique_base_port
+# from cloudmesh.common.network import PortGenerator
 
 from haproxy_cfg_generator import generate_haproxy_cfg
 
@@ -56,8 +56,9 @@ class HAProxyLoadBalancer:
             haproxy_sif (str): The path to the HAProxy SIF file.
         """
 
-        p = PortGenerator(config["constant.haproxy_port"])
-        self.port = p.get_port()
+        # p = PortGenerator(config["constant.haproxy_port"])
+        # self.port = p.get_port()
+        self.port = unique_base_port(config)
         self.output_dir = config["data.output"]
         generate_haproxy_cfg(config)
         self.haproxy_config_file = config["data.haproxy_cfg_file"]

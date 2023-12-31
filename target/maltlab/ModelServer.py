@@ -35,11 +35,12 @@ import socket
 import time
 from docopt import docopt
 from pprint import pprint
-# from port_generator import unique_base_port
-from cloudmesh.common.network import PortGenerator
+from port_generator import unique_base_port
+import os
+# from cloudmesh.common.network import PortGenerator
 
-# TODO: DO NOT HARDCODE JPF!!!
-APPTAINER = "apptainer exec --bind `pwd`:/home --pwd /home --bind /mnt/hdd/`whoami`:/mnt/hdd/`whoami`"
+
+# APPTAINER = []
 
 class ModelServer:
 
@@ -52,8 +53,9 @@ class ModelServer:
         - config_filename (str): Optional filename of the configuration file.
 
         """
-        p = PortGenerator(config["constant.tfs_base_port"] - 1)
-        self.tfs_base_port = p.get_port() + 1
+        # p = PortGenerator(config["constant.tfs_base_port"] - 1)
+        # self.tfs_base_port = p.get_port() + 1
+        self.tfs_base_port = unique_base_port(config) + 1
         self.ngpus = config["experiment.ngpus"]
         self.output_dir = config["data.output"]
         self.batch = config["experiment.batch"]
@@ -81,25 +83,31 @@ class ModelServer:
             """
             
             StopWatch.event("ModelServer: start")
+            result = subprocess.run('ls', shell=True, check=True, capture_output=True, text=True)
+            print(result.stdout)
+            print('can it even see it')
+            mypwd = subprocess.run('pwd', shell=True, check=True, capture_output=True, text=True)
+            mypwd = mypwd.stdout.strip()
             for i in range(self.ngpus):
                 port = self.tfs_base_port + i
                 command = [
-                            "CUDA_VISIBLE_DEVICES=" + str(i),
-                            APPTAINER, self.tfs_sif,
-                            "tensorflow_model_server", f"--port={port:04d}", "--rest_api_port=0",
-                            f"--model_config_file={self.model_conf_file}"
+                            # "CUDA_VISIBLE_DEVICES=" + str(i),
+                            "apptainer", "exec", 
+                            f"--bind={mypwd}:/home", "--pwd=/home", 
+                            "--bind=/mnt/hdd/jpf:/mnt/hdd/jpf",
+                            self.tfs_sif,
+                            "tensorflow_model_server", 
+                            f"--port={port:04d}", "--rest_api_port=0",
+                            f"--model_config_file={self.model_conf_file}",
+                            
                         ]
                         #   f"tensorflow_model_server --port={port:04d} --rest_api_port=0 --model_config_file={self.model_conf_file} "\
                         #   f">& {self.output_dir}/v100-{port:04d}.log &\""
-                print(command)
-                # r = Shell.run(command)
-                # print(r)
-                try:
-                    result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-                    print(result.stdout)
-                except subprocess.CalledProcessError as e:
-                    print(f"Command failed with return code {e.returncode}:")
-                    print(e.stderr)
+                
+                # command = " ".join(command)
+                print(" ".join(command))
+                r = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                
                 print('subprocess start above')
     
     def shutdown(self):

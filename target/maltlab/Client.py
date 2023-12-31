@@ -35,8 +35,8 @@ from docopt import docopt
 import os
 from cloudmesh.common.FlatDict import FlatDict
 from multiprocessing import Process
-# from port_generator import unique_base_port
-from cloudmesh.common.network import PortGenerator
+from port_generator import unique_base_port
+# from cloudmesh.common.network import PortGenerator
 
 args = docopt(__doc__)
 
@@ -70,9 +70,9 @@ class OSMI:
         self.nrequests = config["constant.nrequests"]
         self.batch = config["experiment.batch"]
         self.server = config["constant.server"]
-        p = PortGenerator(2500)
-        self.port = p.get_port()
-        # self.port = unique_base_port(config)
+        # p = PortGenerator(2500)
+        # self.port = p.get_port()
+        self.port = unique_base_port(config)
         self.osmi_sif = config["data.osmi_sif"]
         self.algorithm = config["constant.algorithm"]
         self.output_dir = config["data.output"]
@@ -82,9 +82,7 @@ class OSMI:
         log_file = f"{self.output_dir}/log-{id}-{self.model}-{self.nrequests}-{self.batch}-{self.port:04d}.txt"
         cmd = f"time {SINGULARITY} {self.osmi_sif} "\
               f"python {self.algorithm} {self.server}:{self.port:04d} -m {self.model} -b {self.batch} -n {self.nrequests} --identifier {id} &> {log_file}"
-        print(cmd)
         r = os.system(cmd)
-        print(r)
 
 if __name__ == "__main__":
     osmi = OSMI(config)

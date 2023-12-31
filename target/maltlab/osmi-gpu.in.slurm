@@ -84,7 +84,7 @@ python ModelServer.py start_and_wait --config=$CONFIG_FILE
 
 python LoadBalancer.py start_and_wait --config=$CONFIG_FILE
 
-python Client.py --config=$CONFIG_FILE
+python Client.py run --config=$CONFIG_FILE
 
 nvidia-smi
 

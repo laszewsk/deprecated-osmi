@@ -9,6 +9,29 @@ SHELL=/bin/bash
 
 all: requirements data
 
+# J.P.'s great recipes
+
+process_killer:
+	-pkill nvidia-smi
+	-pkill cms
+	-pkill haproxy
+
+cool_runner:
+	sh project-jobs.sh
+
+omega: stop process_killer clean project cool_runner
+	@echo #####################################################################
+	@echo "Cool runner is DONE."
+	@echo #####################################################################
+
+hap:
+	# apptainer exec --bind `pwd`:/home --pwd /home /mnt/hdd/jpf/scratch/osmi/target/maltlab/image-apptainer/haproxy_latest.sif haproxy -d -f haproxy-grpc.cfg > ./outputs/haproxy.log 2>&1 &
+	# apptainer shell
+	apptainer shell /mnt/hdd/jpf/scratch/osmi/target/maltlab/image-apptainer/haproxy_latest.sif
+
+
+# thats it
+
 # #####################################################################
 # REQUIREMENTS
 # #####################################################################
@@ -115,7 +138,7 @@ project_lsf: project.json
 kill: stop
 
 stop:
-	for i in "$$(squeue --user $$USER | awk 'NR>1{print $$1}')"; do scancel $$i ; done
+	-for i in "$$(squeue --user $$USER | awk 'NR>1{print $$1}')"; do scancel $$i ; done
 
 inspect:
 	$(eval D=$(shell ls project/$(ls -1) | head -n 1))
