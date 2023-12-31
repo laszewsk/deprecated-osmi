@@ -53,7 +53,7 @@ def generate_haproxy_cfg(config):
     backend be_grpc
       mode tcp
       balance roundrobin
-  ''').strip
+  ''').strip()
   with open(config["data.haproxy_cfg_file"], 'w+') as f:
     f.write(base)
     for i in range(config["experiment.ngpus"]):

@@ -71,10 +71,10 @@ PROGRESS "running" 3
 
 head /proc/meminfo
 
-module purge
-module load apptainer gcc/11.2.0 openmpi/4.1.4 python/3.11.1
+# module purge
+# module load apptainer gcc/11.2.0 openmpi/4.1.4 python/3.11.1
 
-source $USER_PROJECT/ENV3/bin/activate
+source $BASE/ENV3/bin/activate
 
 for gpu in $(seq 0 {experiment.ngpus}); do
     cms gpu watch --gpu=$gpu --delay=0.5 --dense > $OUTPUT_DIR/gpu-0.log &
@@ -84,7 +84,7 @@ python ModelServer.py start_and_wait --config=$CONFIG_FILE
 
 python LoadBalancer.py start_and_wait --config=$CONFIG_FILE
 
-python Client.py --config=$CONFIG_FILE
+python Client.py run --config=$CONFIG_FILE
 
 nvidia-smi
 

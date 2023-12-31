@@ -83,7 +83,7 @@ constant:
   timeout: 45
 
 project:
-  user: "/scratch/{os.USER}"
+  user: "/mnt/hdd/{os.USER}"
   dir: "{project.user}/osmi"
 
 # this is a bug we should be able to use project.dir, it does not show properly in the slurm script

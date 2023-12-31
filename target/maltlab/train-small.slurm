@@ -13,8 +13,8 @@ if [ -z "$EXEC_DIR" ]; then
 fi
 export CONTAINER_DIR=$EXEC_DIR/image-apptainer/
 
-module purge
-module load apptainer
+# module purge
+# module load apptainer
 # module load tensorflow/2.10.0 gcc openmpi python
 
 nvidia-smi

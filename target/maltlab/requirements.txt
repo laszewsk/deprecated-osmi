@@ -10,7 +10,8 @@ tensorflow-serving-api
 tqdm==4.64.0
 matplotlib
 cloudmesh-ee
-cloudmesh-common
+# cloudmesh-common
+git+https://github.com/cloudmesh/cloudmesh-common.git
 cloudmesh-gpu
 cloudmesh-rivanna
 pyyaml
