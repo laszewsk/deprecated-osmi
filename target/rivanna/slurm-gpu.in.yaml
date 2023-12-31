@@ -89,7 +89,7 @@ project:
 # this is a bug we should be able to use project.dir, it does not show properly in the slurm script
 data:
   output: "./outputs"
-  sif_dir: "{project.dir}/target/rivanna/image-apptainer"
+  sif_dir: "{project.dir}/target/rivanna/images"
   haproxy_sif: "{data.sif_dir}/haproxy_latest.sif"
   tfs_sif: "{data.sif_dir}/serving_latest-gpu.sif"
   osmi_sif: "{data.sif_dir}/osmi.sif"

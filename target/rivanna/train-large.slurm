@@ -15,7 +15,7 @@ if [ -z "$EXEC_DIR" ]; then
     echo "EXEC_DIR is not set"
     exit 1
 fi
-export CONTAINER_DIR=$EXEC_DIR/image-apptainer/
+export CONTAINER_DIR=$EXEC_DIR/images/
 
 module purge
 module load apptainer

@@ -6,7 +6,7 @@ OS_TYPE=macos
 OS_DIR=..
 PROJECT_DIR=../..
 
-.PHONY: image-apptainer image-docker project
+.PHONY: images image-docker project
 
 benchmark:
 	-make project
@@ -85,29 +85,29 @@ get-results:
 # #####################################################################
 
 clean-images:
-	@-rm -rf image-apptainer/*.sif
+	@-rm -rf images/*.sif
 
 images: image
 
 image: image-haproxy image-osmi image-tfs
 
-image-haproxy: # image-apptainer/haproxy_latest.sif
-	-cd image-apptainer; time apptainer pull docker://haproxy
+image-haproxy: # images/haproxy_latest.sif
+	-cd images; time apptainer pull docker://haproxy
 
-image-serving: # image-apptainer/serving_latest-gpu.sif
-	-cd image-apptainer; time apptainer pull docker://tensorflow/serving:latest-gpu
+image-serving: # images/serving_latest-gpu.sif
+	-cd images; time apptainer pull docker://tensorflow/serving:latest-gpu
 
 
-image-osmi: # image-apptainer/osmi.sif
-	-cd image-apptainer; apptainer build osmi.sif osmi.def
-
-# broken?
-image-tfs: # image-apptainer/tfs.sif
-	-cd image-apptainer; time apptainer build tfs.sif tfs.def
+image-osmi: # images/osmi.sif
+	-cd images; apptainer build osmi.sif osmi.def
 
 # broken?
-image-combined: # image-apptainer/combined.sif
-	-cd image-apptainer; apptainer build combined.sif combined.def
+image-tfs: # images/tfs.sif
+	-cd images; time apptainer build tfs.sif tfs.def
+
+# broken?
+image-combined: # images/combined.sif
+	-cd images; apptainer build combined.sif combined.def
 
 
 # #####################################################################
@@ -118,30 +118,30 @@ shell:
 	apptainer ${BIND} shell --nv ${IMAGE}
 
 shell-serving:
-	apptainer ${BIND} shell --nv image-apptainer/serving.sif
+	apptainer ${BIND} shell --nv images/serving.sif
 
 # #####################################################################
 # THESE ARE NOT YET DONE AND JUST PLACEHOLDERS
 # #####################################################################
 
 # run-osmi:
-# 	# cd image-apptainer; make run
+# 	# cd images; make run
 
 
 run-apptainer:
-	cd image-apptainer; make run
+	cd images; make run
 
 shell-apptainer:
-	cd image-apptainer; make shell
+	cd images; make shell
 
 run-localscratch:
-	cd image-apptainer; make run-localscratch
+	cd images; make run-localscratch
 
 shell-localscratch:
-	cd image-apptainer; make shell-localscratch
+	cd images; make shell-localscratch
 
 shell-rivanna:
-	cd image-apptainer; make shell-rivanna
+	cd images; make shell-rivanna
 
 run: run-apptainer
 

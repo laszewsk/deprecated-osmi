@@ -15,7 +15,7 @@ if [ -z "$EXEC_DIR" ]; then
     echo "EXEC_DIR is not set"
     exit 1
 fi
-export CONTAINER_DIR=$EXEC_DIR/image-apptainer/
+export CONTAINER_DIR=$EXEC_DIR/images/
 
 module purge
 module load apptainer
@@ -31,5 +31,5 @@ cd $BASE/osmi/models
 MODEL=small_lstm 
 time apptainer exec --nv $CONTAINER_DIR/osmi.sif python train.py $MODEL
 
-# cd $EXEC_DIR/image-apptainer/
+# cd $EXEC_DIR/images/
 # time apptainer pull docker://tensorflow/serving:latest-gpu 

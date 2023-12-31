@@ -46,8 +46,9 @@
     - [3.1 Logging into MALTLab](#31-logging-into-maltlab)
     - [3.2 Running OSMI Bench on maltlab](#32-running-osmi-bench-on-maltlab)
     - [3.3 Set up a project directory and get the code](#33-set-up-a-project-directory-and-get-the-code)
-    - [3.4 Running the small OSMI model benchmark](#34-running-the-small-osmi-model-benchmark)
+    - [3.4 Setup Python Environment](#34-setup-python-environment)
     - [3.5 Build Tensorflow Serving, Haproxy, and OSMI Images](#35-build-tensorflow-serving-haproxy-and-osmi-images)
+    - [3.4 Running the small OSMI model benchmark](#34-running-the-small-osmi-model-benchmark)
     - [3.6 Compile OSMI Models in Batch Jobs](#36-compile-osmi-models-in-batch-jobs)
     - [Run benchmark with cloudmesh experiment executor](#run-benchmark-with-cloudmesh-experiment-executor-1)
       - [Quick redo](#quick-redo)
@@ -269,9 +270,9 @@ You now have the code in `$PROJECT`
 
 ### 2.4 Set up Python Environment
 
-Note: This is no longer working
+<!-- Note: This is no longer working -->
 
-> OSMI will run in batch mode this is also valid for setting up the
+<!-- > OSMI will run in batch mode this is also valid for setting up the
 > environment for which we created sbatch script.  This has the
 > advantage that it installed via the worker nodes, which is typically
 > faster, but also gurantees that the worker node itself is ued to
@@ -289,18 +290,20 @@ Note: This is no longer working
 
 Note: currently we recommend this way:
 
-An alternate way is to run the following commands directly:
+An alternate way is to run the following commands directly: -->
 
-```
+Now we set up a python envioonment with all necessary software. 
+
+```bash
 b1>
   cd $EXEC_DIR
   module load gcc/11.4.0  openmpi/4.1.4 python/3.11.4
+  source $BASE/OSMI/bin/activate
   which python
   python --version
-  python -m venv $BASE/OSMI # takes about 5.2s
-  source $BASE/OSMI/bin/activate
+  time python -m venv $BASE/OSMI # takes about 5.6s
   pip install pip -U
-  time pip install -r $EXEC_DIR/requirements.txt # takes about 1m21s
+  time pip install -r $EXEC_DIR/requirements.txt # takes about 2m57s
   cms help
 ```
 
@@ -315,7 +318,8 @@ haproxy, and the code to be executed. This is done with
 ```
 b1>
   cd $EXEC_DIR
-  make images
+  module load apptainer
+  time make images      # 3m18s 
 ```
 
 
@@ -534,32 +538,27 @@ maltlab>
 
 You now have the code in `$PROJECT`
 
-### 3.4 Running the small OSMI model benchmark
 
-```bash
-maltlab>
-  cd models
-  time python train.py small_lstm  # ~   4.9s on an 5950X with RTX3090
-  time python train.py medium_cnn  # ~  34.0s on an 5950X with RTX3090
-  time python train.py large_tcnn  # ~ 16m58s on an 5950X with RTX3090
-```
+### 3.4 Setup Python Environment
 
-Now we consider using slurm and batch ee execution
+
+Now we set up a python envioonment with all necessary software. 
 
 
 ```bash
 maltlab>
   cd $EXEC_DIR
-  
-  python3.11 -m venv $BASE/ENV3 # takes about 5.2s
-  source $BASE/ENV3/bin/activate
+  time python3.11 -m venv $BASE/OSMI # takes about 5.2s
+  source $BASE/OSMI/bin/activate
+  which python
+  python --version
   pip install pip -U
   time pip install -r $EXEC_DIR/requirements.txt # takes about 1m21s
   cms help
-  # you may need to pip uninstall cloudmesh-common -y
-  # and then run the time pip install command again
-  # because we use the git committed common not the pypi
 ```
+
+
+
 
 ### 3.5 Build Tensorflow Serving, Haproxy, and OSMI Images
 
@@ -570,7 +569,17 @@ haproxy, and the code to be executed. This is done with
 ```
 maltlab>
   cd $EXEC_DIR
-  make images
+  time make images
+```
+
+### 3.4 Running the small OSMI model benchmark
+
+```bash
+maltlab>
+  cd models
+  time python train.py small_lstm  # ~   4.9s on an 5950X with RTX3090
+  time python train.py medium_cnn  # ~  34.0s on an 5950X with RTX3090
+  time python train.py large_tcnn  # ~ 16m58s on an 5950X with RTX3090
 ```
 
 
