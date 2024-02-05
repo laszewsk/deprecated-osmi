@@ -1,5 +1,7 @@
 # mlcommons-osmi
 
+deprecated: please see <https://github.com/laszewsk/osmi-bench> for a new version
+
 [![GitHub Repo](https://img.shields.io/badge/github-repo-green.svg)](https://github.com/laszewsk/osmi)
 [![GitHub issues](https://img.shields.io/github/issues/laszewsk/osmi.svg)](https://github.com/laszewsk/osmi/issues)
 [![Contributors](https://img.shields.io/github/contributors/laszewsk/osmi.svg)](https://github.com/laszewsk/osmi/graphs/contributors)
